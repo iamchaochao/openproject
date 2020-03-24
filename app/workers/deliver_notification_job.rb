@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,12 +28,12 @@
 #++
 
 class DeliverNotificationJob < ApplicationJob
-  def initialize(recipient_id, sender_id)
+  queue_with_priority :notification
+
+  def perform(recipient_id, sender_id)
     @recipient_id = recipient_id
     @sender_id = sender_id
-  end
 
-  def perform
     # nothing to do if recipient was deleted in the meantime
     return unless recipient
 

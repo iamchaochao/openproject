@@ -1,6 +1,6 @@
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,19 +23,20 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 
 import {WorkPackageResource} from 'core-app/modules/hal/resources/work-package-resource';
 import {WorkPackageViewColumnsService} from './wp-view-columns.service';
 import {RelationResource} from 'core-app/modules/hal/resources/relation-resource';
 import {WorkPackageViewHierarchiesService} from './wp-view-hierarchy.service';
-import {WorkPackageNotificationService} from 'core-components/wp-edit/wp-notification.service';
+import {HalResourceNotificationService} from "core-app/modules/hal/services/hal-resource-notification.service";
 import {IsolatedQuerySpace} from "core-app/modules/work_packages/query-space/isolated-query-space";
 import {Injectable} from '@angular/core';
 import {HalResourceService} from 'core-app/modules/hal/services/hal-resource.service';
 import {WorkPackageCacheService} from "core-components/work-packages/work-package-cache.service";
 import {RelationsStateValue, WorkPackageRelationsService} from "core-components/wp-relations/wp-relations.service";
+import {WorkPackageNotificationService} from "core-app/modules/work_packages/notifications/work-package-notification.service";
 
 @Injectable()
 export class WorkPackageViewAdditionalElementsService {
@@ -43,7 +44,7 @@ export class WorkPackageViewAdditionalElementsService {
   constructor(readonly querySpace:IsolatedQuerySpace,
               readonly wpTableHierarchies:WorkPackageViewHierarchiesService,
               readonly wpTableColumns:WorkPackageViewColumnsService,
-              readonly wpNotificationsService:WorkPackageNotificationService,
+              readonly notificationService:WorkPackageNotificationService,
               readonly halResourceService:HalResourceService,
               readonly wpCacheService:WorkPackageCacheService,
               readonly wpRelations:WorkPackageRelationsService) {
@@ -66,7 +67,7 @@ export class WorkPackageViewAdditionalElementsService {
       })
       .catch((e) => {
         this.querySpace.additionalRequiredWorkPackages.putValue(null, 'Failure loading required work packages');
-        this.wpNotificationsService.handleRawError(e);
+        this.notificationService.handleRawError(e);
       });
   }
 

@@ -1,6 +1,6 @@
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 
 import {OpModalComponent} from "core-components/op-modals/op-modal.component";
@@ -64,6 +64,9 @@ export class AddListModalComponent extends OpModalComponent implements OnInit {
 
   /** The selected attribute */
   public selectedAttribute:HalResource|undefined;
+
+  /** avoid double click */
+  public inFlight = false;
 
   public trackByHref = AngularTrackingHelpers.trackByHref;
 
@@ -122,14 +125,17 @@ export class AddListModalComponent extends OpModalComponent implements OnInit {
   }
 
   create() {
+    this.inFlight = true;
     this.actionService
       .addActionQuery(this.board, this.selectedAttribute!)
       .then(board => this.boardService.save(board))
       .then((board) => {
+        this.inFlight = false;
         this.closeMe();
         this.boardCache.update(board);
         this.state.go('boards.show', { board_id: board.id, isNew: true });
-      });
+      })
+      .catch(() => this.inFlight = false);
   }
 
   onNewActionCreated(newValue:HalResource) {

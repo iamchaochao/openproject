@@ -1,3 +1,24 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
 vi:
   js:
     ajax:
@@ -13,17 +34,17 @@ vi:
       remove: "Xoá %{name}"
       active: "Kích hoạt %{label} %{name}"
     close_popup_title: "Đóng"
-    close_filter_title: "Close filter"
+    close_filter_title: "Đóng bộ lọc"
     close_form_title: "Close form"
     button_add_watcher: "Thêm người theo dõi"
     button_back: "Quay lại"
-    button_back_to_list_view: "Back to list view"
+    button_back_to_list_view: "Quay lại danh sách"
     button_cancel: "Hủy"
     button_close: "Đóng"
     button_change_project: "Change project"
     button_check_all: "Đánh dấu tất cả"
     button_configure-form: "Configure form"
-    button_confirm: "Confirm"
+    button_confirm: "Xác nhận"
     button_continue: "Continue"
     button_copy: "Sao chép"
     button_custom-fields: "Tùy chỉnh mục"
@@ -39,7 +60,7 @@ vi:
     button_log_time: "Thời gian truy cập"
     button_more: "Xem thêm"
     button_open_details: "Mở thông tin chi tiết xem"
-    button_close_details: "Close details view"
+    button_close_details: "Đóng xem chi tiết"
     button_open_fullscreen: "Mở chế độ toàn màn hình"
     button_show_cards: "Show card view"
     button_show_list: "Show list view"
@@ -59,6 +80,7 @@ vi:
         inline: 'Highlight inline:'
         entire_card_by: 'Entire card by'
       remove_from_list: 'Remove card from list'
+    caption_rate_history: "Rate history"
     clipboard:
       browser_error: "Trình duyệt không hỗ trợ copy vào clipboard. Vui lòng copy văn bản đã chọn theo cách thủ công."
       copied_successful: "Sao chép thành công vào clipboard!"
@@ -149,6 +171,9 @@ vi:
       cannot_save_changes_with_message: "Không thể lưu thay đổi của bạn do lỗi sau: %{error}"
       query_saving: "Các tiêu chí không thể được lưu."
       embedded_table_loading: "Không thể nạp được vùng nhìn nhúng: %{message}"
+    enumeration_activities: "Hoạt động (theo dõi thời gian)"
+    enumeration_doc_categories: "Document categories"
+    enumeration_work_package_priorities: "Độ ưu tiên của work package"
     filter:
       description:
         text_open_filter: "Mở bộ lọc này với 'ALT' và phím mũi tên."
@@ -170,16 +195,28 @@ vi:
     general_text_yes: "có"
     general_text_No: "Không"
     general_text_Yes: "Có"
+    global_roles: Global Roles
+    hal:
+      error:
+        update_conflict_refresh: "Nhấn vào đây để làm mới tài nguyên và cập nhật lên phiên bản mới nhất."
+        edit_prohibited: "Chỉnh sửa%{attribute} bị chặn đối với tài nguyên này. Thuộc tính này có nguồn gốc từ các mối quan hệ (ví dụ: trẻ em) hoặc mặt khác không thể định cấu hình."
+        format:
+          date: "%{attribute} không phải là ngày hợp lệ - phải là YYYY-MM-DD."
+        general: "Lỗi đã xảy ra."
     homescreen:
       blocks:
         new_features:
           text_new_features: "Read about new features and product updates."
-          current_new_feature_html: "OpenProject contains a new <b>Boards view</b> for Agile project management. </br> To activate this new feature for your existing projects, please do the following steps: <ul><li>Activate the module Boards within existing projects' settings.</li> <li>Configure your Boards in a project.</li> <li>Verify roles and permissions</li></ul>"
-          image_alt_text: "Board teaser image"
-          learn_about: "Learn more about Agile Boards"
+          learn_about: "Tìm hiểu thêm về các tính năng mới"
+          standard:
+            learn_about_link: https://www.openproject.org/openproject-10-4
+            current_new_feature_html: >
+              Bản phát hành chứa nhiều tính năng và cải tiến mới: <br> <br> <ul> <li> Mặc định <b> mẫu thiết kế </b> để chọn chủ đề sáng hoặc tối (tính năng cao cấp). </li> <li> <b> tiện ích theo dõi thời gian mới </b> cho <i> Trang của tôi </i> để hiển thị thời gian đã sử dụng trong biểu đồ thanh. </li> <li> <b> Xuất khẩu XLS cho báo cáo chi phí </b> và định dạng văn bản trong xuất PDF của các gói công việc. </li> <li> <b> Cải thiện thiết kế và khả năng sử dụng </b>, tức là các tab và hơn thế nữa trong cài đặt và quản trị dự án. </li> </ul>
+          bim:
+            learn_about_link: https://www.openproject.org/openproject-bim-10-4
+            current_new_feature_html: >
+              OpenProject chứa <b> mô-đun IFC mới để tích hợp các mô hình 3D </b> vào ứng dụng quản lý dự án của bạn và để làm việc cộng tác với các tệp này với nhóm của bạn mà không cần cài đặt phần mềm hoặc giấy phép tốn kém riêng biệt. <br> <br> <ul> <li> <b> Nhập tệp IFC </b> của các mô hình tòa nhà vào ứng dụng OpenProject của bạn. </li> <li> <b> Mở mô hình 3D và trực quan hóa mô hình tòa nhà </b > trong trình duyệt của bạn. </li> <li> Dễ dàng <b> hoạt động trên nhiều tệp IFC </b> với nhóm của bạn trực tiếp trong OpenProject mà không cần cài đặt phần mềm tốn kém riêng biệt. </li> </ul>
     label_activate: "Activate"
-    label_activity_no: "Số chỉ mục hoạt động %{activityNo}"
-    label_activity_with_comment_no: "Số chỉ mục hoạt động %{activityNo}. Có một nhận xét của người dùng."
     label_add_column_after: "Thêm cột phía sau"
     label_add_column_before: "Thêm cột phía trước"
     label_add_columns: "Add columns"
@@ -196,6 +233,7 @@ vi:
     label_and: "and"
     label_ascending: "Tăng dần"
     label_author: "Tác giả: %{user}"
+    label_avatar: "Avatar"
     label_between: "between"
     label_board: "Board"
     label_board_locked: "Đã khóa"
@@ -203,12 +241,14 @@ vi:
     label_board_sticky: "Chú ý"
     label_create: "Tạo mới"
     label_create_work_package: "Create new work package"
-    label_created_by: "Created by"
+    label_created_by: "Được tạo bởi"
     label_date: "Ngày"
     label_date_with_format: "Nhập vào %{date_attribute} bằng cách sử dụng định dạng sau: %{format}"
     label_deactivate: "Tắt"
     label_descending: "Giảm dần"
     label_description: "Mô tả"
+    label_details: "Chi tiết"
+    label_display: "Hiển thị"
     label_cancel_comment: "Hủy bình luận"
     label_closed_work_packages: "đã đóng"
     label_collapse: "Thu gọn"
@@ -229,22 +269,29 @@ vi:
     label_export: "Xuất"
     label_filename: "Tệp"
     label_filesize: "Kích cỡ"
+    label_general: "Tổng quan"
     label_greater_or_equal: ">="
     label_group: 'Nhóm'
     label_group_by: "Nhóm theo"
+    label_group_plural: "Các Nhóm"
     label_hide_attributes: "Hiện ít hơn"
     label_hide_column: "Ẩn cột"
     label_hide_project_menu: "Thu gọn menu dự án"
     label_in: "trong"
     label_in_less_than: "ít hơn"
     label_in_more_than: "nhiều hơn"
+    label_incoming_emails: "Các thư đến"
+    label_information_plural: "Thông tin"
     label_import: "Import"
     label_latest_activity: "Hoạt động mới nhất"
     label_last_updated_on: "Cập nhật lần cuối lúc"
     label_less_or_equal: "<="
     label_less_than_ago: "less than days ago"
     label_loading: "Loading..."
+    label_mail_notification: "Thông báo qua email"
     label_me: "me"
+    label_meeting_agenda: "Agenda"
+    label_meeting_minutes: "Minutes"
     label_menu_collapse: "thu lại"
     label_menu_expand: "mở rộng"
     label_more_than_ago: "nhiều hơn mấy ngày trước"
@@ -253,6 +300,7 @@ vi:
     label_no_data: "Không có dữ liệu để hiển thị"
     label_no_due_date: "không có ngày kết thúc"
     label_no_start_date: "không có ngày bắt đầu"
+    label_no_value: "No value"
     label_none: "không"
     label_not_contains: "không chứa"
     label_not_equals: "không là"
@@ -264,12 +312,16 @@ vi:
     label_previous: "Trước đó"
     label_per_page: "Mỗi trang:"
     label_please_wait: "Vui lòng chờ"
+    label_project_plural: "Các dự án"
     label_visibility_settings: "Cài đặt hiển thị"
     label_quote_comment: "Trích bình luận này"
+    label_recent: "Gần đây"
     label_reset: "Reset"
     label_remove_column: "Xóa cột"
     label_remove_columns: "Loại bỏ cột được chọn"
     label_remove_row: "Xóa hàng"
+    label_report: "Báo cáo"
+    label_repository_plural: "Repositories"
     label_save_as: "Lưu thành"
     label_select_watcher: "Chọn một người theo dõi..."
     label_selected_filter_list: "Các bộ lọc đã chọn: %s"
@@ -280,6 +332,7 @@ vi:
     label_sort_higher: "Move up"
     label_sort_lower: "Dịch xuống"
     label_sorting: "Sắp xếp"
+    label_spent_time: "Thời gian"
     label_star_query: "Ưa thích"
     label_press_enter_to_save: "Nhấn enter để lưu."
     label_public_query: "Công cộng"
@@ -288,7 +341,9 @@ vi:
     label_subject: "Chủ đề"
     label_this_week: "tuần này"
     label_today: "hôm nay"
+    label_time_entry_plural: "Thời gian"
     label_up: "Lên"
+    label_user_plural: "Người dùng"
     label_activity_show_only_comments: "Hiển thị các hoạt động với các bình luận"
     label_activity_show_all: "Hiển thị các hoạt động"
     label_total_progress: "%{percent}% Tổng tiến độ"
@@ -300,7 +355,7 @@ vi:
     label_work_package_plural: "Work Packages"
     label_watch: "Theo dõi"
     label_watch_work_package: "Xem gói công việc"
-    label_watcher_added_successfully: "Watcher successfully added!"
+    label_watcher_added_successfully: "Đã thêm nhận xét thành công."
     label_watcher_deleted_successfully: "Watcher successfully deleted!"
     label_work_package_details_you_are_here: "You're on the %{tab} tab for %{type} %{subject}."
     label_unwatch: "Ngừng theo dõi"
@@ -315,7 +370,7 @@ vi:
     label_drop_files: Thả các tập tin ở đây
     label_drop_files_hint: hoặc nhấn vào đây để thêm tập tin
     label_drop_folders_hint: You cannot upload folders as an attachment. Please select single files.
-    label_add_attachments: "Add attachments"
+    label_add_attachments: "Tệp đính kèm"
     label_formattable_attachment_hint: "Đính kèm và liên kết tập tin bằng cách thả vào đây, hoặc copy và dán."
     label_remove_file: "Xóa %{fileName}"
     label_remove_watcher: "Loại bỏ người theo dõi %{name}"
@@ -330,14 +385,15 @@ vi:
     label_wait: "Xin vui lòng chờ cho cấu hình..."
     label_upload_counter: "%{done} %{count} tập tin hoàn thành"
     label_validation_error: "Không thể lưu các công việc do các lỗi sau đây:"
+    label_version_plural: "Các phiên bản"
     label_view_has_changed: "This view has unsaved changes. Click to save them."
     help_texts:
       show_modal: 'Hiển thị văn bản trợ giúp'
     onboarding:
       buttons:
-        skip: 'Skip'
+        skip: 'Bỏ qua'
         next: 'Tiếp'
-        got_it: 'Got it'
+        got_it: 'Đã hiểu'
       steps:
         help_menu: 'In the <b>Help</b> menu you will find a user guide and additional help resources. <br> Enjoy your work with OpenProject!'
         members: 'Invite new <b>Members</b> to join your project.'
@@ -373,7 +429,7 @@ vi:
         previous: "Trở lại trang trước"
     placeholders:
       default: '-'
-      subject: 'Enter subject here'
+      subject: 'Nhập tiêu đề ở đây'
       selection: 'Vui lòng chọn'
       relation_description: 'Click to add description for this relation'
     project:
@@ -396,23 +452,22 @@ vi:
         upgrade_to_ee_text: "Wow! If you need this feature you are a super pro! Would you mind supporting us OpenSource developers by becoming an Enterprise Edition client?"
         more_information: "More information"
         nevermind: "Nevermind"
-        filter_types:
-          parent: "being child of"
-          precedes: "preceding"
-          follows: "following"
-          relates: "relating to"
-          duplicates: "duplicating"
-          duplicated: "bị trùng bởi"
-          blocks: "blocking"
-          blocked: "bị chặn bởi"
-          partof: "being part of"
-          includes: "including"
-          requires: "requiring"
-          required: "required by"
+      edit:
+        form_configuration: "Cấu hình biểu mẫu"
+        projects: "Các dự án"
+        settings: "Settings"
     time_entry:
+      project: 'Dự án'
+      work_package: 'Work Package'
+      work_package_required: 'Yều cầu chọn một gói công việc đầu tiên.'
       activity: 'Hoạt động'
       comment: 'Nhận xét'
+      duration: 'Duration'
+      spent_on: 'Ngày'
       hours: 'Giờ'
+      label: 'Thời gian nhập'
+    two_factor_authentication:
+      label_two_factor_authentication: 'Two-factor authentication'
     watchers:
       label_loading: lấy danh sách người theo dõi...
       label_error_loading: Lỗi khi tải về danh sách người theo dõi
@@ -472,11 +527,13 @@ vi:
     field_value_enter_prompt: "Enter a value for '%{field}'"
     select2:
       input_too_short:
+        zero: "Vui lòng nhập thêm ký tự"
         other: "Vui lòng nhập {{count}} thêm nhân vật"
       load_more: "Loading more results ..."
       no_matches: "Không tìm thấy"
       searching: "Đang tìm ..."
       selection_too_big:
+        zero: "Bạn không thể chọn bất cứ mục nào tại đây"
         other: "Bạn có thể chỉ chọn {{limit}} mục"
     project_menu_details: "Chi tiết"
     sort:
@@ -583,12 +640,6 @@ vi:
       description_enter_text: "Nhập văn bản"
       description_options_hide: "Hide options"
       description_options_show: "Show options"
-      error:
-        update_conflict_refresh: "Click here to refresh the work package and update to the newest version."
-        edit_prohibited: "Việc chỉnh sửa %{attribute} bị chặn cho work package này. Hoặc thuộc tính này bắt nguồn từ quan hệ (ví dụ, trẻ em) hoặc nếu không không thể cấu hình."
-        format:
-          date: "%{attribute} không phải là ngày hợp lệ - phải là YYYY-MM-DD."
-        general: "Lỗi đã xảy ra."
       edit_attribute: "%{attribute} - chỉnh sửa"
       key_value: "%{key}: %{value}"
       label_enable_multi_select: "Enable multiselect"
@@ -603,7 +654,6 @@ vi:
       message_view_spent_time: "Show spent time for this work package"
       message_work_package_read_only: "Work package is locked in this status. No attribute other than status can be altered."
       message_work_package_status_blocked: "Work package status is not writable due to closed status and closed version being assigned."
-      no_value: "No value"
       placeholder_filter_by_text: "Chủ đề, mô tả, bình luận, ..."
       inline_create:
         title: 'Click vào đây để thêm một work package mới vào danh sách này'
@@ -628,8 +678,7 @@ vi:
       no_results:
         title: Không có gói công việc để hiển thị.
         description: Không có gì được tạo ra hoặc tất cả các gói công việc đã được lọc.
-      limited_results: >
-        There are %{total} total work packages, but only %{count} can be shown in manual sorting mode. Please reduce the results by filtering.
+      limited_results: Only %{count} work packages can be shown in manual sorting mode. Please reduce the results by filtering.
       property_groups:
         details: "Chi tiết"
         people: "Người"
@@ -671,7 +720,7 @@ vi:
         label_content: "Click here to skip over the menu and go to the content"
       placeholders:
         default: "-"
-        description: "Click to enter description..."
+        formattable: "%{name}: Bấm vào để chỉnh sửa..."
       query:
         column_names: "Cột"
         group_by: "Nhóm kết quả bởi"
@@ -736,8 +785,7 @@ vi:
           relation_columns: 'Need to see relations in the work package list?'
           check_out_link: 'Check out the Enterprise Edition.'
         relation_filters:
-          first_part: "Show all work packages"
-          second_part: "the current work package"
+          filter_work_packages_by_relation_type: 'Lọc các gói công việc theo loại quan hệ'
       tabs:
         overview: Tổng quan
         activity: Hoạt động
@@ -821,6 +869,7 @@ vi:
       child_work_packages:
         other: "%{count} tác phẩm gói phần mềm trẻ em"
       hour:
+        zero: "0 h"
         other: "%{count} h"
     zen_mode:
       button_activate: 'Activate zen mode'

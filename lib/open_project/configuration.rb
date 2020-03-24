@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -133,6 +133,8 @@ module OpenProject
       # Allow in-context translations to be loaded with CSP
       'crowdin_in_context_translations' => true,
 
+      'avatar_link_expiry_seconds' => 24.hours.to_i,
+
       # Default gravatar image, set to something other than 404
       # to ensure a default is returned
       'gravatar_fallback_image' => '404',
@@ -150,12 +152,22 @@ module OpenProject
       # Show pending migrations as warning bar
       'show_pending_migrations_warning' => true,
 
+      # Show mismatched protocol/hostname warning
+      # in settings where they must differ this can be disabled
+      'show_setting_mismatch_warning' => true,
+
       # Render warning bars (pending migrations, deprecation, unsupported browsers)
       # Set to false to globally disable this for all users!
       'show_warning_bars' => true,
 
       # Render storage information
-      'show_storage_information' => true
+      'show_storage_information' => true,
+
+      # Log errors to sentry instance
+      'sentry_dsn' => nil,
+      # Allow error reporting for frontend errors
+      'sentry_report_js' => false,
+      'sentry_host' => 'https://sentry.openproject.com'
     }
 
     @config = nil
@@ -400,15 +412,21 @@ module OpenProject
       # using YAML.
       #
       # @param key [String] The key of the input within the source hash.
-      # @param value [String] The string from which to extract the actual value.
+      # @param original_value [String] The string from which to extract the actual value.
       # @return A ruby object (e.g. Integer, Float, String, Hash, Boolean, etc.)
       # @raise [ArgumentError] If the string could not be parsed.
-      def extract_value(key, value)
+      def extract_value(key, original_value)
         # YAML parses '' as false, but empty ENV variables will be passed as that.
         # To specify specific values, one can use !!str (-> '') or !!null (-> nil)
-        return value if value == ''
+        return original_value if original_value == ''
 
-        YAML.load(value)
+        parsed = YAML.load(original_value)
+
+        if parsed.is_a?(String)
+          original_value
+        else
+          parsed
+        end
       rescue StandardError => e
         raise ArgumentError, "Configuration value for '#{key}' is invalid: #{e.message}"
       end

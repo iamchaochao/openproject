@@ -1,6 +1,6 @@
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 
 import {AfterViewInit, Directive, ElementRef, Inject, Injector} from '@angular/core';
@@ -96,15 +96,16 @@ export class WorkPackageTableSumsRowController implements AfterViewInit {
   }
 
   private render(columns:QueryColumn[], resource:WorkPackageCollectionResource, schema:SchemaResource) {
-    this.elementRef.nativeElement.classList.add('sum', 'group', 'all', 'issue', 'work_package');
-
     // build
     columns.forEach((column, i:number) => {
       const td = document.createElement('td');
+      td.classList.add('wp-table--sum-container');
       const div = this.renderContent(resource.totalSums!, column.id, schema[column.id]);
 
       if (i === 0) {
         this.appendFirstLabel(div);
+        // colspan 2 for the d&d column
+        td.setAttribute('colspan', '2');
       }
 
       td.appendChild(div);

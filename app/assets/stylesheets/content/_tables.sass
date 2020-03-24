@@ -1,6 +1,6 @@
 //-- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -104,18 +104,6 @@ table
       background: none
 
 tr
-  &.issue
-    white-space: nowrap
-    &.sum
-      font-weight: bold
-      background-color: #f6f7f8
-    td
-      &.category
-        white-space: normal
-      &.subject
-        text-align: left
-      @include dot_border_width_style
-
   div.expander
     cursor: pointer
     float: left
@@ -180,7 +168,7 @@ tr.-checked
   .custom-option-value
     display: inline-block
     width: calc(100% - 5rem)
-  .icon-toggle:before
+  .icon-drag-handle:before
     vertical-align: middle
 
 // Exceptions for summary reports where multiple tables are used in one view.

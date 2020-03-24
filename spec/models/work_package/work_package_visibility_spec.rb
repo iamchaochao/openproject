@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -32,9 +32,9 @@ describe 'WorkPackage-Visibility', type: :model do
   using_shared_fixtures :admin
   let(:anonymous) { FactoryBot.create(:anonymous) }
   let(:user) { FactoryBot.create(:user) }
-  let(:public_project) { FactoryBot.create(:project, is_public: true) }
-  let(:private_project) { FactoryBot.create(:project, is_public: false) }
-  let(:other_project) { FactoryBot.create(:project, is_public: true) }
+  let(:public_project) { FactoryBot.create(:project, public: true) }
+  let(:private_project) { FactoryBot.create(:project, public: false) }
+  let(:other_project) { FactoryBot.create(:project, public: true) }
   let(:view_work_packages) { FactoryBot.create(:role, permissions: [:view_work_packages]) }
   let(:view_work_packages_role2) { FactoryBot.create(:role, permissions: [:view_work_packages]) }
 

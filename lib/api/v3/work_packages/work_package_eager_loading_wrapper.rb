@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -31,18 +31,9 @@
 module API
   module V3
     module WorkPackages
-      class WorkPackageEagerLoadingWrapper < SimpleDelegator
-        private_class_method :new
-
+      class WorkPackageEagerLoadingWrapper < API::V3::Utilities::EagerLoading::EagerLoadingWrapper
         def wrapped?
           true
-        end
-
-        ##
-        # Workaround against warnings in flatten
-        # delegator does not forward private method #to_ary
-        def to_ary
-          __getobj__.send(:to_ary)
         end
 
         class << self

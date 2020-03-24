@@ -51,6 +51,10 @@ export class WidgetNewsComponent extends AbstractWidgetComponent implements OnIn
       });
   }
 
+  public get isEditable() {
+    return false;
+  }
+
   public newsPath(news:NewsResource) {
     return this.pathHelper.newsPath(news.id!);
   }
@@ -94,7 +98,7 @@ export class WidgetNewsComponent extends AbstractWidgetComponent implements OnIn
   }
 
   private get newsDmParams() {
-    let params:DmListParameter = { sortBy: [['created_on', 'desc']],
+    let params:DmListParameter = { sortBy: [['created_at', 'desc']],
                                    pageSize: 3 };
 
     if (this.currentProject.id) {

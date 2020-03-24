@@ -1,6 +1,6 @@
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,17 +23,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 
 import {Injectable} from "@angular/core";
 import {HttpClient} from '@angular/common/http';
-import {WorkPackageNotificationService} from "core-app/components/wp-edit/wp-notification.service";
+import {HalResourceNotificationService} from "core-app/modules/hal/services/hal-resource-notification.service";
 
 @Injectable()
 export class CostBudgetSubformAugmentService {
 
-  constructor(private wpNotifications:WorkPackageNotificationService,
+  constructor(private halNotification:HalResourceNotificationService,
               private http:HttpClient) {
   }
 
@@ -80,14 +80,25 @@ export class CostBudgetSubformAugmentService {
     let request = this.buildRefreshRequest(row, row_identifier);
 
     this.http
-      .post(el.attr('update-url')!, request, { headers: { 'Accept': 'application/json' } })
+      .post(
+        el.attr('update-url')!,
+        request,
+        {
+          headers: { 'Accept': 'application/json' },
+          withCredentials: true
+        })
       .subscribe(
         (data:any) => {
           _.each(data, (val:string, selector:string) => {
-            jQuery('#' + selector).html(val);
+            let element = document.getElementById(selector) as HTMLElement|HTMLInputElement|undefined;
+            if (element instanceof HTMLInputElement) {
+              element.value = val;
+            } else if (element) {
+              element.textContent = val;
+            }
           });
         },
-        (error:any) => this.wpNotifications.handleRawError(error)
+        (error:any) => this.halNotification.handleRawError(error)
       );
   }
 
@@ -97,7 +108,7 @@ export class CostBudgetSubformAugmentService {
   private buildRefreshRequest(row:JQuery, row_identifier:string) {
     let request:any = {
       element_id: row_identifier,
-      fixed_date: row.find('#cost_object_fixed_date').val()
+      fixed_date: jQuery('#cost_object_fixed_date').val()
     };
 
     // Augment common values with specific values for this type

@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -32,17 +32,16 @@ class AuthSource < ApplicationRecord
 
   has_many :users
 
-  validates_presence_of :name
-  validates_uniqueness_of :name
-  validates_length_of :name, maximum: 60
+  validates :name,
+            uniqueness: { case_sensitive: false },
+            length: { maximum: 60 }
 
   def self.unique_attribute
     :name
   end
   prepend ::Mixins::UniqueFinder
 
-  def authenticate(_login, _password)
-  end
+  def authenticate(_login, _password); end
 
   def find_user(_login)
     raise "subclass repsonsiblity"

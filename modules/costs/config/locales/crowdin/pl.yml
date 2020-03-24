@@ -1,8 +1,30 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
+#---
 pl:
   activerecord:
     attributes:
       cost_entry:
-        work_package: "Zestaw zadań"
+        work_package: "Zadanie"
         overridden_costs: "Koszty zastąpione"
         spent: "Wydatki"
         spent_on: "Data"
@@ -18,7 +40,7 @@ pl:
         status: "Status"
         subject: "Temat"
         type: "Jednostki"
-        updated_on: "Zaktualizowano"
+        updated_on: "Aktualizacja"
       cost_type:
         unit: "Nazwa jednostki"
         unit_plural: "Liczba mnoga jednostki"
@@ -53,7 +75,7 @@ pl:
           nullify_is_not_valid_for_cost_entries: "Pozycje kosztów nie mogą być przypisane do projektu."
   attributes:
     budget: "Planowane koszty"
-    comment: "Typ kosztu"
+    comment: "Komentarz"
     cost_object: "Budżet"
     cost_type: "Jednostki"
     costs: "Koszty"
@@ -70,7 +92,7 @@ pl:
   button_log_costs: "Rejestruj koszty jednostkowe"
   button_log_time: "Rejestruj czas pracy"
   caption_booked_on_project: "Zarezerwowano na projekt"
-  caption_default: "Domyślny"
+  caption_default: "Domyślnie"
   caption_default_rate_history_for: "Domyślna stawka historii dla %{user}"
   caption_labor: "Praca"
   caption_labor_costs: "Rzeczywiste koszty pracy"
@@ -84,9 +106,6 @@ pl:
   caption_set_rate: "Ustaw domyślną stawkę"
   caption_show_locked: "Pokaż zamknięte typy kosztów"
   cost_objects_title: "Budżetowanie"
-  label_cost_type_plural: "Rodzaje kosztów"
-  currency_delimiter: ","
-  currency_separator: "."
   description_date_for_new_rate: "Data nowej stawki"
   events:
     cost_object: "Budżet edytowany"
@@ -104,18 +123,19 @@ pl:
   label_cost_plural: "Koszty"
   label_cost_report: "Raport kosztów"
   label_cost_type_specific: "Budżet #%{id}: %{name}"
+  label_cost_type_plural: "Rodzaje kosztów"
   label_costs_per_page: "Kosztów na stronę"
   label_currency: "Waluta"
   label_currency_format: "Format waluty"
   label_current_default_rate: "Aktualne stawki domyślne"
-  label_date_on: "na"
+  label_date_on: "wł"
   label_deleted_cost_types: "Usunięte typy kosztów"
   label_locked_cost_types: "Zablokowane typy kosztów"
   label_deliverable: "Budżet"
   label_display_cost_entries: "Pokaż koszty jednostkowe"
   label_display_time_entries: "Wyświetl zgłoszone godziny"
   label_display_types: "Wyświetl typy"
-  label_edit: "Edytuj"
+  label_edit: "Edycja"
   label_fixed_cost_object: "Poprawiony budżet"
   label_fixed_date: "Przypisana data"
   label_generic_user: "Ogólne informacje"
@@ -172,4 +192,4 @@ pl:
   text_warning_hidden_elements: "Niektóre wpisy mogą zostać wyłączone ze zbioru."
   week: "tydzień"
   js:
-    text_are_you_sure: "Jesteś pewny?"
+    text_are_you_sure: "Jesteś pewien?"

@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -58,11 +58,30 @@ describe Projects::UpdateService, 'integration', type: :model do
       end
 
       it 'touches the project after saving' do
-        former_updated_at = Project.pluck(:updated_on).first
+        former_updated_at = Project.pluck(:updated_at).first
 
         service_result
 
-        later_updated_at = Project.pluck(:updated_on).first
+        later_updated_at = Project.pluck(:updated_at).first
+
+        expect(former_updated_at)
+          .not_to eql later_updated_at
+      end
+    end
+
+    context 'if a new custom field gets a value assigned' do
+      let(:custom_field2) { FactoryBot.create(:text_project_custom_field) }
+
+      let(:attributes) do
+        { "custom_field_#{custom_field2.id}" => 'some text' }
+      end
+
+      it 'touches the project after saving' do
+        former_updated_at = Project.pluck(:updated_at).first
+
+        service_result
+
+        later_updated_at = Project.pluck(:updated_at).first
 
         expect(former_updated_at)
           .not_to eql later_updated_at

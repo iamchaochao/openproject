@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -109,6 +109,20 @@ module Pages
       expect_card(list_name, work_package.subject)
     end
 
+    def expect_not_referencable(list_name, work_package)
+      within_list(list_name) do
+        page.find('.board-list--card-dropdown-button').click
+      end
+
+      page.find('.menu-item', text: 'Add existing').click
+
+      target_dropdown = search_autocomplete(page.find('.wp-inline-create--reference-autocompleter'),
+                                            query: work_package.subject,
+                                            results_selector: '.board--container')
+
+      expect(target_dropdown).to have_no_selector('.ui-menu-item', text: work_package.subject)
+    end
+
     ##
     # Expect the given titled card in the list name to be present (expect=true) or not (expect=false)
     def expect_card(list_name, card_title, present: true)
@@ -123,7 +137,7 @@ module Pages
     def expect_cards_in_order(list_name, *card_titles)
       within_list(list_name) do
         found = all('.wp-card .wp-card--subject')
-                .map(&:text)
+          .map(&:text)
         expected = card_titles.map { |title| title.is_a?(WorkPackage) ? title.subject : title.to_s }
 
         expect(found)

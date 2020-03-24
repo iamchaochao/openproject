@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,7 +30,7 @@ require 'spec_helper'
 
 RSpec.feature 'Work package navigation', js: true, selenium: true do
   let(:user) { FactoryBot.create(:admin) }
-  let(:project) { FactoryBot.create(:project, name: 'Some project') }
+  let(:project) { FactoryBot.create(:project, name: 'Some project', enabled_module_names: [:work_package_tracking]) }
   let(:work_package) { FactoryBot.build(:work_package, project: project) }
   let(:global_html_title) { ::Components::HtmlTitle.new }
   let(:project_html_title) { ::Components::HtmlTitle.new project }
@@ -129,7 +129,7 @@ RSpec.feature 'Work package navigation', js: true, selenium: true do
     project_html_title.expect_first_segment wp_title_segment
 
     # Back to split screen using the button
-    find('.work-packages-back-button').click
+    full_work_package.go_back
     global_work_packages.expect_work_package_listed(work_package)
     expect(current_path).to eq project_work_packages_path(project) + "/details/#{work_package.id}/relations"
 
@@ -208,6 +208,56 @@ RSpec.feature 'Work package navigation', js: true, selenium: true do
       wp_display.expect_state 'Cards'
     else
       wp_display.expect_state 'Table'
+    end
+  end
+
+  describe 'moving back to filtered list after change' do
+    let!(:work_package) { FactoryBot.create(:work_package, project: project, subject: 'foo') }
+    let!(:query) do
+      query = FactoryBot.build(:query, user: user, project: project)
+      query.column_names = %w(id subject)
+      query.name = "My fancy query"
+      query.add_filter('subject', '~', ['foo'])
+
+      query.save!
+      query
+    end
+
+    it 'will filter out the work package' do
+      wp_table = Pages::WorkPackagesTable.new project
+      wp_table.visit!
+
+      wp_table.expect_work_package_listed work_package
+      full_view = wp_table.open_full_screen_by_link work_package
+
+      full_view.ensure_page_loaded
+      subject = full_view.edit_field :subject
+      subject.update 'bar'
+
+      full_view.expect_and_dismiss_notification message: 'Successful update.'
+
+      # Go back to list
+      full_view.go_back
+
+      wp_table.ensure_work_package_not_listed! work_package
+    end
+  end
+
+  context 'work package with an attachment' do
+    let!(:attachment) { FactoryBot.build(:attachment, filename: 'attachment-first.pdf') }
+    let!(:wp_with_attachment) do
+      FactoryBot.create :work_package, subject: 'WP attachment A', project: project, attachments: [attachment]
+    end
+
+    it 'will show it when navigating from table to single view' do
+      wp_table = Pages::WorkPackagesTable.new project
+      wp_table.visit!
+
+      wp_table.expect_work_package_listed wp_with_attachment
+      full_view = wp_table.open_full_screen_by_link wp_with_attachment
+
+      full_view.ensure_page_loaded
+      expect(page).to have_selector('.work-package--attachments--filename', text: 'attachment-first.pdf', wait: 10)
     end
   end
 end

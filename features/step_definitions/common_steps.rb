@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -48,7 +48,7 @@ Given /^the [pP]roject(?: "([^\"]+?)")? uses the following types:$/ do |project,
     type
   }
 
-  project.update_attributes type_ids: types.map(&:id).map(&:to_s)
+  project.update type_ids: types.map(&:id).map(&:to_s)
 end
 
 Then(/^I should see the following fields:$/) do |table|

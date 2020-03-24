@@ -1,6 +1,6 @@
 //-- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -44,7 +44,9 @@
         possibleValues        = $('#custom_field_possible_values_attributes'),
         defaultValueFields    = $('#custom_field_default_value_attributes'),
         spanDefaultText       = $('#default_value_text'),
-        spanDefaultBool       = $('#default_value_bool');
+        spanDefaultLongText   = $('#default_value_long_text'),
+        spanDefaultBool       = $('#default_value_bool'),
+        textOrientationField  = $('#custom_field_text_orientation');
 
     var deactivate = function(element) {
       element.hide().find('input, textarea').not('.destroy_flag,.-cf-ignore-disabled').attr('disabled', true);
@@ -65,10 +67,10 @@
           unsearchable = function() { searchable.attr('checked', false).hide(); };
 
       // defaults (reset these fields before doing anything else)
-      $.each([spanDefaultBool, spanDefaultText, multiSelect], function(idx, element) {
+      $.each([spanDefaultBool, spanDefaultLongText, spanDefaultText, multiSelect, textOrientationField], function(idx, element) {
         deactivate(element);
       });
-      show(defaultValueFields);
+      activate(defaultValueFields);
       activate(spanDefaultText);
 
       switch (format.val()) {
@@ -107,6 +109,13 @@
           hide(lengthField, regexpField, defaultValueFields);
           unsearchable();
           break;
+        case 'text':
+          activate(spanDefaultLongText);
+          deactivate(spanDefaultText);
+          show(lengthField, regexpField, searchable, textOrientationField);
+          deactivate(possibleValues);
+          activate(textOrientationField);
+          break;
         default:
           show(lengthField, regexpField, searchable);
           deactivate(possibleValues);
@@ -116,6 +125,7 @@
 
     // assign the switch format function to the select field
     format.on('change', toggleFormat).trigger('change');
+    toggleFormat();
   });
 
   $(function() {

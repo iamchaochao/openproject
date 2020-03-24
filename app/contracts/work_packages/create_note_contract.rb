@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -33,22 +33,20 @@ module WorkPackages
       WorkPackage
     end
 
-    attr_accessor :policy
-
     attribute :journal_notes do
       errors.add(:journal_notes, :error_unauthorized) unless can?(:comment)
-    end
-
-    def initialize(work_package, user)
-      super(work_package, user)
-
-      self.policy = WorkPackagePolicy.new(user)
     end
 
     private
 
     def can?(permission)
       policy.allowed?(model, permission)
+    end
+
+    attr_writer :policy
+
+    def policy
+      @policy ||= WorkPackagePolicy.new(user)
     end
   end
 end

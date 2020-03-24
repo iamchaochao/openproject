@@ -1,6 +1,6 @@
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 
 import {
@@ -34,7 +34,6 @@ import {
   Injector,
   Input,
   NgZone,
-  OnDestroy,
   OnInit,
   ViewEncapsulation
 } from '@angular/core';
@@ -43,7 +42,6 @@ import {QueryResource} from 'core-app/modules/hal/resources/query-resource';
 import {I18nService} from 'core-app/modules/common/i18n/i18n.service';
 import {TableHandlerRegistry} from 'core-components/wp-fast-table/handlers/table-handler-registry';
 import {IsolatedQuerySpace} from "core-app/modules/work_packages/query-space/isolated-query-space";
-import {untilComponentDestroyed} from 'ng2-rx-componentdestroyed';
 import {combineLatest} from 'rxjs';
 import {States} from '../states.service';
 import {
@@ -61,6 +59,7 @@ import {WpTableHoverSync} from "core-components/wp-table/wp-table-hover-sync";
 import {WorkPackageTimelineTableController} from "core-components/wp-table/timeline/container/wp-timeline-container.directive";
 import {WorkPackageTable} from "core-components/wp-fast-table/wp-fast-table";
 import {WorkPackageViewTimelineService} from "core-app/modules/work_packages/routing/wp-view-base/view-services/wp-view-timeline.service";
+import {UntilDestroyedMixin} from "core-app/helpers/angular/until-destroyed.mixin";
 
 @Component({
   templateUrl: './wp-table.directive.html',
@@ -69,7 +68,7 @@ import {WorkPackageViewTimelineService} from "core-app/modules/work_packages/rou
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'wp-table',
 })
-export class WorkPackagesTableController implements OnInit, OnDestroy {
+export class WorkPackagesTableController extends UntilDestroyedMixin implements OnInit {
 
   @Input() projectIdentifier:string;
   @Input('configuration') configurationObject:WorkPackageTableConfigurationObject;
@@ -100,7 +99,7 @@ export class WorkPackagesTableController implements OnInit, OnDestroy {
 
   public results:WorkPackageCollectionResource;
 
-  public groupBy:QueryGroupByResource | null;
+  public groupBy:QueryGroupByResource|null;
 
   public columns:QueryColumn[];
 
@@ -123,6 +122,7 @@ export class WorkPackagesTableController implements OnInit, OnDestroy {
               readonly wpTableTimeline:WorkPackageViewTimelineService,
               readonly wpTableColumns:WorkPackageViewColumnsService,
               readonly wpTableSortBy:WorkPackageViewSortByService) {
+    super();
   }
 
   ngOnInit():void {
@@ -160,7 +160,7 @@ export class WorkPackagesTableController implements OnInit, OnDestroy {
     ]);
 
     statesCombined.pipe(
-      untilComponentDestroyed(this)
+      this.untilDestroyed()
     ).subscribe(([results, groupBy, columns, timelines, sort]) => {
       this.query = this.querySpace.query.value!;
       this.results = results;
@@ -186,6 +186,7 @@ export class WorkPackagesTableController implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy():void {
+    super.ngOnDestroy();
     this.wpTableHoverSync.deactivate();
   }
 

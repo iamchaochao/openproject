@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -33,11 +33,11 @@ class WorkPackage < ApplicationRecord
   include WorkPackage::SchedulingRules
   include WorkPackage::StatusTransitions
   include WorkPackage::AskBeforeDestruction
-  include WorkPackage::TimeEntries
+  include WorkPackage::TimeEntriesCleaner
   include WorkPackage::Ancestors
   prepend WorkPackage::Parent
   include WorkPackage::TypedDagDefaults
-  include WorkPackage::CustomActions
+  include WorkPackage::CustomActioned
   include WorkPackage::Hooks
 
   include OpenProject::Journal::AttachmentHelper
@@ -62,7 +62,7 @@ class WorkPackage < ApplicationRecord
     order("#{Changeset.table_name}.committed_on ASC, #{Changeset.table_name}.id ASC")
   }
 
-  scope :recently_updated, ->() {
+  scope :recently_updated, -> {
     order(updated_at: :desc)
   }
 
@@ -84,12 +84,12 @@ class WorkPackage < ApplicationRecord
     end
   }
 
-  scope :with_status_open, ->() {
+  scope :with_status_open, -> {
     includes(:status)
       .where(statuses: { is_closed: false })
   }
 
-  scope :with_status_closed, ->() {
+  scope :with_status_closed, -> {
     includes(:status)
       .where(statuses: { is_closed: true })
   }
@@ -100,7 +100,7 @@ class WorkPackage < ApplicationRecord
 
   scope :on_active_project, -> {
     includes(:status, :project, :type)
-      .where(projects: { status: Project::STATUS_ACTIVE })
+      .where(projects: { active: true })
   }
 
   scope :without_version, -> {
@@ -158,7 +158,8 @@ class WorkPackage < ApplicationRecord
                      order: "#{Attachment.table_name}.file",
                      add_on_new_permission: :add_work_packages,
                      add_on_persisted_permission: :edit_work_packages,
-                     modification_blocked: ->(*) { readonly_status? }
+                     modification_blocked: ->(*) { readonly_status? },
+                     extract_tsv: true
 
   after_validation :set_attachments_error_details,
                    if: lambda { |work_package| work_package.errors.messages.has_key? :attachments }
@@ -264,7 +265,7 @@ class WorkPackage < ApplicationRecord
   def assignable_versions
     @assignable_versions ||= begin
       current_version = fixed_version_id_changed? ? Version.find_by(id: fixed_version_id_was) : fixed_version
-      ((project&.assignable_versions || []) + [current_version]).compact.uniq.sort
+      ((project&.assignable_versions || []) + [current_version]).compact.uniq
     end
   end
 
@@ -283,10 +284,6 @@ class WorkPackage < ApplicationRecord
     status.present? && status.is_readonly?
   end
 
-  def closed_version_and_status?
-    fixed_version&.closed? && status.is_closed?
-  end
-
   # Returns true if the work_package is overdue
   def overdue?
     !due_date.nil? && (due_date < Date.today) && !closed?
@@ -296,23 +293,6 @@ class WorkPackage < ApplicationRecord
     type&.is_milestone?
   end
   alias_method :is_milestone?, :milestone?
-
-  # Returns an array of status that user is able to apply
-  def new_statuses_allowed_to(user, include_default = false)
-    return Status.where('1=0') if status.nil?
-
-    current_status = Status.where(id: status_id)
-
-    return current_status if closed_version_and_status?
-
-    statuses = new_statuses_allowed_by_workflow_to(user)
-               .or(current_status)
-
-    statuses = statuses.or(Status.where_default) if include_default
-    statuses = statuses.where(is_closed: false) if blocked?
-
-    statuses.order_by_position
-  end
 
   # Returns users that should be notified
   def recipients
@@ -349,11 +329,6 @@ class WorkPackage < ApplicationRecord
   def estimated_hours=(h)
     converted_hours = (h.is_a?(String) ? h.to_hours : h)
     write_attribute :estimated_hours, !!converted_hours ? converted_hours : h
-  end
-
-  # Overrides Redmine::Acts::Customizable::InstanceMethods#available_custom_fields
-  def available_custom_fields
-    WorkPackage::AvailableCustomFields.for(project, type)
   end
 
   # aliasing subject to name
@@ -626,6 +601,11 @@ class WorkPackage < ApplicationRecord
     where("id IN (SELECT common_id FROM (#{sub_query}) following_relations)")
   end
 
+  # Overrides Redmine::Acts::Customizable::ClassMethods#available_custom_fields
+  def self.available_custom_fields(work_package)
+    WorkPackage::AvailableCustomFields.for(work_package.project, work_package.type)
+  end
+
   protected
 
   def <=>(other)
@@ -641,15 +621,6 @@ class WorkPackage < ApplicationRecord
                               spent_on: Date.today)
 
     time_entries.build(attributes)
-  end
-
-  def new_statuses_allowed_by_workflow_to(user)
-    status.new_statuses_allowed_to(
-      user.roles_for_project(project),
-      type,
-      author == user,
-      assigned_to_id_changed? ? assigned_to_id_was == user.id : assigned_to_id == user.id
-    )
   end
 
   ##

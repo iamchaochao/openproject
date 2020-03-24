@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,8 +29,10 @@
 module Redmine
   module Acts
     module Attachable
-      def self.included(base)
-        base.extend ClassMethods
+      extend ActiveSupport::Concern
+
+      included do
+        extend ClassMethods
       end
 
       def self.attachables
@@ -51,6 +53,8 @@ module Redmine
           attr_accessor :attachments_replacements,
                         :attachments_claimed
           send :include, Redmine::Acts::Attachable::InstanceMethods
+
+          OpenProject::Deprecation.deprecate_method self, :attach_files
         end
 
         private
@@ -62,7 +66,8 @@ module Redmine
             add_on_new_permission: add_on_new_permission(options),
             add_on_persisted_permission: add_on_persisted_permission(options),
             only_user_allowed: only_user_allowed(options),
-            modification_blocked: options[:modification_blocked]
+            modification_blocked: options[:modification_blocked],
+            extract_tsv: attachable_extract_tsv_option(options)
           }
 
           options.except!(:view_permission,
@@ -71,7 +76,8 @@ module Redmine
                           :add_on_persisted_permission,
                           :add_permission,
                           :only_user_allowed,
-                          :modification_blocked)
+                          :modification_blocked,
+                          :extract_tsv)
         end
 
         def view_permission(options)
@@ -101,6 +107,10 @@ module Redmine
         def edit_permission_default
           "edit_#{name.pluralize.underscore}".to_sym
         end
+
+        def attachable_extract_tsv_option(options)
+          options.fetch(:extract_tsv, false)
+        end
       end
 
       module InstanceMethods
@@ -118,6 +128,10 @@ module Redmine
           def attachments_addable?(user = User.current)
             user.allowed_to_globally?(attachable_options[:add_on_new_permission]) ||
               user.allowed_to_globally?(attachable_options[:add_on_persisted_permission])
+          end
+
+          def attachment_tsv_extracted?
+            attachable_options[:extract_tsv]
           end
         end
 
@@ -148,6 +162,13 @@ module Redmine
           end
 
           # Bulk attaches a set of files to an object
+          # @deprecated
+          # Either use the already existing Attachments::CreateService or
+          # write/extend Services for the attached to object.
+          # The service should rely on the attachments_replacements variable.
+          # See:
+          # * app/services/attachments/set_replacements.rb
+          # * app/services/attachments/replace_attachments.rb
           def attach_files(attachments)
             return unless attachments&.is_a?(Hash)
 
@@ -199,7 +220,8 @@ module Redmine
 
           def memoize_attachment_for_claiming(attachment_hash)
             self.attachments_claimed ||= []
-            self.attachments_claimed << Attachment.find(attachment_hash['id'])
+            attachment = Attachment.find(attachment_hash['id'])
+            self.attachments_claimed << attachment unless id && attachment.container_id == id
           end
 
           def validate_attachments_claimable

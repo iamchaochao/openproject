@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -116,6 +116,19 @@ describe Principal, type: :model do
       user.save!
 
       expect(Principal.active_or_registered_like(user.lastname[0, -1]).to_a).to include(user)
+    end
+  end
+
+  describe '.not_builtin' do
+    let!(:anonymous_user) { FactoryBot.create(:anonymous) }
+    let!(:system_user) { FactoryBot.create(:system) }
+    let!(:deleted_user) { FactoryBot.create(:deleted_user) }
+    let!(:group) { FactoryBot.create(:group) }
+    let!(:user) { FactoryBot.create(:user) }
+
+    it 'returns only actual users and groups' do
+      expect(described_class.not_builtin)
+        .to match_array [user, group]
     end
   end
 end

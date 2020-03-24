@@ -1,11 +1,18 @@
 #-- copyright
-# OpenProject Costs Plugin
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
-# Copyright (C) 2009 - 2014 the OpenProject Foundation (OPF)
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License version 3.
+#
+# OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+# Copyright (C) 2006-2017 Jean-Philippe Lang
+# Copyright (C) 2010-2013 the ChiliProject Team
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
-# version 3.
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,6 +22,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
+# See docs/COPYRIGHT.rdoc for more details.
 #++
 
 class CostObjectsController < ApplicationController
@@ -117,22 +126,19 @@ class CostObjectsController < ApplicationController
     @cost_object.project_id = @project.id
 
     # fixed_date must be set before material_budget_items and labor_budget_items
-    if params[:cost_object] && params[:cost_object][:fixed_date]
-      @cost_object.fixed_date = params[:cost_object].delete(:fixed_date)
-    else
-      @cost_object.fixed_date = Date.today
-    end
+    @cost_object.fixed_date = if params[:cost_object] && params[:cost_object][:fixed_date]
+                                params[:cost_object].delete(:fixed_date)
+                              else
+                                Date.today
+                              end
 
     @cost_object.attributes = permitted_params.cost_object
     @cost_object.attach_files(permitted_params.attachments.to_h)
 
     if @cost_object.save
-      render_attachment_warning_if_needed(@cost_object)
-
       flash[:notice] = t(:notice_successful_create)
       redirect_to(params[:continue] ? { action: 'new' } :
                       { action: 'show', id: @cost_object })
-      return
     else
       render action: 'new', layout: !request.xhr?
     end
@@ -163,8 +169,6 @@ class CostObjectsController < ApplicationController
     @cost_object.attach_files(permitted_params.attachments.to_h)
 
     if @cost_object.save
-      render_attachment_warning_if_needed(@cost_object)
-
       flash[:notice] = t(:notice_successful_update)
       redirect_to(params[:back_to] || { action: 'show', id: @cost_object })
     else
@@ -187,7 +191,7 @@ class CostObjectsController < ApplicationController
     cost_type = CostType.where(id: params[:cost_type_id]).first
 
     if cost_type && params[:units].present?
-      volume = BigDecimal(Rate.clean_currency(params[:units])) rescue 0.0
+      volume = Rate.parse_number_string_to_number(params[:units])
       @costs = (volume * cost_type.rate_at(params[:fixed_date]).rate rescue 0.0)
       @unit = volume == 1.0 ? cost_type.unit : cost_type.unit_plural
     else
@@ -195,9 +199,13 @@ class CostObjectsController < ApplicationController
       @unit = cost_type.try(:unit_plural) || ''
     end
 
-    response = { "#{@element_id}_unit_name" => h(@unit) }
+    response = {
+      "#{@element_id}_unit_name" => h(@unit),
+      "#{@element_id}_currency" => Setting.plugin_openproject_costs['costs_currency']
+    }
     if current_user.allowed_to?(:view_cost_rates, @project)
       response["#{@element_id}_costs"] = number_to_currency(@costs)
+      response["#{@element_id}_cost_value"] = @costs
     end
 
     respond_to do |format|
@@ -218,9 +226,13 @@ class CostObjectsController < ApplicationController
       @costs = 0.0
     end
 
-    response = { "#{@element_id}_unit_name" => h(@unit) }
+    response = {
+      "#{@element_id}_unit_name" => h(@unit),
+      "#{@element_id}_currency" => Setting.plugin_openproject_costs['costs_currency']
+    }
     if current_user.allowed_to?(:view_hourly_rates, @project)
       response["#{@element_id}_costs"] = number_to_currency(@costs)
+      response["#{@element_id}_cost_value"] = @costs
     end
 
     respond_to do |format|

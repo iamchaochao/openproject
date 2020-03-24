@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -41,6 +41,47 @@ describe AdminController, type: :controller do
 
       expect(response).to be_successful
       expect(response).to render_template 'index'
+    end
+
+    describe "with a plugin adding a menu item" do
+      render_views
+
+      let(:visible) { true }
+      let(:plugin_name) { nil }
+
+      before do
+        show = visible
+        name = plugin_name
+
+        Redmine::Plugin.register name.to_sym do
+          menu :admin_menu,
+               :"#{name}_settings",
+               { controller: '/settings', action: :plugin, id: :"openproject_#{name}" },
+               caption: name.capitalize,
+               icon: 'icon2 icon-arrow',
+               if: ->(*) { show }
+        end
+
+        get :index
+      end
+
+      context "with the menu item visible" do
+        let(:plugin_name) { "Apple" }
+        let(:visible) { true }
+
+        it "should show the plugin in the overview" do
+          expect(response.body).to have_selector('a.menu-block', text: plugin_name.capitalize)
+        end
+      end
+
+      context "with the menu item hidden" do
+        let(:plugin_name) { "Orange" }
+        let(:visible) { false }
+
+        it "should not show the plugin in the overview" do
+          expect(response.body).not_to have_selector('a.menu-block', text: plugin_name.capitalize)
+        end
+      end
     end
   end
 

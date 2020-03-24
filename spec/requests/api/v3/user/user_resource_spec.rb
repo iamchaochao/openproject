@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -48,7 +48,7 @@ describe 'API v3 User resource',
   end
 
   describe '#index' do
-    let(:get_path) { api_v3_paths.users }
+    let(:get_path) { api_v3_paths.path_for(:users, sort_by: [%i[id asc]]) }
 
     before do
       user
@@ -94,12 +94,12 @@ describe 'API v3 User resource',
 
       context 'on filtering for name' do
         let(:get_path) do
-          filter = [{ 'name' => {
+          filter = [{'name' => {
             'operator' => '~',
             'values' => [user.name]
-          } }]
+          }}]
 
-          "#{api_v3_paths.users}?#{{ filters: filter.to_json }.to_query}"
+          "#{api_v3_paths.users}?#{{filters: filter.to_json}.to_query}"
         end
 
         it 'contains the filtered user in the response' do
@@ -123,7 +123,7 @@ describe 'API v3 User resource',
         let(:get_path) do
           sort = [['name', 'desc']]
 
-          "#{api_v3_paths.users}?#{{ sortBy: sort.to_json }.to_query}"
+          "#{api_v3_paths.users}?#{{sortBy: sort.to_json}.to_query}"
         end
 
         it 'contains the first user as the first element' do
@@ -141,12 +141,12 @@ describe 'API v3 User resource',
 
       context 'on an invalid filter' do
         let(:get_path) do
-          filter = [{ 'name' => {
+          filter = [{'name' => {
             'operator' => 'a',
             'values' => [user.name]
-          } }]
+          }}]
 
-          "#{api_v3_paths.users}?#{{ filters: filter.to_json }.to_query}"
+          "#{api_v3_paths.users}?#{{filters: filter.to_json}.to_query}"
         end
 
         it 'returns an error' do
@@ -228,6 +228,7 @@ describe 'API v3 User resource',
       allow(Setting).to receive(:users_deletable_by_self?).and_return(self_delete)
 
       delete path
+      user.reload
     end
 
     shared_examples 'deletion allowed' do
@@ -235,8 +236,12 @@ describe 'API v3 User resource',
         expect(subject.status).to eq 202
       end
 
-      it 'should delete the account' do
-        expect(User.exists?(user.id)).not_to be_truthy
+      it 'should lock the account and mark for deletion' do
+        expect(DeleteUserJob)
+          .to have_been_enqueued
+          .with(user)
+
+        expect(user).to be_locked
       end
 
       context 'with a non-existent user' do

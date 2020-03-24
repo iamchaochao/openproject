@@ -1,6 +1,6 @@
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,21 +23,22 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 
 import {WorkPackageResource} from 'core-app/modules/hal/resources/work-package-resource';
 import {ErrorResource} from 'core-app/modules/hal/resources/error-resource';
-import {WorkPackageNotificationService} from '../../wp-edit/wp-notification.service';
 import {WorkPackageCacheService} from '../work-package-cache.service';
 import {WorkPackagesActivityService} from 'core-components/wp-single-view-tabs/activity-panel/wp-activity.service';
 import {LoadingIndicatorService} from "core-app/modules/common/loading-indicator/loading-indicator.service";
 import {CommentService} from "core-components/wp-activity/comment-service";
 import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ContentChild,
   ElementRef,
-  Inject, Injector,
+  Injector,
   Input,
   OnDestroy,
   OnInit,
@@ -47,20 +48,20 @@ import {
 import {ConfigurationService} from "core-app/modules/common/config/configuration.service";
 
 import {NotificationsService} from "core-app/modules/common/notifications/notifications.service";
-import {untilComponentDestroyed} from "ng2-rx-componentdestroyed";
 import {I18nService} from "core-app/modules/common/i18n/i18n.service";
-import {WorkPackageChangeset} from "core-components/wp-edit-form/work-package-changeset";
 import {WorkPackageCommentFieldHandler} from "core-components/work-packages/work-package-comment/work-package-comment-field-handler";
+import {WorkPackageNotificationService} from "core-app/modules/work_packages/notifications/work-package-notification.service";
 
 @Component({
   selector: 'work-package-comment',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './work-package-comment.component.html'
 })
 export class WorkPackageCommentComponent extends WorkPackageCommentFieldHandler implements OnInit, OnDestroy {
   @Input() public workPackage:WorkPackageResource;
 
-  @ContentChild(TemplateRef, { static: false }) template:TemplateRef<any>;
-  @ViewChild('commentContainer', { static: false }) public commentContainer:ElementRef;
+  @ContentChild(TemplateRef) template:TemplateRef<any>;
+  @ViewChild('commentContainer') public commentContainer:ElementRef;
 
   public text = {
     editTitle: this.I18n.t('js.label_add_comment_title'),
@@ -73,7 +74,6 @@ export class WorkPackageCommentComponent extends WorkPackageCommentFieldHandler 
   public inFlight = false;
   public canAddComment:boolean;
   public showAbove:boolean;
-  public changeset:WorkPackageChangeset;
 
   constructor(protected elementRef:ElementRef,
               protected injector:Injector,
@@ -82,8 +82,9 @@ export class WorkPackageCommentComponent extends WorkPackageCommentFieldHandler 
               protected ConfigurationService:ConfigurationService,
               protected loadingIndicator:LoadingIndicatorService,
               protected wpCacheService:WorkPackageCacheService,
-              protected wpNotificationsService:WorkPackageNotificationService,
+              protected workPackageNotificationService:WorkPackageNotificationService,
               protected NotificationsService:NotificationsService,
+              protected cdRef:ChangeDetectorRef,
               protected I18n:I18nService) {
     super(elementRef, injector);
   }
@@ -96,7 +97,7 @@ export class WorkPackageCommentComponent extends WorkPackageCommentFieldHandler 
 
     this.commentService.quoteEvents
       .pipe(
-        untilComponentDestroyed(this)
+        this.untilDestroyed()
       )
       .subscribe((quote:string) => {
         this.activate(quote);
@@ -116,11 +117,6 @@ export class WorkPackageCommentComponent extends WorkPackageCommentFieldHandler 
     return false;
   }
 
-
-  public ngOnDestroy() {
-    // Nothing to do.
-  }
-
   public get htmlId() {
     return 'wp-comment-field';
   }
@@ -131,11 +127,14 @@ export class WorkPackageCommentComponent extends WorkPackageCommentFieldHandler 
     if (!this.showAbove) {
       this.scrollToBottom();
     }
+
+    this.cdRef.detectChanges();
   }
 
   public deactivate(focus:boolean) {
     focus && this.focus();
-    this.inEdit = false;
+    this.active = false;
+    this.cdRef.detectChanges();
   }
 
   public async handleUserSubmit() {
@@ -148,20 +147,19 @@ export class WorkPackageCommentComponent extends WorkPackageCommentFieldHandler 
     let indicator = this.loadingIndicator.wpDetails;
     return indicator.promise = this.commentService.createComment(this.workPackage, this.commentValue)
       .then(() => {
-        this.inEdit = false;
+        this.active = false;
         this.NotificationsService.addSuccess(this.I18n.t('js.work_packages.comment_added'));
 
         this.wpLinkedActivities.require(this.workPackage, true);
         this.wpCacheService.updateWorkPackage(this.workPackage);
         this.inFlight = false;
-        this.focus();
+        this.deactivate(true);
       })
       .catch((error:any) => {
         this.inFlight = false;
         if (error instanceof ErrorResource) {
-          this.wpNotificationsService.showError(error, this.workPackage);
-        }
-        else {
+          this.workPackageNotificationService.showError(error, this.workPackage);
+        } else {
           this.NotificationsService.addError(this.I18n.t('js.work_packages.comment_send_failed'));
         }
       });
@@ -170,7 +168,13 @@ export class WorkPackageCommentComponent extends WorkPackageCommentFieldHandler 
   scrollToBottom():void {
     const scrollableContainer = jQuery(this.elementRef.nativeElement).scrollParent()[0];
     if (scrollableContainer) {
-      setTimeout(() => { scrollableContainer.scrollTop = scrollableContainer.scrollHeight; }, 400);
+      setTimeout(() => {
+        scrollableContainer.scrollTop = scrollableContainer.scrollHeight;
+      }, 400);
     }
+  }
+
+  setErrors(newErrors:string[]):void {
+    // interface
   }
 }

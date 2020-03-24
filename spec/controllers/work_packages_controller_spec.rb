@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -37,8 +37,8 @@ describe WorkPackagesController, type: :controller do
     allow(UserMailer).to receive(:new).and_return(double('mailer').as_null_object)
   end
 
-  let(:project) { FactoryBot.create(:project, identifier: 'test_project', is_public: false) }
-  let(:stub_project) { FactoryBot.build_stubbed(:project, identifier: 'test_project', is_public: false) }
+  let(:project) { FactoryBot.create(:project, identifier: 'test_project', public: false) }
+  let(:stub_project) { FactoryBot.build_stubbed(:project, identifier: 'test_project', public: false) }
   let(:stub_work_package) { double('work_package', id: 1337, project: stub_project).as_null_object }
 
   let(:current_user) { FactoryBot.create(:user) }

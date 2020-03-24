@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -33,6 +33,7 @@ describe 'Query menu item', js: true do
   let(:project) { FactoryBot.create :project }
   let(:wp_table) { ::Pages::WorkPackagesTable.new(project) }
   let(:filters) { ::Components::WorkPackages::Filters.new }
+  let(:query_title) { ::Components::WorkPackages::QueryTitle.new }
 
   before do
     login_as(user)
@@ -73,6 +74,20 @@ describe 'Query menu item', js: true do
 
       last_query = Query.last
       expect(last_query.is_public).to be_truthy
+    end
+
+    it 'only saves a single query when saving through the title input (Regression #31095)' do
+      filters.open
+      filters.remove_filter('status')
+
+      filters.expect_filter_count 0
+      query_title.expect_changed
+
+      query_title.input_field.click
+      query_title.rename 'My special query!123'
+
+      query_title.expect_title 'My special query!123'
+      expect(page).to have_selector('.ui-menu-item', text: 'My special query!123', wait: 20, count: 1)
     end
 
     it 'allows filtering, saving, retrieving and altering the saved filter (Regression #25372)' do

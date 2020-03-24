@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,6 @@
 # See docs/COPYRIGHT.rdoc for more details.
 #++
 
-require 'diff'
 require 'htmldiff'
 
 # The WikiController follows the Rails REST controller pattern but with
@@ -115,7 +114,6 @@ class WikiController < ApplicationController
     @page.attach_files(permitted_params.attachments.to_h)
 
     if @page.save
-      render_attachment_warning_if_needed(@page)
       call_hook(:controller_wiki_edit_after_save, params: params, page: @page)
       flash[:notice] = l(:notice_successful_create)
       redirect_to_show
@@ -192,7 +190,6 @@ class WikiController < ApplicationController
     @content.add_journal User.current, params['content']['comments']
 
     if @page.save_with_content
-      render_attachment_warning_if_needed(@page)
       call_hook(:controller_wiki_edit_after_save, params: params, page: @page)
       flash[:notice] = l(:notice_successful_update)
       redirect_to_show
@@ -224,7 +221,7 @@ class WikiController < ApplicationController
           existing_identifier: item.name)
 
         redirect_to_show
-      elsif @page.update_attributes(attributes)
+      elsif @page.update(attributes)
         flash[:notice] = t(:notice_successful_update)
         redirect_to_show
       end
@@ -249,11 +246,13 @@ class WikiController < ApplicationController
 
   def edit_parent_page
     return render_403 unless editable?
+
     @parent_pages = @wiki.pages.includes(:parent) - @page.self_and_descendants
   end
 
   def update_parent_page
     return render_403 unless editable?
+
     @page.parent_id = params[:wiki_page][:parent_id]
     if @page.save
       flash[:notice] = l(:notice_successful_update)

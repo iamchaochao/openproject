@@ -1,7 +1,8 @@
 #-- encoding: UTF-8
+
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,9 +29,17 @@
 #++
 
 OpenProject::Notifications.subscribe('journal_created') do |payload|
-  JournalNotificationMailer.distinguish_journals(payload[:journal], payload[:send_notification])
+  Notifications::JournalNotificationService.call(payload[:journal], payload[:send_notification])
+end
+
+OpenProject::Notifications.subscribe(OpenProject::Events::AGGREGATED_WORK_PACKAGE_JOURNAL_READY) do |payload|
+  Notifications::JournalWpMailService.call(payload[:journal], payload[:send_mail])
 end
 
 OpenProject::Notifications.subscribe('watcher_added') do |payload|
-  WatcherNotificationMailer.handle_watcher(payload[:watcher], payload[:watcher_setter])
+  WatcherAddedNotificationMailer.handle_watcher(payload[:watcher], payload[:watcher_setter])
+end
+
+OpenProject::Notifications.subscribe('watcher_removed') do |payload|
+  WatcherRemovedNotificationMailer.handle_watcher(payload[:watcher], payload[:watcher_remover])
 end

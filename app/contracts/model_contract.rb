@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -96,11 +96,13 @@ class ModelContract < Reform::Contract
   end
 
   attr_reader :user
+  attr_accessor :options
 
-  def initialize(model, user)
+  def initialize(model, user, options: {})
     super(model)
 
     @user = user
+    @options = options
   end
 
   # we want to add a validation error whenever someone sets a property that we don't know.
@@ -178,7 +180,7 @@ class ModelContract < Reform::Contract
     invalid_changes = attributes_changed_by_user - writable_attributes
 
     invalid_changes.each do |attribute|
-      outside_attribute = collect_ancestor_attributes(:attribute_aliases)[attribute] || attribute
+      outside_attribute = collect_ancestor_attribute_aliases[attribute] || attribute
 
       errors.add outside_attribute, :error_readonly
     end
@@ -187,8 +189,8 @@ class ModelContract < Reform::Contract
   def attributes_changed_by_user
     changed = model.changed
 
-    if model.respond_to?(:changed_by_system)
-      changed -= model.changed_by_system
+    if options[:changed_by_system]
+      changed -= options[:changed_by_system]
     end
 
     changed
@@ -200,6 +202,10 @@ class ModelContract < Reform::Contract
 
   def attribute_validations
     collect_ancestor_attributes(:attribute_validations)
+  end
+
+  def collect_ancestor_attribute_aliases
+    @ancestor_attribute_aliases ||= collect_ancestor_attributes(:attribute_aliases)
   end
 
   # Traverse ancestor hierarchy to collect contract information.
@@ -216,7 +222,13 @@ class ModelContract < Reform::Contract
 
   def collect_ancestor_attributes_by(attribute_to_collect, combination_method, cleanup_method)
     klass = self.class
-    attributes = klass.send(attribute_to_collect)
+    # `dup` is very important here.
+    # As the array/hash queried for here is memoized in the class (e.g. writable_conditions) and that
+    # object is later on combined (e.g. with #concat which alters the called on object) with a
+    # similar object from the superclass, every call would alter the memoized object as an unwanted side effect.
+    # Not only would that lead to the subclass now having all the attributes of the superclass,
+    # but those attributes would also be duplicated so that performance suffers significantly.
+    attributes = klass.send(attribute_to_collect).dup
 
     while klass.superclass != ModelContract
       # Collect all the attribute_to_collect from ancestors
@@ -230,6 +242,12 @@ class ModelContract < Reform::Contract
 
   def collect_writable_attributes
     writable = collect_ancestor_attributes(:writable_attributes)
+
+    writable.each do |attribute|
+      if collect_ancestor_attribute_aliases[attribute]
+        writable << collect_ancestor_attribute_aliases[attribute].to_s
+      end
+    end
 
     if model.respond_to?(:available_custom_fields)
       writable += model.available_custom_fields.map { |cf| "custom_field_#{cf.id}" }

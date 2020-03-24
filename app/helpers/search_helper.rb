@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -60,6 +60,7 @@ module SearchHelper
 
   def has_tokens?(text, tokens)
     return false unless text && tokens && !tokens.empty?
+
     re_tokens = tokens.map { |t| Regexp.escape(t) }
     regexp = Regexp.new "(#{re_tokens.join('|')})", Regexp::IGNORECASE
     !!regexp.match(text)
@@ -74,7 +75,7 @@ module SearchHelper
   def notes_anchor(event)
     version = event.version.to_i
 
-    (version > 1) ? "note-#{version - 1}" : ''
+    version > 1 ? "note-#{version - 1}" : ''
   end
 
   def with_notes_anchor(event, tokens)

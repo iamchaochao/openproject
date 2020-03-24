@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,16 +30,16 @@ require 'spec_helper'
 
 describe WorkPackage, type: :model do
   describe ActionMailer::Base do
-    let(:user_1) {
+    let(:user_1) do
       FactoryBot.build(:user,
-                        mail: 'dlopper@somenet.foo',
-                        member_in_project: project)
-    }
-    let(:user_2) {
+                       mail: 'dlopper@somenet.foo',
+                       member_in_project: project)
+    end
+    let(:user_2) do
       FactoryBot.build(:user,
-                        mail: 'jsmith@somenet.foo',
-                        member_in_project: project)
-    }
+                       mail: 'jsmith@somenet.foo',
+                       member_in_project: project)
+    end
     let(:project) { FactoryBot.create(:project) }
     let(:work_package) { FactoryBot.build(:work_package, project: project) }
 
@@ -47,12 +47,17 @@ describe WorkPackage, type: :model do
       allow(work_package).to receive(:recipients).and_return([user_1])
       allow(work_package).to receive(:watcher_recipients).and_return([user_2])
 
-      work_package.save
+      JournalManager.with_send_notifications true do
+        work_package.save
+      end
     end
 
     subject { ActionMailer::Base.deliveries.size }
 
-    it { is_expected.to eq(2) }
+    it do
+      perform_enqueued_jobs
+      expect(subject).to eq 2
+    end
 
     context 'stale object' do
       before do
@@ -74,9 +79,9 @@ describe WorkPackage, type: :model do
       before do
         ActionMailer::Base.deliveries.clear # clear mails sent due to prior WP creation
 
-        JournalManager.send_notification = false
-
-        work_package.save!
+        JournalManager.with_send_notifications false do
+          work_package.save!
+        end
       end
 
       it { is_expected.to eq(0) }

@@ -1,6 +1,6 @@
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,12 +23,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Output} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output} from '@angular/core';
 import {I18nService} from 'core-app/modules/common/i18n/i18n.service';
-import {WorkPackageEditFieldGroupComponent} from "core-components/wp-edit/wp-edit-field/wp-edit-field-group.directive";
+import {EditFormComponent} from "core-app/modules/fields/edit/edit-form/edit-form.component";
 
 @Component({
   templateUrl: './wp-edit-actions-bar.html',
@@ -46,8 +46,8 @@ export class WorkPackageEditActionsBarComponent {
   };
 
   constructor(private I18n:I18nService,
-              private cdRef:ChangeDetectorRef,
-              private wpEditFieldGroup:WorkPackageEditFieldGroupComponent) {
+              private editForm:EditFormComponent,
+              private cdRef:ChangeDetectorRef) {
   }
 
   public set saving(active:boolean) {
@@ -65,8 +65,8 @@ export class WorkPackageEditActionsBarComponent {
     }
 
     this.saving = true;
-    this.wpEditFieldGroup
-      .saveWorkPackage()
+    this.editForm
+      .save()
       .then(() => {
         this.saving = false;
         this.onSave.emit();
@@ -77,7 +77,7 @@ export class WorkPackageEditActionsBarComponent {
   }
 
   public cancel():void {
-    this.wpEditFieldGroup.stop();
+    this.editForm.stop();
     this.onCancel.emit();
   }
 }

@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -52,10 +52,12 @@ describe 'Projects#destroy',
   it 'can destroy the project' do
     # Confirm the deletion
     danger_zone.confirm_with(project.identifier)
-    expect(danger_zone.disabled?).to be false
+    expect(danger_zone).not_to be_disabled
     danger_zone.danger_button.click
 
     expect(page).to have_selector '.flash.notice', text: I18n.t('projects.delete.scheduled')
+
+    perform_enqueued_jobs
 
     expect { project.reload }.to raise_error(ActiveRecord::RecordNotFound)
   end

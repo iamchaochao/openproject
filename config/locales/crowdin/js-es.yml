@@ -1,3 +1,24 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
 es:
   js:
     ajax:
@@ -20,7 +41,7 @@ es:
     button_back_to_list_view: "Volver a la lista"
     button_cancel: "Cancelar"
     button_close: "Cerrar"
-    button_change_project: "Change project"
+    button_change_project: "Cambiar proyecto"
     button_check_all: "Seleccionar Todos"
     button_configure-form: "Configurar formulario"
     button_confirm: "Confirmar"
@@ -41,8 +62,8 @@ es:
     button_open_details: "Abrir vista detallada"
     button_close_details: "Cerrar vista detallada"
     button_open_fullscreen: "Ver pantalla completa"
-    button_show_cards: "Show card view"
-    button_show_list: "Show list view"
+    button_show_cards: "Mostrar vista de tarjeta"
+    button_show_list: "Mostrar vista de lista"
     button_quote: "Comentario"
     button_save: "Guardar"
     button_settings: "Configuración"
@@ -52,33 +73,34 @@ es:
     button_export-atom: "Descargar Atom"
     calendar:
       title: 'Calendario'
-      too_many: 'There are %{count} work packages in total, but only %{max} can be shown.'
+      too_many: 'Hay %{count} paquetes de trabajo en total, pero solo pueden mostrarse %{max}.'
     card:
       add_new: 'Añadir nueva tarjeta'
       highlighting:
         inline: 'Resaltar en línea:'
         entire_card_by: 'Toda la tarjeta en'
       remove_from_list: 'Eliminar tarjeta de la lista'
+    caption_rate_history: "Historial de tasa"
     clipboard:
       browser_error: "Su navegador no soporta copiar al portapapeles. Por favor, copie el texto seleccionado manualmente."
       copied_successful: "¡Copiado correctamente en el portapapeles!"
     chart:
-      type: 'Chart type'
-      axis_criteria: 'Axis criteria'
-      modal_title: 'Work package graph configuration'
+      type: 'Tipo de gráfico'
+      axis_criteria: 'Criterios de eje'
+      modal_title: 'Configuración del gráfico del paquete de trabajo'
       types:
-        line: 'Line'
-        horizontal_bar: 'Horizontal bar'
-        bar: 'Bar'
-        pie: 'Pie'
-        doughnut: 'Doughnut'
-        radar: 'Radar'
-        polar_area: 'Polar area'
+        line: 'Línea'
+        horizontal_bar: 'Barra horizontal'
+        bar: 'Barra'
+        pie: 'Circular'
+        doughnut: 'Anillos'
+        radar: 'Radial'
+        polar_area: 'Área polar'
       tabs:
         graph_settings: 'General'
-        dataset: 'Dataset %{number}'
+        dataset: 'Conjunto de datos %{number}'
       errors:
-        could_not_load: 'The data to display the graph could not be loaded. The necessary permissions may be lacking.'
+        could_not_load: 'No se pueden cargar los datos necesarios para mostrar el gráfico. Puede que falten los permisos necesarios.'
     description_available_columns: "Columnas disponibles"
     description_current_position: "Usted está aquí: "
     description_select_work_package: "Seleccione el paquete de trabajo #%{id}"
@@ -138,7 +160,7 @@ es:
         drag_to_activate: "Arrastre campos desde aquí para activarlos"
         add_group: "Agregar grupo de atributos"
         add_table: "Agregar tabla de paquetes de trabajo relacionados"
-        edit_query: 'Edit query'
+        edit_query: 'Editar consulta'
         new_group: 'Nuevo grupo'
         reset_to_defaults: 'Restablecer valores predeterminados'
     custom_actions:
@@ -150,6 +172,9 @@ es:
       cannot_save_changes_with_message: "No se pueden guardar los cambios debido al siguiente error: %{error}"
       query_saving: "No se pudo guardar la vista."
       embedded_table_loading: "No se pudo cargar la vista insertada: %{message}"
+    enumeration_activities: "Actividades (tiempo de seguimiento)"
+    enumeration_doc_categories: "Categorías de documentos"
+    enumeration_work_package_priorities: "Prioridades del paquete de trabajo"
     filter:
       description:
         text_open_filter: "Abrir este filtro con 'ALT' y las flechas de dirección."
@@ -171,16 +196,28 @@ es:
     general_text_yes: "sí"
     general_text_No: "No"
     general_text_Yes: "Sí"
+    global_roles: Roles globales
+    hal:
+      error:
+        update_conflict_refresh: "Haga clic aquí para actualizar el recurso y cambiar a la versión más reciente."
+        edit_prohibited: "La edición de %{attribute} está bloqueada para este recurso. Puede que el atributo se derive de relaciones (por ejemplo, elementos secundarios) o que no pueda configurarse."
+        format:
+          date: "%{attribute} no es una fecha válida -se espera YYYY-MM-DD."
+        general: "Ha ocurrido un error."
     homescreen:
       blocks:
         new_features:
           text_new_features: "Obtenga información sobre nuevas características y actualizaciones de productos."
-          current_new_feature_html: "OpenProject ahora ofrece la nueva <b>vista Panel</b> para la administración de proyectos ágil. </br> Para activar esta nueva característica para sus proyectos existentes, siga este procedimiento: <ul><li>Active el módulo Paneles en la configuración de los proyectos existentes.</li> <li>Configure los paneles en un proyecto.</li> <li>Verifique los roles y los permisos</li></ul>"
-          image_alt_text: "Imagen promocional de los paneles"
-          learn_about: "Obtenga más información sobre los paneles ágiles"
+          learn_about: "Más información sobre las nuevas características"
+          standard:
+            learn_about_link: https://www.openproject.org/openproject-10-4
+            current_new_feature_html: >
+              Esta versión contiene nuevas características y mejoras: <br><br> <ul> <li><b>Plantillas de diseño</b> predeterminadas para seleccionar un tema claro u oscuro (característica de pago).</li> <li>Nuevo <b>widget de seguimiento del tiempo</b> para <i>Mi página</i>, donde se muestra el tiempo invertido en un gráfico de barras.</li> <li><b>Exportación a XLS de informes de costes</b> y texto con formato al exportar a PDF paquetes de trabajo.</li> <li><b>Mejoras de diseño y usabilidad</b> (como pestañas y más) en la configuración del proyecto y en el área de administración.</li> </ul>
+          bim:
+            learn_about_link: https://www.openproject.org/openproject-bim-10-4
+            current_new_feature_html: >
+              OpenProject tiene un <b>nuevo módulo IFC para integrar modelos 3D</b> en su aplicación de gestión de proyectos y trabajar de forma colaborativa en esos archivos con los miembros de su equipo, sin tener que instalar costosos programas adicionales ni usar más licencias. <br><br> <ul> <li><b>Importe archivos IFC</b> de modelos de edificios en su aplicación de OpenProject.</li> <li><b>Abra modelos 3D y visualice modelos de edificios</b> en el navegador.</li> <li> <b>Trabaje en varios archivos IFC</b> fácilmente con su equipo directamente en OpenProject, sin tener que instalar costosos programas adicionales. </li> </ul>
     label_activate: "Activar"
-    label_activity_no: "Entrada de actividad número %{activityNo}"
-    label_activity_with_comment_no: "Entrada de actividad número %{activityNo} tiene un comentario."
     label_add_column_after: "Añadir columna a la derecha"
     label_add_column_before: "Añadir columna a la izquierda"
     label_add_columns: "Añadir columnas"
@@ -197,6 +234,7 @@ es:
     label_and: "y"
     label_ascending: "Ascendente"
     label_author: "Autor: %{user}"
+    label_avatar: "Avatar"
     label_between: "entre"
     label_board: "Tablero"
     label_board_locked: "Bloqueado"
@@ -210,6 +248,8 @@ es:
     label_deactivate: "Desactivar"
     label_descending: "Descendente"
     label_description: "Descripción"
+    label_details: "Detalles"
+    label_display: "Mostrar"
     label_cancel_comment: "Cancelar comentario"
     label_closed_work_packages: "cerrado"
     label_collapse: "Colapsar"
@@ -230,22 +270,29 @@ es:
     label_export: "Exportar"
     label_filename: "Archivo"
     label_filesize: "Tamaño"
+    label_general: "General"
     label_greater_or_equal: ">="
     label_group: 'Grupo'
     label_group_by: "Agrupar por"
+    label_group_plural: "Grupos"
     label_hide_attributes: "Mostrar menos"
     label_hide_column: "Esconder Columna"
     label_hide_project_menu: "Contraer menú de proyecto"
     label_in: "en"
     label_in_less_than: "en menos de"
     label_in_more_than: "en más de"
+    label_incoming_emails: "Correos electrónicos entrantes"
+    label_information_plural: "Información"
     label_import: "Importar"
     label_latest_activity: "Actividad reciente"
     label_last_updated_on: "Ultima actualizacion realizada el"
     label_less_or_equal: "<="
     label_less_than_ago: "menos que hace días"
     label_loading: "Cargando..."
+    label_mail_notification: "Notificaciones de correo electrónico"
     label_me: "mi"
+    label_meeting_agenda: "Agenda"
+    label_meeting_minutes: "Minutos"
     label_menu_collapse: "colapsar"
     label_menu_expand: "expandir"
     label_more_than_ago: "más días atrás"
@@ -254,6 +301,7 @@ es:
     label_no_data: "No hay datos disponibles"
     label_no_due_date: "no hay fecha de finalización"
     label_no_start_date: "sin fecha de inicio"
+    label_no_value: "Sin valor"
     label_none: "ninguno"
     label_not_contains: "no contiene"
     label_not_equals: "no es"
@@ -265,12 +313,16 @@ es:
     label_previous: "Anterior"
     label_per_page: "Por pagina:"
     label_please_wait: "Por favor, espere"
+    label_project_plural: "Proyectos"
     label_visibility_settings: "Configuración de visibilidad"
     label_quote_comment: "Citar este comentario"
+    label_recent: "Recientes"
     label_reset: "Reiniciar"
     label_remove_column: "Eliminar columna"
     label_remove_columns: "Eliminar columnas seleccionadas"
     label_remove_row: "Eliminar fila"
+    label_report: "Informe"
+    label_repository_plural: "Repositorios"
     label_save_as: "Guardad como"
     label_select_watcher: "Selecciona un observador..."
     label_selected_filter_list: "Filtros seleccionados"
@@ -281,6 +333,7 @@ es:
     label_sort_higher: "Mover hacia arriba"
     label_sort_lower: "Mover hacia abajo"
     label_sorting: "Ordenando"
+    label_spent_time: "Tiempo empleado"
     label_star_query: "Favorecido"
     label_press_enter_to_save: "Presione Entrar para guardar los cambios."
     label_public_query: "Público"
@@ -289,13 +342,15 @@ es:
     label_subject: "Asunto"
     label_this_week: "esta semana"
     label_today: "hoy"
+    label_time_entry_plural: "Tiempo empleado"
     label_up: "Arriba"
+    label_user_plural: "Usuarios"
     label_activity_show_only_comments: "Solo mostrar las actividades con comentarios"
     label_activity_show_all: "Mostrar todas las actividades"
     label_total_progress: "Progreso total: %{percent}%"
     label_total_amount: "Total: %{amount}"
     label_updated_on: "actualizado el"
-    label_value_derived_from_children: "(value derived from children)"
+    label_value_derived_from_children: "(valor derivado del elemento secundario)"
     label_warning: "Alerta"
     label_work_package: "Paquete de trabajo"
     label_work_package_plural: "Paquetes de trabajo"
@@ -331,7 +386,8 @@ es:
     label_wait: "Por favor espere para la configuración..."
     label_upload_counter: "%{done} de %{count} archivos terminados"
     label_validation_error: "El paquete de trabajo no puede ser guardado debido a los errores siguientes:"
-    label_view_has_changed: "This view has unsaved changes. Click to save them."
+    label_version_plural: "Versiones"
+    label_view_has_changed: "Esta vista tiene cambios sin guardar. Haga clic para guardarlos."
     help_texts:
       show_modal: 'Mostrar entrada de texto de ayuda para atributo'
     onboarding:
@@ -397,23 +453,22 @@ es:
         upgrade_to_ee_text: "¡Vaya! Si necesita está opción, entonces ¡es un usuario experto! ¿Le importaría apoyar a los desarrolladores de OpenSource convirtiéndose en un cliente de la versión corporativa?"
         more_information: "Más información"
         nevermind: "No importa"
-        filter_types:
-          parent: "es un elemento secundario de"
-          precedes: "anterior"
-          follows: "posterior"
-          relates: "relacionado con"
-          duplicates: "duplicado"
-          duplicated: "duplicado por"
-          blocks: "bloqueo"
-          blocked: "bloqueado por"
-          partof: "pertenece a"
-          includes: "incluido"
-          requires: "requiere"
-          required: "requerido por"
+      edit:
+        form_configuration: "Configuración del formulario"
+        projects: "Proyectos"
+        settings: "Configuración"
     time_entry:
+      project: 'Proyecto'
+      work_package: 'Paquete de trabajo'
+      work_package_required: 'Es necesario seleccionar primero un paquete de trabajo.'
       activity: 'Actividad'
       comment: 'Comentario'
+      duration: 'Duración'
+      spent_on: 'Fecha'
       hours: 'Horas'
+      label: 'Entrada de tiempo'
+    two_factor_authentication:
+      label_two_factor_authentication: 'Autenticación de dos factores'
     watchers:
       label_loading: cargando observadores...
       label_error_loading: Se ha producido un error al cargar los observadores
@@ -444,8 +499,8 @@ es:
       set_parent: "Establecer elemento primario"
       change_parent: "Cambiar padre"
       remove_parent: "Eliminar padre"
-      hierarchy_indent: "Indent hierarchy"
-      hierarchy_outdent: "Outdent hierarchy"
+      hierarchy_indent: "Aumentar sangría de jerarquía"
+      hierarchy_outdent: "Anular sangría de jerarquía"
       group_by_wp_type: "Agrupar por tipo de paquete de trabajo"
       group_by_relation_type: "Grupo por tipo de relación"
       add_parent: "Añadir padre existente"
@@ -473,12 +528,14 @@ es:
     field_value_enter_prompt: "Introduzca un valor para '%{field}'"
     select2:
       input_too_short:
+        zero: "Escriba más caracteres"
         one: "Por favor introduzca un carácter más"
         other: "Por favor, ingrese {{count}} caracteres más"
       load_more: "Cargando mas resultados ..."
       no_matches: "No se encontraron coincidencias"
       searching: "Buscando ..."
       selection_too_big:
+        zero: "No se puede seleccionar ningún elemento"
         one: "Solo puede seleccionar un objeto"
         other: "Solo puede seleccionar {{limit}} objetos"
     project_menu_details: "Detalles"
@@ -573,7 +630,7 @@ es:
       image: "Imagen"
     work_packages:
       bulk_actions:
-        move: 'Bulk change of project'
+        move: 'Cambio masivo del proyecto'
         edit: 'Edición en masa'
         copy: 'Copia en masa'
         delete: 'Eliminación en masa'
@@ -586,12 +643,6 @@ es:
       description_enter_text: "Ingrese texto"
       description_options_hide: "Ocultar opciones"
       description_options_show: "Mostrar opciones"
-      error:
-        update_conflict_refresh: "Haga clic aquí para actualizar el paquete de trabajo y cambiar a la versión más reciente."
-        edit_prohibited: "La edición de %{attribute} está bloqueada para este paquete de trabajo. Ya sea que este atributo se derive de las relaciones (por ejemplo, niños) o de lo contrario que no sea configurable."
-        format:
-          date: "%{attribute} no es una fecha válida -se espera YYYY-MM-DD."
-        general: "Ha ocurrido un error."
       edit_attribute: "%{attribute} - Editar"
       key_value: "%{key}: %{value}"
       label_enable_multi_select: "Habilitar selección múltiple"
@@ -605,8 +656,7 @@ es:
       message_successful_show_in_fullscreen: "Haga clic aquí para abrir este paquete de trabajo en la vista de pantalla completa."
       message_view_spent_time: "Mostrar el tiempo invertido en este paquete de trabajo"
       message_work_package_read_only: "El paquete de trabajo está bloqueado en este estado. Excepto el estado, ningún otro atributo se puede modificar."
-      message_work_package_status_blocked: "Work package status is not writable due to closed status and closed version being assigned."
-      no_value: "Sin valor"
+      message_work_package_status_blocked: "El estado del paquete de trabajo no permite la escritura porque se asignarán el estado cerrado y la versión cerrada."
       placeholder_filter_by_text: "Asunto, descripción, comentarios, ..."
       inline_create:
         title: 'Haga clic aquí para agregar un nuevo paquete de trabajo a esta lista'
@@ -631,8 +681,7 @@ es:
       no_results:
         title: No hay paquetes de trabajo para mostrar.
         description: O bien no se han creado o se filtran todos los paquetes de trabajo.
-      limited_results: >
-        There are %{total} total work packages, but only %{count} can be shown in manual sorting mode. Please reduce the results by filtering.
+      limited_results: En el modo de ordenación manual, solo puede mostrarse un máximo de %{count} paquetes de trabajo. Filtre para reducir el número de resultados.
       property_groups:
         details: "Detalles"
         people: "Participantes"
@@ -674,7 +723,7 @@ es:
         label_content: "Haga clic aquí para saltar el menú e ir al contenido"
       placeholders:
         default: "-"
-        description: "Pulse para introducir una descripción..."
+        formattable: "%{name}: haga clic para editar…"
       query:
         column_names: "Columnas"
         group_by: "Resultados de grupo por"
@@ -692,9 +741,9 @@ es:
         confirm_edit_cancel: "¿Está seguro de que quiere cancelar la edición del nombre de esta vista? El título volverá a establecerse en el valor anterior."
         click_to_edit_query_name: "Haga clic para editar el título de esta vista."
         rename_query_placeholder: "Nombre de la vista"
-        star_text: "Mark this view as favorite and add to the saved views sidebar on the left."
+        star_text: "Marque esta vista como favorita y agréguela a la barra lateral de vistas guardadas de la izquierda."
         public_text: >
-          Publish this view, allowing other users to access your view. Users with the 'Manage public views' permission can modify or remove public query. This does not affect the visibility of work package results in that view and depending on their permissions, users may see different results.
+          Publique esta vista para que otros usuarios puedan acceder a esta. Los usuarios con el permiso “Administrar vistas públicas” puede modificar o quitar consultas públicas. Esto no afecta a la visibilidad de los resultados de paquetes de trabajo en esa vista y, según sus permisos, los usuarios pueden ver resultados distintos.
         errors:
           unretrievable_query: "No se puede recuperar la vista de la URL"
           not_found: "No existe la vista"
@@ -729,18 +778,17 @@ es:
           priority: 'Prioridad'
           type: 'Tipo'
         sorting_mode:
-          description: 'Chose the mode to sort your Work packages:'
-          automatic: 'Automatic'
-          manually: 'Manually'
-          warning: 'You will lose your previous sorting when activating the automatic sorting mode.'
+          description: 'Seleccione el modo de ordenación de los paquetes de trabajo:'
+          automatic: 'Automático'
+          manually: 'Manual'
+          warning: 'Al activar el modo de ordenación automática, se perderá la ordenación actual.'
         columns_help_text: "Use los datos anteriores para agregar o quitar columnas de la vista de tabla. Puede arrastrar y colocar las columnas para cambiar el orden."
         upsale:
           attribute_highlighting: '¿Necesita que algunos paquetes de trabajo destaquen del resto?'
           relation_columns: '¿Necesita ver las relaciones en la lista del paquete de trabajo?'
           check_out_link: 'Vea la versión Enterprise Edition.'
         relation_filters:
-          first_part: "Mostrar todos los paquetes de trabajo"
-          second_part: "el paquete de trabajo actual"
+          filter_work_packages_by_relation_type: 'Filtrar paquetes de trabajo por tipo de relación'
       tabs:
         overview: Resumen
         activity: Actividad
@@ -826,6 +874,7 @@ es:
         one: "un paquete de trabajo secundario"
         other: "%{count} paquetes de trabajo secundarios"
       hour:
+        zero: "0 h"
         one: "1 h"
         other: "%{count} h"
     zen_mode:
@@ -842,6 +891,6 @@ es:
         project_and_subprojects: "y todos los subproyectos"
         search_for: "Búsqueda por"
     views:
-      card: 'Cards'
-      list: 'Table'
+      card: 'Tarjetas'
+      list: 'Tabla'
       timeline: 'Gantt'

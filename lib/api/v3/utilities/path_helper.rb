@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -209,9 +209,15 @@ module API
             alias :issue_priority :priority
           end
 
-          index :project
-          show :project
-          schema :project
+          resources :project
+
+          def self.projects_available_parents
+            "#{projects}/available_parent_projects"
+          end
+
+          def self.projects_schema
+            "#{projects}/schema"
+          end
 
           resources :query
 
@@ -317,11 +323,22 @@ module API
             "#{root}/string_objects?value=#{val}"
           end
 
-          index :time_entry
-          show :time_entry
+          resources :time_entry
 
           def self.time_entries_activity(activity_id)
             "#{root}/time_entries/activities/#{activity_id}"
+          end
+
+          def self.time_entries_available_projects
+            "#{time_entries}/available_projects"
+          end
+
+          def self.time_entries_available_work_packages_on_create
+            "#{time_entries}/available_work_packages"
+          end
+
+          def self.time_entries_available_work_packages_on_edit(time_entry_id)
+            "#{time_entry(time_entry_id)}/available_work_packages"
           end
 
           index :type
@@ -421,10 +438,11 @@ module API
             "#{project(project_id)}/work_packages"
           end
 
-          def self.path_for(path, filters: nil, sort_by: nil)
+          def self.path_for(path, filters: nil, sort_by: nil, page_size: nil)
             query_params = {
               filters: filters&.to_json,
-              sortBy: sort_by&.to_json
+              sortBy: sort_by&.to_json,
+              pageSize: page_size
             }.reject { |_, v| v.blank? }
 
             if query_params.any?

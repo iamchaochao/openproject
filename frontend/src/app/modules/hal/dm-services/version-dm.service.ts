@@ -1,6 +1,6 @@
 //-- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 //++
 
 import {HalResourceService} from 'core-app/modules/hal/services/hal-resource.service';
@@ -36,6 +36,7 @@ import {ProjectResource} from "core-app/modules/hal/resources/project-resource";
 import {GridResource} from "core-app/modules/hal/resources/grid-resource";
 import {SchemaResource} from "core-app/modules/hal/resources/schema-resource";
 import {Observable} from "rxjs";
+import {buildApiV3Filter} from "core-components/api/api-v3/api-v3-filter-builder";
 
 @Injectable()
 export class VersionDmService {
@@ -72,6 +73,18 @@ export class VersionDmService {
     return this.halResourceService
       .get<CollectionResource<VersionResource>>(this.pathHelper.api.v3.projects.id(projectId).versions.toString())
       .toPromise();
+  }
+
+  public canCreateVersionInProject(id:string):Promise<boolean> {
+    return this.halResourceService
+      .get<CollectionResource<ProjectResource>>(
+        this.pathHelper.api.v3.versions.availableProjects.toString(),
+        { filters: buildApiV3Filter('id', '=', [id]).toJson() }
+      )
+      .toPromise()
+      .then((collection) => {
+        return collection.elements.length === 1;
+      });
   }
 
   public listProjectsAvailableForVersions():Promise<CollectionResource<ProjectResource>> {

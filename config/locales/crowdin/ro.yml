@@ -1,3 +1,24 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
 ro:
   no_results_title_text: În acest moment nu este nimic de afișat.
   activities:
@@ -7,21 +28,40 @@ ro:
     plugins:
       no_results_title_text: În acest moment nu există plugin-uri disponibile.
     custom_styles:
+      color_theme: "Color theme"
+      color_theme_custom: "(Custom)"
+      colors:
+        alternative-color: "Alternative"
+        content-link-color: "Link font"
+        primary-color: "Primary"
+        primary-color-dark: "Primary (dark)"
+        header-bg-color: "Header background"
+        header-item-bg-hover-color: "Header background on hover"
+        header-item-font-color: "Header font"
+        header-item-font-hover-color: "Header font on hover"
+        header-border-bottom-color: "Header border"
+        main-menu-bg-color: "Main menu background"
+        main-menu-bg-selected-background: "Main menu when selected"
+        main-menu-bg-hover-background: "Main menu on hover"
+        main-menu-font-color: "Main menu font"
+        main-menu-selected-font-color: "Main menu font when selected"
+        main-menu-hover-font-color: "Main menu font on hover"
+        main-menu-border-color: "Main menu border"
       custom_colors: "Culori personalizate"
       customize: "Poersonalizați instalarea dumneavoastră folosind propriul logo. Notă: Acest logo va fi accesibil publicului."
       enterprise_notice: "Ca și un semn al reconoștinței noastre, această opțiune este disponiblă doar utlizatorilor care dețin versiunea Enterprise."
       manage_colors: "Modificați opțiunile de selecție ale culorilor"
       instructions:
-        alternative_color: "Strong accent color, typically used for most the important button on a screen."
-        content_link_color: "Culoarea fontului pentru majoritatea link-urilor."
-        primary_color: "Culoarea principală."
-        primary_color_dark: "Typically a darker version of the main color used for hover effects."
-        header_bg_color: "Culoarea de fundal a antetului."
-        header_item_bg_hover_color: "Culoarea de fundal a obiectelor care pot fi selectate când cursorului se află deasupra lor."
-        header_item_font_color: "Culoare fontului pentru elementele selectabile din antet."
-        header_item_font_hover_color: "Culoarea fontului pentru elementele selectabile din antet când cursorul se află deasupra lor."
-        header_border_bottom_color: "Linia de sub antet. Lăsați acest câmp gol dacă nu doriți această linie."
-        main_menu_bg_color: "Culoarea de fundal pentru meniul din partea stângă."
+        alternative-color: "Strong accent color, typically used for the most important button on a screen."
+        content-link-color: "Culoarea fontului pentru majoritatea link-urilor."
+        primary-color: "Culoarea principală."
+        primary-color-dark: "Typically a darker version of the main color used for hover effects."
+        header-item-bg-hover-color: "Culoarea de fundal a obiectelor care pot fi selectate când cursorului se află deasupra lor."
+        header-item-font-color: "Culoare fontului pentru elementele selectabile din antet."
+        header-item-font-hover-color: "Culoarea fontului pentru elementele selectabile din antet când cursorul se află deasupra lor."
+        header-border-bottom-color: "Linia de sub antet. Lăsați acest câmp gol dacă nu doriți această linie."
+        main-menu-bg-color: "Culoarea de fundal pentru meniul din partea stângă."
+      theme_warning: Changing the theme will overwrite you custom style. The design will then be lost. Are you sure you want to continue?
     enterprise:
       upgrade_to_ee: "Achiziționați versiunea Enterprise"
       add_token: "Upload an Enterprise Edition support token"
@@ -45,7 +85,39 @@ ro:
       no_results_content_title: În acest moment nu există moduri de autentificare.
       no_results_content_text: Creare mod de autentificare nou
   ldap_auth_sources:
+    technical_warning_html: |
+      This LDAP form requires technical knowledge of your LDAP / Active Directory setup.
+      <br/>
+      <a href="https://www.openproject.org/help/administration/manage-ldap-authentication/">Please visit our documentation for detailed instructions</a>.
+    attribute_texts:
+      name: Arbitrary name of the LDAP connection
+      host: LDAP host name or IP address
+      login_map: The attribute key in LDAP that is used to identify the unique user login. Usually, this will be `uid` or `samAccountName`.
+      generic_map: The attribute key in LDAP that is mapped to the OpenProject `%{attribute}` attribute
+      admin_map_html: "Optional: The attribute key in LDAP that <strong>if present</strong> marks the OpenProject user an admin. Leave empty when in doubt."
+      system_user_dn_html: |
+        Enter the DN of the system user used for read-only access.
+        <br/>
+        Example: uid=openproject,ou=system,dc=example,dc=com
+      system_user_password: Enter the bind password of the system user
+      base_dn: |
+        Enter the Base DN of the subtree in LDAP you want OpenProject to look for users and groups.
+        OpenProject will filter for provided usernames in this subtree only.
+        Example: ou=users,dc=example,dc=com
+      onthefly_register: |
+        If you check this box, OpenProject will automatically create new users from their LDAP entries
+        when they first authenticate with OpenProject.
+        Leave this unchecked to only allow existing accounts in OpenProject to authenticate through LDAP!
     connection_encryption: 'Connection encryption'
+    system_account: 'System account'
+    system_account_legend: |
+      OpenProject requires read-only access through a system account to lookup users and groups in your LDAP tree.
+      Please specify the bind credentials for that system user in the following section.
+    ldap_details: 'LDAP details'
+    user_settings: 'Attribute mapping'
+    user_settings_legend: |
+      The following fields are related to how users are created in OpenProject from LDAP entries and
+      what LDAP attributes are used to define the attributes of an OpenProject user (attribute mapping).
     tls_mode:
       plain: 'niciunul'
       simple_tls: 'simple_tls'
@@ -280,7 +352,7 @@ ro:
       changeset:
         repository: "Repo"
       comment:
-        commented: "Cu comentarii"
+        commented: "Cu comentarii" #an object that this comment belongs to
       custom_action:
         actions: "Actions"
       custom_field:
@@ -328,6 +400,13 @@ ro:
         types: "Tipuri"
         versions: "Versiuni"
         work_packages: "Pachete de lucru"
+      project/status:
+        code: 'Stare'
+        explanation: 'Status description'
+        codes:
+          on_track: 'On track'
+          at_risk: 'At risk'
+          off_track: 'Off track'
       query:
         column_names: "Coloane"
         relations_to_type_column: "Relations to %{type}"
@@ -419,6 +498,8 @@ ro:
         confirmation: "nu se potrivește cu %{attribute}."
         could_not_be_copied: "nu poate fi (complet) copiat(ă)."
         does_not_exist: "nu există."
+        error_unauthorized: "may not be accessed."
+        error_readonly: "was attempted to be written but is not writable."
         empty: "nu poate fi gol."
         even: "trebuie să fie par."
         exclusion: "este rezervat."
@@ -482,6 +563,8 @@ ro:
               invalid_values: "A value is invalid."
               id_filter_required: "An 'id' filter is required."
         project:
+          archived_ancestor: 'The project has an archived ancestor.'
+          foreign_wps_reference_version: 'Work packages in non descendant projects reference versions of the project or its descendants.'
           attributes:
             types:
               in_use_by_work_packages: "încă în uz în pachetele de lucru: %{types}"
@@ -515,6 +598,10 @@ ro:
         role:
           permissions:
             dependency_missing: "need to also include '%{dependency}' as '%{permission}' is selected."
+        time_entry:
+          attributes:
+            hours:
+              day_limit: "is too high as a maximum of 24 hours can be logged per date."
         work_package:
           is_not_a_valid_target_for_time_entries: "Pachetul de lucru #%{id} nu este o ţintă validă pentru reasocierea timpilor de lucru."
           attributes:
@@ -613,6 +700,7 @@ ro:
   activity:
     created: "Creat: %{title}"
     updated: "Actualizat: %{title}"
+  #common attributes of all models
   attributes:
     active: "Activ"
     assigned_to: "Executant"
@@ -645,6 +733,7 @@ ro:
     is_default: "Valoare implicită"
     is_for_all: "Pentru toate proiectele"
     is_public: "Public"
+    #kept for backwards compatibility
     issue: "Pachet de lucru"
     lastname: "Nume"
     login: "Username"
@@ -653,6 +742,7 @@ ro:
     password: "Parolă"
     priority: "Prioritate"
     project: "Proiect"
+    public: "Public"
     responsible: "Accountable"
     role: "Rol"
     roles: "Roluri"
@@ -664,6 +754,7 @@ ro:
     type: "Tip"
     updated_at: "Actualizat pe"
     updated_on: "Actualizat pe"
+    uploader: "Uploader"
     user: "Utilizator"
     version: "Versiune"
     work_package: "Pachet de lucru"
@@ -788,9 +879,13 @@ ro:
       - "Vineri"
       - "Sâmbătă"
     formats:
+      #Use the strftime parameters for formats.
+      #When no format has been given, it uses default.
+      #You can provide other formats here if you like!
       default: "%d-%m-%Y"
       long: "%d %B %Y"
       short: "%d %b"
+    #Don't forget the nil at the beginning; there's no such thing as a 0th month
     month_names:
       - null
       - "Ianuarie"
@@ -805,6 +900,7 @@ ro:
       - "Octombrie"
       - "Noiembrie"
       - "Decembrie"
+    #Used in date_select and datime_select.
     order:
       - :year
       - :month
@@ -946,6 +1042,7 @@ ro:
   description_sub_work_package: "Pachetul de lucru fiu"
   description_toc_toggle: "Afișare/ascundere cuprins"
   description_wiki_subpages_reassign: "Alegeți noua pagină părinte"
+  #Text direction: Left-to-Right (ltr) or Right-to-Left (rtl)
   direction: ltr
   ee:
     upsale:
@@ -954,13 +1051,12 @@ ro:
         add_groups: "Add new attribute groups"
         rename_groups: "Rename attributes groups"
       project_filters:
-        description_html: "Actualizați la %{link} pentru a filtra și sorta câmpuri personalizate"
-  enumeration_activities: "Activități (durata de lucru)"
+        description_html: "Filtering and sorting on custom fields is an enterprise edition feature."
+  enumeration_activities: "Time tracking activities"
   enumeration_work_package_priorities: "Priorități pentru pachetele de lucru"
-  enumeration_system_activity: "Activitate sistem"
   enumeration_reported_project_statuses: "Stările proiectului raportat"
   error_auth_source_sso_failed: "Single Sign-On (SSO) for user '%{value}' failed"
-  error_can_not_archive_project: "This project cannot be archived: There is at least one work package assigned to a version defined in this project."
+  error_can_not_archive_project: "This project cannot be archived: %{errors}"
   error_can_not_delete_entry: "Unable to delete entry"
   error_can_not_delete_custom_field: "Câmpul personalizat nu poate fi șters"
   error_can_not_delete_type: "Acest tip conține pachete de lucru și nu poate fi șters."
@@ -969,6 +1065,7 @@ ro:
   error_can_not_remove_role: "Acest rol este utilizat și nu poate fi șters."
   error_can_not_reopen_work_package_on_closed_version: "Un pachet de lucru atribuit la o versiune închisă nu poate fi redeschis"
   error_can_not_find_all_resources: "Could not find all related resources to this request."
+  error_can_not_unarchive_project: "This project cannot be unarchived: %{errors}"
   error_check_user_and_role: "Alegeți un utilizator și un rol."
   error_code: "Error %{code}"
   error_cookie_missing: 'Cookie-ul OpenProject lipseşte. Vă rugăm să verificați setările referitoare la cookies, această aplicație nu va funcţiona corespunzător fără acestea.'
@@ -1026,6 +1123,8 @@ ro:
       pdf_with_descriptions: "PDF cu descrieri"
       pdf_with_descriptions_and_attachments: "Documentul pdf cu descriere și fișiere atașate"
       pdf_with_attachments: "Document pdf cu fișiere atașate"
+    image:
+      omitted: "Image not exported."
   extraction:
     available:
       pdftotext: "Pdftotext available (optional)"
@@ -1073,6 +1172,8 @@ ro:
       blog: "Blog-ul OpenProject"
       forums: "Forum comunitate"
       newsletter: "Security alerts / Newsletter"
+  journals:
+    changes_retracted: "The changes where retracted."
   links:
     configuration_guide: 'Ghid de configurare'
   instructions_after_registration: "Vă puteţi autentifica de îndată ce contul a fost activat dând click pe %{signin}."
@@ -1606,18 +1707,22 @@ ro:
   label_workflow_plural: "Fluxuri de lucru"
   label_workflow_summary: "Descriere"
   label_x_closed_work_packages_abbr:
+    zero: "0 closed"
     one: "unul închis"
     few: "%{count} închise"
     other: "%{count} închise"
   label_x_comments:
+    zero: "no comments"
     one: "un comentariu"
     few: "%{count} comentarii"
     other: "%{count} comentarii"
   label_x_open_work_packages_abbr:
+    zero: "0 open"
     one: "unul deschis"
     few: "%{count} deschise"
     other: "%{count} deschise"
   label_x_projects:
+    zero: "no projects"
     one: "un proiect"
     few: "%{count} proiecte"
     other: "%{count} proiecte"
@@ -1679,12 +1784,14 @@ ro:
   mail_body_lost_password: "Pentru a vă modifica parola, dați click pe următorul link:"
   mail_body_register: "Pentru a vă activa contul, dați click pe următorul link:"
   mail_body_reminder: "%{count} pachete de lucru care vă sunt atribuite au scadență în următoarele %{days} zile:"
+  mail_body_group_reminder: "%{count} work package(s) that are assigned to group \"%{group}\" are due in the next %{days} days:"
   mail_body_wiki_content_added: "Pagina de wiki '%{id}' a fost adăugată de %{author}."
   mail_body_wiki_content_updated: "Pagina wiki '%{id}' a fost actualizată de %{author}."
   mail_subject_account_activation_request: "cererea de activare a contului %{value}"
   mail_subject_lost_password: "Parola dumneavoastră pentru %{value}"
   mail_subject_register: "Activarea contului dumneavoastră %{value}"
   mail_subject_reminder: "%{count} pachete de lucru trebuie rezolvate în următoarele %{days} zile"
+  mail_subject_group_reminder: "For group \"%{group}\" %{count} work package(s) due in the next %{days} days"
   mail_subject_wiki_content_added: "Pagina de wiki '%{id}' a fost adăugată"
   mail_subject_wiki_content_updated: "Pagina wiki '%{id}' a fost actualizată"
   mail_user_activation_limit_reached:
@@ -1693,8 +1800,8 @@ ro:
       Un nou utilizator (%{email}) a încercat să creeze un cont pe un server pe care îl gestionați (%{host}). Utilizatorul nu-și poate activa contul deoarece s-a atins limita superioară de utilizatori activi.
     steps:
       label: "Pentru a permite utilizatorului să se conecteze, puteți: "
-      a: "Actualizați planul de plată ([here](upgrade_url))"
-      b: "Lock or delete an existing user ([here](users_url))"
+      a: "Actualizați planul de plată ([here](upgrade_url))" #here turned into a link
+      b: "Lock or delete an existing user ([here](users_url))" #here turned into a link
   more_actions: "Mai multe acțiuni"
   noscript_description: "Trebuie să activaţi JavaScript pentru a utiliza OpenProject!"
   noscript_heading: "JavaScript dezactivat"
@@ -1761,6 +1868,7 @@ ro:
   notice_project_cannot_update_custom_fields: "Nu puteți actualiza câmpurile particularizate disponibile ale proiectului. Proiectul este invalid: %{errors}"
   notice_attachment_migration_wiki_page: >
     This page was generated automatically during the update of OpenProject. It contains all attachments previously associated with the %{container_type} "%{container_name}".
+  #Default format for numbers
   number:
     format:
       delimiter: ""
@@ -1867,6 +1975,7 @@ ro:
       title: Modificare identificator proiect
     archive:
       are_you_sure: "Sunteţi sigur că doriţi să arhivaţi proiectul '%{name}'?"
+      archived: "Archived"
   project_module_activity: "Activitate"
   project_module_forums: "Forumuri"
   project_module_calendar: "Calendar"
@@ -1878,6 +1987,8 @@ ro:
   project_module_wiki: "Wiki"
   query:
     attribute_and_direction: "%{attribute} (%{direction})"
+  #possible query parameters (e.g. issue queries),
+  #which are not attributes of an AR-Model.
   query_fields:
     active_or_archived: "Active or archived"
     assigned_to_role: "Rolul executantului"
@@ -2121,6 +2232,7 @@ ro:
   status_invited: invitat
   status_locked: blocat
   status_registered: înregistrat
+  #Used in array.to_sentence.
   support:
     array:
       sentence_connector: "și"
@@ -2156,7 +2268,7 @@ ro:
   text_destroy_with_associated: "Există obiecte suplimentare asociate cu pachetul(ele) de lucru care urmează să fie șters(e). Aceste obiecte sunt de următoarele tipuri:"
   text_destroy_what_to_do: "Ce vrei să faci?"
   text_diff_truncated: "... Acest diff a fost trunchiat deoarece depășește dimensiunea maximă care poate fi afișată."
-  text_email_delivery_not_configured: "Trimiterea de emailuri nu este configurată și ca urmare, notificările sunt dezactivate.\nTrebuie configurat serverul SMTP în config/configuration.yml și apoi repornită aplicația pentru a le activa."
+  text_email_delivery_not_configured: "Email delivery is not configured, and notifications are disabled.\nConfigure your SMTP server to enable them."
   text_enumeration_category_reassign_to: "Reasociere la valoarea:"
   text_enumeration_destroy_question: "%{count} obiecte sunt asociate la această valoare."
   text_file_repository_writable: "Directorul pentru atașamente inscriptibil"
@@ -2169,7 +2281,8 @@ ro:
   text_work_package_category_destroy_question: "Există pachete de lucru (%{count}) atribuite acestei categorii. Cum doriți să procedați?"
   text_work_package_category_reassign_to: "Reditribuire pachete de lucru la această categorie"
   text_work_package_updated: "Pachetul de lucru %{id} a fost actualizat de către %{author}."
-  text_work_package_watcher_added: "Ați fost adăugat ca observator la pachetul de lucru %{id} de către %{watcher_setter}."
+  text_work_package_watcher_added: "You have been added as a watcher to Work package %{id} by %{watcher_changer}."
+  text_work_package_watcher_removed: "You have been removed from watchers of Work package %{id} by %{watcher_changer}."
   text_work_packages_destroy_confirmation: "Sunteți sigur că doriți ștergerea pachetelor de lucru selectate?"
   text_work_packages_ref_in_commit_messages: "Referențiere și rezolvare a pachetelor de lucru în mesajele de încărcare"
   text_journal_added: "%{label} %{value} adăugat"
@@ -2451,6 +2564,17 @@ ro:
     User limit reached. You cannot activate any more users. Please <a href="%{upgrade_url}">upgrade your plan</a> or block members to allow for additional users.
   warning_user_limit_reached_instructions: >
     You reached your user limit (%{current}/%{max} active users). Please contact sales@openproject.com to upgrade your Enterprise Edition plan and add additional users.
+  0: >
+
+  warning_bar:
+    protocol_mismatch:
+      title: 'Protocol setting mismatch'
+      text_html: >
+        Your application is running with its protocol setting set to <code>%{set_protocol}</code>, but the request is an <code>%{actual_protocol}</code> request. This will result in errors! Go to <a href="%{setting_path}">System settings</a> and change the "Protocol" setting to correct this.
+    hostname_mismatch:
+      title: 'Hostname setting mismatch'
+      text_html: >
+        Your application is running with its host name setting set to <code>%{set_hostname}</code>, but the request is a <code>%{actual_hostname}</code> hostname. This will result in errors! Go to <a href="%{setting_path}">System settings</a> and change the "Host name" setting to correct this.
   menu_item: "Element de meniu"
   menu_item_setting: "Vizibilitate"
   wiki_menu_item_for: "Meniu pentru pagina wiki \"%{title}\""
@@ -2459,6 +2583,7 @@ ro:
     Ștergeți doar meniul principal wiki. Va trebui să alegeți o altă pagină wiki pentru care se va genera meniul principal. Dacă doriți să ștergeți wiki-ul, modulul corespunzător poate fi dezactivat de către administratorii de proiect.
   wiki_menu_item_delete_not_permitted: Meniul wiki pentru ultima pagină wiki nu poate fi șters.
   query_menu_item_for: "Meniul pentru interogarea \"%{title}\""
+  #TODO: merge with work_packages top level key
   work_package:
     updated_automatically_by_child_changes: |
       _Modificat automat prin schimbarea valorilor în pachetul de lucru fiu %{child}_
@@ -2503,7 +2628,9 @@ ro:
         estimated_hours: "Efortul estimat nu poate fi setat pe pachetele de lucru părinte."
         invalid_user_assigned_to_work_package: "Utilizatorul selectat nu poate fi '%{property}' pentru acest pachet de lucru."
         start_date: "Nu se poate seta data start pe pachetele de lucru părinte."
-      writing_read_only_attributes: "Nu puteți scrie într-un câmp restricționat."
+      eprops:
+        invalid_gzip: "is invalid gzip: %{message}"
+        invalid_json: "is invalid json: %{message}"
     resources:
       schema: 'Schemă'
   doorkeeper:
@@ -2511,18 +2638,22 @@ ro:
       status: 'Pre-authorization'
     errors:
       messages:
+        #Common error messages
         invalid_request: 'The request is missing a required parameter, includes an unsupported parameter value, or is otherwise malformed.'
-        invalid_redirect_uri: "The requested redirect uri is malformed or doesn't match client redirect URI."
+        invalid_redirect_uri: "The requested redirect URI is malformed or doesn't match client redirect URI."
         unauthorized_client: 'The client is not authorized to perform this request using this method.'
         access_denied: 'The resource owner or authorization server denied the request.'
         invalid_scope: 'The requested scope is invalid, unknown, or malformed.'
         invalid_code_challenge_method: 'The code challenge method must be plain or S256.'
         server_error: 'The authorization server encountered an unexpected condition which prevented it from fulfilling the request.'
         temporarily_unavailable: 'The authorization server is currently unable to handle the request due to a temporary overloading or maintenance of the server.'
+        #Configuration error messages
         credential_flow_not_configured: 'Resource Owner Password Credentials flow failed due to Doorkeeper.configure.resource_owner_from_credentials being unconfigured.'
         resource_owner_authenticator_not_configured: 'Resource Owner find failed due to Doorkeeper.configure.resource_owner_authenticator being unconfigured.'
         admin_authenticator_not_configured: 'Access to admin panel is forbidden due to Doorkeeper.configure.admin_authenticator being unconfigured.'
+        #Access grant errors
         unsupported_response_type: 'The authorization server does not support this response type.'
+        #Access token errors
         invalid_client: 'Client authentication failed due to unknown client, no client authentication included, or unsupported authentication method.'
         invalid_grant: 'The provided authorization grant is invalid, expired, revoked, does not match the redirection URI used in the authorization request, or was issued to another client.'
         unsupported_grant_type: 'The authorization grant type is not supported by the authorization server.'
@@ -2547,6 +2678,7 @@ ro:
         redirect_uri_html: >
           The allowed URLs authorized users can be redirected to. One entry per line. <br/> If you're registering a desktop application, use the following URL.
         confidential: "Check if the application will be used where the client secret can be kept confidential. Native mobile apps and Single Page Apps are assumed non-confidential."
+        scopes: "Check the scopes you want the application to grant access to. If no scope is checked, api_v3 is assumed."
         client_credential_user_id: "Optional user ID to impersonate when clients use this application. Leave empty to allow public access only"
         register_intro: "If you are developing an OAuth API client application for OpenProject, you can register it using this form for all users to use."
         default_scopes: ""
@@ -2561,8 +2693,8 @@ ro:
       wants_to_access_html: >
         This application requests access to your OpenProject account. <br/> <strong>It has requested the following permissions:</strong>
     scopes:
-      api_v3: "Full API access"
-      api_v3_text: "Application will receive full read & write access to the OpenProject API to perform actions on your behalf."
+      api_v3: "Full API v3 access"
+      api_v3_text: "Application will receive full read & write access to the OpenProject API v3 to perform actions on your behalf."
     grants:
       created_date: "Approved on"
       scopes: "Drepturi"

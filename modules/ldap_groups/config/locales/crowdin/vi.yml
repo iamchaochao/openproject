@@ -21,6 +21,12 @@ vi:
         confirmation: "If you continue, the synchronized group %{name} and all %{users_count} users synchronized through it will be removed."
         info: "Note: The OpenProject group itself and members added outside this LDAP synchronization will not be removed."
         verification: "Enter the group's name %{name} to verify the deletion."
+      help_text_html: |
+        Mô-đun này cho phép bạn thiết lập đồng bộ hóa giữa các nhóm LDAP và OpenProject.
+        Nó phụ thuộc vào các nhóm LDAP cần sử dụng thuộc tính <em>groupOfNames / memberOf</em> để hoạt động với OpenProject.
+        <br/>
+        Các nhóm được đồng bộ hóa hàng giờ thông qua một công việc định kỳ.
+        <a href="https://www.openproject.org/help/administration/manage-ldap-authentication/">Xin vui lòng xem tài liệu của chúng tôi về chủ đề này</a>.
       no_results: 'No synchronized groups found.'
       no_members: 'This group has no synchronized members yet.'
       plural: 'Synchronized LDAP groups'

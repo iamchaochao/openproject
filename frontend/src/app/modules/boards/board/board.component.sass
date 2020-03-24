@@ -1,10 +1,12 @@
+@import 'helpers'
+
 $board-list-max-width: 300px
 
 // Let board list span whole screen
 .router--boards-full-view
-  #content-wrapper
-    padding-bottom: 0
-    padding-left: 0
+  @include extended-content--bottom
+  @include extended-content--left
+  
   #content
     height: 100%
 
@@ -15,7 +17,6 @@ $board-list-max-width: 300px
   flex-grow: 1
 
   // Make it scrollable
-  padding-bottom: 5px
   overflow-y: auto
 
 
@@ -27,11 +28,13 @@ $board-list-max-width: 300px
   &:first-of-type
     margin-left: 5px
 
+  &.cdk-drag-placeholder
+    @include modifying--placeholder
+
 .board--header-container
   display: flex
   align-items: flex-start
   margin-bottom: 0
-  margin-left: 20px
 
 .boards-list-item-handle
   position: absolute

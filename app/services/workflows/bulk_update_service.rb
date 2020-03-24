@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2019 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -25,7 +25,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-# See doc/COPYRIGHT.rdoc for more details.
+# See docs/COPYRIGHT.rdoc for more details.
 #++
 
 class Workflows::BulkUpdateService < ::BaseServices::Update
@@ -58,7 +58,7 @@ class Workflows::BulkUpdateService < ::BaseServices::Update
   def build_workflows(status_transitions)
     new_workflows = []
 
-    status_transitions.each do |status_id, transitions|
+    (status_transitions || {}).each do |status_id, transitions|
       transitions.each do |new_status_id, options|
         new_workflows << Workflow.new(type: type,
                                       role: role,

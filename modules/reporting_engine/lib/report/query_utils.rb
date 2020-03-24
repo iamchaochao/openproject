@@ -1,11 +1,18 @@
 #-- copyright
-# ReportingEngine
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
-# Copyright (C) 2010 - 2014 the OpenProject Foundation (OPF)
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License version 3.
+#
+# OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+# Copyright (C) 2006-2017 Jean-Philippe Lang
+# Copyright (C) 2010-2013 the ChiliProject Team
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
-# version 3.
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,38 +22,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
+# See docs/COPYRIGHT.rdoc for more details.
 #++
 
 module Report::QueryUtils
   Infinity = 1.0 / 0
   include Engine
 
-  alias singleton_class metaclass unless respond_to? :singleton_class
-
   delegate :quoted_false, :quoted_true, to: 'engine.reporting_connection'
   attr_writer :engine
 
-  module PropagationHook
-    include Report::QueryUtils
-
-    def append_features(base)
-      ancestors[1..-1].reverse_each { |m| base.send(:include, m) }
-      base.extend PropagationHook
-      base.extend self
-      super
-    end
-
-    def propagate!(to = engine)
-      to.constants(false).each do |name|
-        const = to.const_get name
-        next unless Module === const
-        append_features const unless const <= self or not const < Report::QueryUtils
-        propagate! const
-      end
-    end
-  end
-
-  extend PropagationHook
+  include Costs::NumberHelper
 
   ##
   # Graceful string quoting.
@@ -160,17 +147,6 @@ module Report::QueryUtils
   end
 
   ##
-  # FIXME: This is redmine
-  # Generates string representation for a currency.
-  #
-  # @see CostRate.clean_currency
-  # @param [BigDecimal] value
-  # @return [String]
-  def clean_currency(value)
-    CostRate.clean_currency(value).to_f.to_s
-  end
-
-  ##
   # Generates a SQL case statement.
   #
   # @example
@@ -193,36 +169,20 @@ module Report::QueryUtils
   # Converts value with a given behavior, but treats nil differently.
   # Params
   #  - value: the value to convert
-  #  - weight_of_nil (optional): How a nil should be treated.
-  #    :infinit - makes a nil weight really heavy, which will make it stay
-  #               at the very end when sorting
-  #    :negative_infinit - opposite of :infinit, let's the nil stay at the very beginning
-  #    any other object - nil's will be replaced by thyt object
   #  - block (optional) - defines how to convert values which are not nil
   #               if no block is given, values stay untouched
-  def convert_unless_nil(value, weight_of_nil = :infinit)
+  def convert_unless_nil(value)
     if value.nil?
-      if weight_of_nil == :infinit
-        1.0 / 0 # Infinity, which is greater than any string or number
-      elsif weight_of_nil == :negative_infinit
-        -1.0 / 0 # negative Infinity, which is smaller than any string or number
-      else
-        weight_of_nil
-      end
+      1.0 / 0 # Infinity, which is greater than any string or number
     else
-      if block_given?
-        yield value
-      else
-        value
-      end
+      yield value
     end
   end
 
   def map_field(key, value)
     case key.to_s
-    when 'singleton_value', /_id$/ then convert_unless_nil(value) { |v| v.to_i }
-    when 'work_package_id', 'tweek', 'tmonth', 'tweek' then value.to_i
-    else convert_unless_nil(value) { |v| v.to_s }
+    when 'tweek', 'tmonth', 'tweek' then value.to_i
+    else convert_unless_nil(value, &:to_s)
     end
   end
 

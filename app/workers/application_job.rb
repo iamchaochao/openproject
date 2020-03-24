@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,7 +26,9 @@
 # See docs/COPYRIGHT.rdoc for more details.
 #++
 
-class ApplicationJob
+require 'active_job'
+
+class ApplicationJob < ::ActiveJob::Base
 
   ##
   # Return a priority number on the given payload
@@ -43,12 +45,20 @@ class ApplicationJob
     end
   end
 
+  def self.queue_with_priority(value = :default)
+    if value.is_a?(Symbol)
+      super priority_number(value)
+    else
+      super value
+    end
+  end
+
   def self.inherited(child)
     child.prepend Setup
   end
 
   module Setup
-    def perform
+    def perform(*args)
       before_perform!
       with_clean_request_store { super }
     end

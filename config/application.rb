@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,23 +29,6 @@
 
 require_relative 'boot'
 
-require 'benchmark'
-module SimpleBenchmark
-  #
-  # Measure execution of block and display result
-  #
-  # Time is measured by Benchmark module, displayed time is total
-  # (user cpu time + system cpu time + user and system cpu time of children)
-  # This is not wallclock time.
-  def self.bench(title)
-    $stderr.print "#{title}... "
-    result = Benchmark.measure do
-      yield
-    end
-    $stderr.printf "%.03fs\n", result.total
-  end
-end
-
 require 'rails/all'
 require 'active_support'
 require 'active_support/dependencies'
@@ -71,7 +54,7 @@ if defined?(Bundler)
   Bundler.require(*Rails.groups(:opf_plugins))
 end
 
-require File.dirname(__FILE__) + '/../lib/open_project/configuration'
+require_relative '../lib/open_project/configuration'
 
 env = ENV['RAILS_ENV'] || 'production'
 db_config = ActiveRecord::Base.configurations[env] || {}
@@ -122,6 +105,7 @@ module OpenProject
     # http://stackoverflow.com/questions/4590229
     config.middleware.use Rack::TempfileReaper
 
+    config.autoloader = :zeitwerk
     # Custom directories with classes and modules you want to be autoloadable.
     config.enable_dependency_loading = true
     config.paths.add Rails.root.join('lib').to_s, eager_load: true
@@ -173,6 +157,10 @@ module OpenProject
     # Use SHA-1 instead of MD5 to generate non-sensitive digests, such as the ETag header.
     Rails.application.config.active_support.use_sha1_digests = true
 
+    # This option is not backwards compatible with earlier Rails versions.
+    # It's best enabled when your entire app is migrated and stable on 6.0.
+    Rails.application.config.action_dispatch.use_cookies_with_metadata = true
+
     # Make `form_with` generate id attributes for any generated HTML tags.
     # Rails.application.config.action_view.form_with_generates_ids = true
 
@@ -199,6 +187,9 @@ module OpenProject
     config.active_job.queue_adapter = :delayed_job
 
     config.action_controller.asset_host = OpenProject::Configuration::AssetHost.value
+
+    # Return false instead of self when enqueuing is aborted from a callback.
+    # Rails.application.config.active_job.return_false_on_aborted_enqueue = true
 
     config.log_level = OpenProject::Configuration['log_level'].to_sym
 

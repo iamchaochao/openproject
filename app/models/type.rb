@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -51,16 +51,16 @@ class ::Type < ApplicationRecord
                           join_table: "#{table_name_prefix}custom_fields_types#{table_name_suffix}",
                           association_foreign_key: 'custom_field_id'
 
-  belongs_to :color, class_name:  'Color',
-                     foreign_key: 'color_id'
+  belongs_to :color,
+             class_name: 'Color',
+             foreign_key: 'color_id'
 
   acts_as_list
 
-  validates_presence_of :name
-  validates_uniqueness_of :name
-  validates_length_of :name,
-                      maximum: 255,
-                      unless: lambda { |e| e.name.blank? }
+  validates :name,
+            presence: true,
+            uniqueness: { case_sensitive: false },
+            length: { maximum: 255 }
 
   validates_inclusion_of :is_default, :is_milestone, in: [true, false]
 
@@ -113,21 +113,9 @@ class ::Type < ApplicationRecord
     object.types.include?(self)
   end
 
-  def valid_transition?(status_id_a, status_id_b, roles)
-    transition_exists?(status_id_a, status_id_b, roles.map(&:id))
-  end
-
   private
 
   def check_integrity
     raise "Can't delete type" if WorkPackage.where(type_id: id).any?
-  end
-
-  def transition_exists?(status_id_a, status_id_b, role_ids)
-    workflows
-      .where(old_status_id: status_id_a,
-             new_status_id: status_id_b,
-             role_id: role_ids)
-      .any?
   end
 end

@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -31,9 +31,9 @@ require 'spec_helper'
 RSpec.feature 'Work package pagination', js: true do
   using_shared_fixtures :admin
 
-  let(:project) {
+  let(:project) do
     FactoryBot.create(:project, name: 'project1', identifier: 'project1')
-  }
+  end
 
   shared_examples_for 'paginated work package list' do
     let!(:work_package_1) { FactoryBot.create(:work_package, project: project) }
@@ -50,7 +50,7 @@ RSpec.feature 'Work package pagination', js: true do
     scenario do
       expect(page).to have_content('All open')
 
-      within('.work-packages-list-view--container') do
+      within('.work-packages-partitioned-query-space--container') do
         expect(page).to     have_content(work_package_1.subject)
         expect(page).to_not have_content(work_package_2.subject)
       end
@@ -59,7 +59,7 @@ RSpec.feature 'Work package pagination', js: true do
         find('.pagination--item a', text: '2').click
       end
 
-      within('.work-packages-list-view--container') do
+      within('.work-packages-partitioned-query-space--container') do
         expect(page).to     have_content(work_package_2.subject)
         expect(page).to_not have_content(work_package_1.subject)
       end
@@ -68,7 +68,7 @@ RSpec.feature 'Work package pagination', js: true do
         find('.pagination--item a', text: '50').click
       end
 
-      within('.work-packages-list-view--container') do
+      within('.work-packages-partitioned-query-space--container') do
         expect(page).to have_content(work_package_1.subject)
         expect(page).to have_content(work_package_2.subject)
       end

@@ -1,6 +1,6 @@
 <%#-- copyright
-OpenProject is a project management system.
-Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+OpenProject is an open source project management software.
+Copyright (C) 2012-2020 the OpenProject GmbH
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License version 3.
@@ -40,7 +40,7 @@ See docs/COPYRIGHT.rdoc for more details.
       <%= f.select :attribute_name, selectable_attributes(@attribute_help_text), container_class: '-middle' %>
     <% end %>
   </div>
-  <div class="form--field -required">
+  <div class="form--field -required -visible-overflow">
     <%= f.text_area :help_text, cols: 100, rows: 20, class: 'wiki-edit', with_text_formatting: true %>
   </div>
 </section>

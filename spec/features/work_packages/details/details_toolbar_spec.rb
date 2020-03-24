@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,7 +30,7 @@ require 'spec_helper'
 require 'features/work_packages/work_packages_page'
 
 describe 'Work package details toolbar', js: true, selenium: true do
-  let(:project) { FactoryBot.create :project_with_types, is_public: true }
+  let(:project) { FactoryBot.create :project_with_types, public: true }
   let!(:work_package) { FactoryBot.create :work_package, project: project }
   let(:work_packages_page) { WorkPackagesPage.new(project) }
 

@@ -1,11 +1,18 @@
 #-- copyright
-# OpenProject Reporting Plugin
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
-# Copyright (C) 2010 - 2014 the OpenProject Foundation (OPF)
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License version 3.
+#
+# OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+# Copyright (C) 2006-2017 Jean-Philippe Lang
+# Copyright (C) 2010-2013 the ChiliProject Team
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
-# version 3.
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,10 +22,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
+# See docs/COPYRIGHT.rdoc for more details.
 #++
 
 require 'digest/md5'
-require 'date'
 
 module ReportingHelper
   # ======================= SHARED CODE START
@@ -35,6 +43,7 @@ module ReportingHelper
   def mapped(value, klass, default)
     id = value.to_i
     return default if id < 0
+
     klass.find(id).name
   end
 
@@ -87,7 +96,8 @@ module ReportingHelper
   end
 
   def field_representation_map(key, value)
-    return l(:label_none) if value.blank?
+    return I18n.t(:label_none) if value.blank?
+
     case key.to_sym
     when :activity_id                           then mapped value, Enumeration, "<i>#{l(:caption_material_costs)}</i>"
     when :project_id                            then link_to_project Project.find(value.to_i)
@@ -106,12 +116,14 @@ module ReportingHelper
     when :fixed_version_id                      then h(Version.find(value.to_i).name)
     when :singleton_value                       then ''
     when :status_id                             then h(Status.find(value.to_i).name)
+    when /custom_field\d+/                      then CustomOption.find_by(id: value)&.value || value.to_s
     else h(value.to_s)
     end
   end
 
   def field_sort_map(key, value)
     return '' if value.blank?
+
     case key.to_sym
     when :work_package_id, :tweek, :tmonth, :week  then value.to_i
     when :spent_on                                 then value.to_date.mjd
@@ -196,11 +208,11 @@ module ReportingHelper
     options[:delim] ||= '&bull;'
     delimited = []
     items.each_with_index do |item, ix|
-      if ix != 0 and ix % options[:step] == 0
-        delimited << "<b> #{options[:delim]} </b>" + item
-      else
-        delimited << item
-      end
+      delimited << if ix != 0 && (ix % options[:step]).zero?
+                     "<b> #{options[:delim]} </b>" + item
+                   else
+                     item
+                   end
     end
     delimited
   end
@@ -212,6 +224,6 @@ module ReportingHelper
     return klass if klass.is_a? Class
     nil
   rescue NameError
-    return nil
+    nil
   end
 end

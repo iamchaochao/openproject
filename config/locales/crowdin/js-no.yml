@@ -1,3 +1,24 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
 "no":
   js:
     ajax:
@@ -8,23 +29,23 @@
         Drag on editor field to inline image or reference attachment. Closed editor fields will be opened while you keep dragging.
     autocomplete_select:
       placeholder:
-        multi: "Add \"%{name}\""
-        single: "Select \"%{name}\""
-      remove: "Remove %{name}"
-      active: "Active %{label} %{name}"
+        multi: "Legg til \"%{name}\""
+        single: "Velg \"%{name}\""
+      remove: "Fjern %{name}"
+      active: "Aktiv %{label} %{name}"
     close_popup_title: "Lukk sprettoppvindu"
-    close_filter_title: "Close filter"
-    close_form_title: "Close form"
+    close_filter_title: "Lukk filter"
+    close_form_title: "Lukk skjema"
     button_add_watcher: "Legg til overvåker"
     button_back: "Tilbake"
-    button_back_to_list_view: "Back to list view"
+    button_back_to_list_view: "Tilbake til listevisning"
     button_cancel: "Avbryt"
     button_close: "Lukk"
     button_change_project: "Change project"
     button_check_all: "Velg alle"
-    button_configure-form: "Configure form"
+    button_configure-form: "Konfigurer skjema"
     button_confirm: "Bekreft"
-    button_continue: "Fortsett"
+    button_continue: "Fortsette"
     button_copy: "Kopier"
     button_custom-fields: "Egendefinerte felter"
     button_delete: "Slett"
@@ -33,7 +54,7 @@
     button_duplicate: "Kopier"
     button_edit: "Rediger"
     button_filter: "Filter"
-    button_advanced_filter: "Advanced filter"
+    button_advanced_filter: "Avansert filter"
     button_list_view: "Listevisning"
     button_show_view: "Fullskjermvisning"
     button_log_time: "Logg tid"
@@ -59,6 +80,7 @@
         inline: 'Highlight inline:'
         entire_card_by: 'Entire card by'
       remove_from_list: 'Remove card from list'
+    caption_rate_history: "Rate history"
     clipboard:
       browser_error: "Nettleseren støtter ikke kopiering til utklippstavle. Kopier den merkede teksten manuelt."
       copied_successful: "Kopiert til utklippstavlen!"
@@ -107,8 +129,8 @@
           language: 'Formatting language'
           language_hint: 'Enter the formatting language that will be used for highlighting (if supported).'
         dropdown:
-          macros: 'Macros'
-          chose_macro: 'Chose macro'
+          macros: 'Makroer'
+          chose_macro: 'Lukk makro'
         toc: 'Table of contents'
         toolbar_help: 'Click to select widget and show the toolbar. Double-click to edit widget'
         wiki_page_include:
@@ -121,7 +143,7 @@
             You can include the wiki page of another project by separating them with a colon like the following example.
         work_package_button:
           button: 'Insert create work package button'
-          type: 'Work package type'
+          type: 'Arbeidspakke type'
           button_style: 'Use button style'
           button_style_hint: 'Optional: Check to make macro appear as a button, not as a link.'
           without_type: 'Create work package'
@@ -150,6 +172,9 @@
       cannot_save_changes_with_message: "Cannot save your changes due to the following error: %{error}"
       query_saving: "The view could not be saved."
       embedded_table_loading: "The embedded view could not be loaded: %{message}"
+    enumeration_activities: "Aktiviteter (tidsstyring)"
+    enumeration_doc_categories: "Dokumentkategorier"
+    enumeration_work_package_priorities: "Prioritering av arbeidspakker"
     filter:
       description:
         text_open_filter: "Åpne dette filteret med 'ALT' og piltastene."
@@ -171,16 +196,28 @@
     general_text_yes: "ja"
     general_text_No: "Nei"
     general_text_Yes: "Ja"
+    global_roles: Global Roles
+    hal:
+      error:
+        update_conflict_refresh: "Click here to refresh the resource and update to the newest version."
+        edit_prohibited: "Editing %{attribute} is blocked for this resource. Either this attribute is derived from relations (e.g, children) or otherwise not configurable."
+        format:
+          date: "%{attribute} is no valid date - YYYY-MM-DD expected."
+        general: "En feil har oppstått."
     homescreen:
       blocks:
         new_features:
           text_new_features: "Read about new features and product updates."
-          current_new_feature_html: "OpenProject contains a new <b>Boards view</b> for Agile project management. </br> To activate this new feature for your existing projects, please do the following steps: <ul><li>Activate the module Boards within existing projects' settings.</li> <li>Configure your Boards in a project.</li> <li>Verify roles and permissions</li></ul>"
-          image_alt_text: "Board teaser image"
-          learn_about: "Learn more about Agile Boards"
+          learn_about: "Learn more about the new features"
+          standard:
+            learn_about_link: https://www.openproject.org/openproject-10-4
+            current_new_feature_html: >
+              The release contains various new features and improvements: <br><br> <ul> <li>Default <b>design templates</b> to select a light or dark theme (premium feature).</li> <li>New <b>time tracking widget</b> for <i>My page</i> to show spent time in a bar chart.</li> <li><b>XLS-exports for cost reports</b> and formatted text in PDF export of work packages.</li> <li><b>Improved design and usability</b>, i.e. tabs and more in project settings and administration.</li> </ul>
+          bim:
+            learn_about_link: https://www.openproject.org/openproject-bim-10-4
+            current_new_feature_html: >
+              OpenProject contains a <b>new IFC module to integrate 3D models</b> into your project management application and to work collaboratively with these files with your team without installation of separate costly software or licenses. <br><br> <ul> <li><b>Import IFC files</b> of building models into your OpenProject application.</li> <li><b>Open 3D models and visualize building models</b> in your browser.</li> <li> Easily <b>work on multiple IFC files</b> with your team directly in OpenProject without installation of separate costly software. </li> </ul>
     label_activate: "Aktiver"
-    label_activity_no: "Activity entry number %{activityNo}"
-    label_activity_with_comment_no: "Activity entry number %{activityNo}. Has a user comment."
     label_add_column_after: "Add column after"
     label_add_column_before: "Add column before"
     label_add_columns: "Add columns"
@@ -197,6 +234,7 @@
     label_and: "og"
     label_ascending: "Stigende"
     label_author: "Author: %{user}"
+    label_avatar: "Avatar"
     label_between: "mellom"
     label_board: "Board"
     label_board_locked: "Låst"
@@ -210,6 +248,8 @@
     label_deactivate: "Deaktiver"
     label_descending: "Synkende"
     label_description: "Beskrivelse"
+    label_details: "Detaljer"
+    label_display: "Vis"
     label_cancel_comment: "Avbryt kommentar"
     label_closed_work_packages: "lukket"
     label_collapse: "Skjul"
@@ -230,22 +270,29 @@
     label_export: "Eksportèr"
     label_filename: "Fil"
     label_filesize: "Størrelse"
+    label_general: "Generell"
     label_greater_or_equal: ">="
     label_group: 'Gruppe'
     label_group_by: "Grupper etter"
+    label_group_plural: "Grupper"
     label_hide_attributes: "Vis færre"
     label_hide_column: "Skjul kolonne"
     label_hide_project_menu: "Collapse project menu"
     label_in: "i"
     label_in_less_than: "i mindre enn"
     label_in_more_than: "i mer enn"
+    label_incoming_emails: "Inkommende e-post"
+    label_information_plural: "Informasjon"
     label_import: "Import"
     label_latest_activity: "Latest activity"
     label_last_updated_on: "Sist oppdatert"
     label_less_or_equal: "<="
     label_less_than_ago: "mindre enn dager siden"
     label_loading: "Laster..."
+    label_mail_notification: "E-postvarsler"
     label_me: "meg"
+    label_meeting_agenda: "Saksliste"
+    label_meeting_minutes: "Referat"
     label_menu_collapse: "skjul"
     label_menu_expand: "utvid"
     label_more_than_ago: "mer enn dager siden"
@@ -254,6 +301,7 @@
     label_no_data: "Ingen data å vise"
     label_no_due_date: "ingen sluttdato"
     label_no_start_date: "ingen startdato"
+    label_no_value: "Ingen verdi"
     label_none: "ingen"
     label_not_contains: "inneholder ikke"
     label_not_equals: "er ikke"
@@ -265,12 +313,16 @@
     label_previous: "Forrige"
     label_per_page: "Pr. side:"
     label_please_wait: "Vennligst vent"
+    label_project_plural: "Prosjekter"
     label_visibility_settings: "Visibility settings"
     label_quote_comment: "Quote this comment"
+    label_recent: "Recent"
     label_reset: "Nullstill"
     label_remove_column: "Remove column"
     label_remove_columns: "Fjern valgte kolonner"
     label_remove_row: "Remove row"
+    label_report: "Rapport"
+    label_repository_plural: "Pakkebrønner"
     label_save_as: "Lagre som"
     label_select_watcher: "Velg en overvåker..."
     label_selected_filter_list: "Valgte filtre"
@@ -281,6 +333,7 @@
     label_sort_higher: "Flytt opp"
     label_sort_lower: "Flytt ned"
     label_sorting: "Sortering"
+    label_spent_time: "Tid brukt"
     label_star_query: "Favored"
     label_press_enter_to_save: "Press enter to save."
     label_public_query: "Offentlig"
@@ -289,7 +342,9 @@
     label_subject: "Emne"
     label_this_week: "denne uken"
     label_today: "i dag"
+    label_time_entry_plural: "Tid brukt"
     label_up: "Up"
+    label_user_plural: "Brukere"
     label_activity_show_only_comments: "Show activities with comments only"
     label_activity_show_all: "Show all activities"
     label_total_progress: "%{percent}% utført"
@@ -331,6 +386,7 @@
     label_wait: "Please wait for configuration..."
     label_upload_counter: "%{done} of %{count} files finished"
     label_validation_error: "The work package could not be saved due to the following errors:"
+    label_version_plural: "Versjoner"
     label_view_has_changed: "This view has unsaved changes. Click to save them."
     help_texts:
       show_modal: 'Show attribute help text entry'
@@ -397,23 +453,22 @@
         upgrade_to_ee_text: "Wow! If you need this feature you are a super pro! Would you mind supporting us OpenSource developers by becoming an Enterprise Edition client?"
         more_information: "Mer informasjon"
         nevermind: "Nevermind"
-        filter_types:
-          parent: "being child of"
-          precedes: "preceding"
-          follows: "following"
-          relates: "relating to"
-          duplicates: "duplicating"
-          duplicated: "duplisert av"
-          blocks: "blocking"
-          blocked: "blokkert av"
-          partof: "being part of"
-          includes: "including"
-          requires: "requiring"
-          required: "required by"
+      edit:
+        form_configuration: "Form Configuration"
+        projects: "Prosjekter"
+        settings: "Innstillinger"
     time_entry:
+      project: 'Prosjekt'
+      work_package: 'Arbeidspakke'
+      work_package_required: 'Requires selecting a work package first.'
       activity: 'Aktivitet'
       comment: 'Kommentar'
+      duration: 'Varighet'
+      spent_on: 'Dato'
       hours: 'Timer'
+      label: 'Time entry'
+    two_factor_authentication:
+      label_two_factor_authentication: 'Tofaktorautentisering'
     watchers:
       label_loading: loading watchers...
       label_error_loading: An error occurred while loading the watchers
@@ -473,12 +528,14 @@
     field_value_enter_prompt: "Angi en verdi for '%{field}'"
     select2:
       input_too_short:
+        zero: "Please enter more characters"
         one: "Angi mer enn {{count}} tegn"
         other: "Vennligst skriv {{count}} flere tegn"
       load_more: "Laster inn flere resultater..."
       no_matches: "Ingen treff"
       searching: "Søker ..."
       selection_too_big:
+        zero: "You cannot select any items"
         one: "Du kan bare velge ett element"
         other: "Du kan bare velge {{limit}} elementer"
     project_menu_details: "Detaljer"
@@ -586,12 +643,6 @@
       description_enter_text: "Skriv tekst"
       description_options_hide: "Skjul alternativer"
       description_options_show: "Vis alternativer"
-      error:
-        update_conflict_refresh: "Click here to refresh the work package and update to the newest version."
-        edit_prohibited: "Redigering av %{attribute} er blokkert for denne arbeidespakken. Enten er attributtet avledet fra en relasjon (f.eks, barn) eller den kan ikke konfigureres."
-        format:
-          date: "%{attribute} is no valid date - YYYY-MM-DD expected."
-        general: "En feil har oppstått."
       edit_attribute: "%{attribute} - Edit"
       key_value: "%{key}: %{value}"
       label_enable_multi_select: "Aktiver multivalg"
@@ -606,7 +657,6 @@
       message_view_spent_time: "Show spent time for this work package"
       message_work_package_read_only: "Work package is locked in this status. No attribute other than status can be altered."
       message_work_package_status_blocked: "Work package status is not writable due to closed status and closed version being assigned."
-      no_value: "Ingen verdi"
       placeholder_filter_by_text: "Subject, description, comments, ..."
       inline_create:
         title: 'Klikk her for å legge til en nye arbeidspakke i listen'
@@ -631,8 +681,7 @@
       no_results:
         title: Ingen arbeidspakke å vise.
         description: Enten kan den ikke opprettes eller så er alle arbeidspakker filtrert ut.
-      limited_results: >
-        There are %{total} total work packages, but only %{count} can be shown in manual sorting mode. Please reduce the results by filtering.
+      limited_results: Only %{count} work packages can be shown in manual sorting mode. Please reduce the results by filtering.
       property_groups:
         details: "Detaljer"
         people: "Personer"
@@ -674,7 +723,7 @@
         label_content: "Click here to skip over the menu and go to the content"
       placeholders:
         default: "-"
-        description: "Klikk for å legge inn en beskrivelse..."
+        formattable: "%{name}: Click to edit..."
       query:
         column_names: "Kolonner"
         group_by: "Gruppèr resultater etter"
@@ -739,8 +788,7 @@
           relation_columns: 'Need to see relations in the work package list?'
           check_out_link: 'Check out the Enterprise Edition.'
         relation_filters:
-          first_part: "Show all work packages"
-          second_part: "the current work package"
+          filter_work_packages_by_relation_type: 'Filter work packages by relation type'
       tabs:
         overview: Oversikt
         activity: Aktivitet
@@ -826,6 +874,7 @@
         one: "one child work package"
         other: "%{count} work package children"
       hour:
+        zero: "0 h"
         one: "1 h"
         other: "%{count} h"
     zen_mode:

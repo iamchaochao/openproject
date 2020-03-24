@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,7 @@
 #++
 
 class SearchController < ApplicationController
-  include Concerns::Layout
+  include Layout
 
   before_action :find_optional_project,
                 :prepare_tokens,
@@ -200,7 +200,7 @@ class SearchController < ApplicationController
           name: OpenProject::GlobalSearch.tab_name(search_type)
         }
       end,
-      current_tab: available_search_types.select { |search_type| search_params[search_type] }.first || 'all'
+      current_tab: available_search_types.detect { |search_type| search_params[search_type] } || 'all'
     }
   end
 end

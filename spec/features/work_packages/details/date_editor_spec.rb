@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,18 +30,19 @@ require 'spec_helper'
 require 'features/page_objects/notification'
 require 'features/work_packages/details/inplace_editor/shared_examples'
 require 'features/work_packages/shared_contexts'
-require 'support/work_packages/work_package_field'
+require 'support/edit_fields/edit_field'
 require 'features/work_packages/work_packages_page'
 
 describe 'date inplace editor',
          with_settings: { date_format: '%Y-%m-%d' },
          js: true, selenium: true do
-  let(:project) { FactoryBot.create :project_with_types, is_public: true }
+  let(:project) { FactoryBot.create :project_with_types, public: true }
   let(:work_package) { FactoryBot.create :work_package, project: project, start_date: '2016-01-01' }
   let(:user) { FactoryBot.create :admin }
   let(:work_packages_page) { Pages::FullWorkPackage.new(work_package,project) }
 
   let(:due_date) { work_packages_page.edit_field(:dueDate) }
+  let(:start_date) { work_packages_page.edit_field(:startDate) }
 
   before do
     login_as(user)
@@ -62,5 +63,27 @@ describe 'date inplace editor',
 
     due_date.expect_inactive!
     due_date.expect_state_text '2016-01-25'
+  end
+
+  it 'saves the date when clearing and then confirming' do
+    start_date.activate!
+
+    sleep 1
+
+    start_date.input_element.click
+    start_date.clear with_backspace: true
+    start_date.input_element.send_keys :backspace
+
+    within('.ui-datepicker') do
+      find('button', text: 'Confirm').click
+    end
+
+    work_packages_page.expect_and_dismiss_notification message: 'Successful update.'
+
+    start_date.expect_inactive!
+    start_date.expect_state_text 'no start date'
+
+    work_package.reload
+    expect(work_package.start_date).to be_nil
   end
 end

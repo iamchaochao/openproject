@@ -1,6 +1,6 @@
 <%#-- copyright
-OpenProject is a project management system.
-Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+OpenProject is an open source project management software.
+Copyright (C) 2012-2020 the OpenProject GmbH
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License version 3.
@@ -33,10 +33,10 @@ See docs/COPYRIGHT.rdoc for more details.
 %>
 <% title avatar(@topic.author) + h(@topic.subject) %>
 <%= toolbar title: title do %>
-    <li class="toolbar-item">
+    <li class="toolbar-item hidden-for-mobile">
       <%= watcher_link(@topic, User.current) %>
     </li>
-    <li class="toolbar-item">
+    <li class="toolbar-item hidden-for-mobile">
       <% if !@topic.locked? && authorize_for('messages', 'reply') %>
           <%= link_to({ action: 'quote', id: @topic }, class: 'boards--quote-button button') do %>
               <%= op_icon('button--icon icon-quote') %>

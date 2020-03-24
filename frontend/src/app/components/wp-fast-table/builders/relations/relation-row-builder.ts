@@ -4,10 +4,11 @@ import {RelationResource} from 'core-app/modules/hal/resources/relation-resource
 import {States} from '../../../states.service';
 import {isRelationColumn, QueryColumn} from '../../../wp-query/query-column';
 import {WorkPackageTable} from '../../wp-fast-table';
-import {wpCellTdClassName} from '../cell-builder';
+import {tdClassName} from '../cell-builder';
 import {commonRowClassName, SingleRowBuilder, tableRowClassName} from '../rows/single-row-builder';
 import {WorkPackageResource} from 'core-app/modules/hal/resources/work-package-resource';
 import {RelationColumnType} from "core-app/modules/work_packages/routing/wp-view-base/view-services/wp-view-relation-columns.service";
+import {InjectField} from "core-app/helpers/angular/inject-field.decorator";
 
 export function relationGroupClass(workPackageId:string) {
   return `__relations-expanded-from-${workPackageId}`;
@@ -21,8 +22,8 @@ export const relationCellClassName = 'wp-table--relation-cell-td';
 
 export class RelationRowBuilder extends SingleRowBuilder {
 
-  public states:States = this.injector.get(States);
-  public I18n:I18nService = this.injector.get(I18nService);
+  @InjectField() public states:States;
+  @InjectField() public I18n:I18nService;
 
   constructor(public readonly injector:Injector,
               protected workPackageTable:WorkPackageTable) {
@@ -120,7 +121,7 @@ export class RelationRowBuilder extends SingleRowBuilder {
 
   protected emptyRelationCell(column:QueryColumn) {
     const cell = document.createElement('td');
-    cell.classList.add(relationCellClassName, wpCellTdClassName, column.id);
+    cell.classList.add(relationCellClassName, tdClassName, column.id);
 
     return cell;
   }

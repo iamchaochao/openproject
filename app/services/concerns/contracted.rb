@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,11 +28,12 @@
 # See docs/COPYRIGHT.rdoc for more details.
 #++
 
-module Concerns::Contracted
+module Contracted
   extend ActiveSupport::Concern
 
   included do
     attr_reader :contract_class
+    attr_accessor :contract_options
 
     def contract_class=(cls)
       unless cls <= ::ModelContract
@@ -42,14 +43,34 @@ module Concerns::Contracted
       @contract_class = cls
     end
 
-    private
+    def changed_by_system(attributes = nil)
+      @changed_by_system ||= []
 
-    def instantiate_contract(object, user)
-      contract_class.new(object, user)
+      if attributes
+        @changed_by_system += Array(attributes)
+      end
+
+      @changed_by_system
     end
 
-    def validate_and_save(object, user)
-      validate_and_yield(object, user) do
+    def change_by_system
+      prior_changes = non_no_op_changes
+
+      ret = yield
+
+      changed_by_system(changed_compared_to(prior_changes))
+
+      ret
+    end
+
+    private
+
+    def instantiate_contract(object, user, options: {})
+      contract_class.new(object, user, options: { changed_by_system: changed_by_system }.merge(options))
+    end
+
+    def validate_and_save(object, user, options: {})
+      validate_and_yield(object, user, options: options) do
         object.save
       end
     end
@@ -57,8 +78,8 @@ module Concerns::Contracted
     ##
     # Call the given block and assume object is erroneous if
     # it does not return truthy
-    def validate_and_yield(object, user)
-      contract = instantiate_contract(object, user)
+    def validate_and_yield(object, user, options: {})
+      contract = instantiate_contract(object, user, options: options)
 
       if !contract.validate
         [false, contract.errors]
@@ -69,10 +90,20 @@ module Concerns::Contracted
       end
     end
 
-    def validate(object, user)
-      validate_and_yield(object, user) do
-        object.valid?
+    def validate(object, user, options: {})
+      validate_and_yield(object, user, options: options) do
+        # No object validation is necessary at this point
+        # as object.valid? is already called in the contract
+        true
       end
+    end
+
+    def non_no_op_changes
+      model.changes.reject { |_, (old, new)| old == 0 && new.nil? }
+    end
+
+    def changed_compared_to(prior_changes)
+      model.changed.select { |c| !prior_changes[c] || prior_changes[c].last != model.changes[c].last }
     end
   end
 end

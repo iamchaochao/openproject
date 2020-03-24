@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -60,7 +60,7 @@ class Journal < ApplicationRecord
     if attributes.is_a? Hash and attributes.values.first.is_a? Array
       attributes.each { |k, v| attributes[k] = v[1] }
     end
-    data.update_attributes attributes
+    data.update attributes
   end
 
   # In conjunction with the included Comparable module, allows comparison of journal records
@@ -119,6 +119,10 @@ class Journal < ApplicationRecord
 
   def previous
     predecessor
+  end
+
+  def noop?
+    (!notes || notes&.empty?) && get_changes.empty?
   end
 
   private

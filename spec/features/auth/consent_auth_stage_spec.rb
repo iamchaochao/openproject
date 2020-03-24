@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2017 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -23,12 +23,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-# See doc/COPYRIGHT.rdoc for more details.
+# See docs/COPYRIGHT.rdoc for more details.
 #++
 
 require 'spec_helper'
 
-describe 'Authentication Stages', type: :feature, js: true do
+describe 'Authentication Stages', type: :feature do
   let(:language) { 'en' }
   let(:user_password) { 'bob' * 4 }
   let(:user) do
@@ -84,12 +84,16 @@ describe 'Authentication Stages', type: :feature, js: true do
       expect_logged_in
     end
   end
+
   context 'when enabled, localized consent exists',
           with_settings: { consent_info: { de: '# Einwilligung', en: '# Consent header!' } } do
     let(:consent_required) { true }
-    let(:language) { 'de' }
 
-    it 'should show localized consent' do
+    before do
+      Capybara.current_session.driver.header('Accept-Language', 'de')
+    end
+
+    it 'should show localized consent as defined by the accept language header (ignoring users language)' do
       login_with user.login, user_password
 
       expect(page).to have_selector('.account-consent')
@@ -97,7 +101,7 @@ describe 'Authentication Stages', type: :feature, js: true do
     end
   end
 
-  context 'when enabled, but consent exists', with_settings: { consent_info: { en: '# Consent header!' } } do
+  context 'when enabled, but consent exists', js: true, with_settings: { consent_info: { en: '# Consent header!' } } do
     let(:consent_required) { true }
 
     after do

@@ -1,9 +1,7 @@
 import {TimelineZoomLevel} from 'core-app/modules/hal/resources/query-resource';
-import {WorkPackageResource} from 'core-app/modules/hal/resources/work-package-resource';
-import {WorkPackageChangeset} from 'core-components/wp-edit-form/work-package-changeset';
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -26,17 +24,21 @@ import {WorkPackageChangeset} from 'core-components/wp-edit-form/work-package-ch
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 import * as moment from 'moment';
 import {InputState, MultiInputState} from 'reactivestates';
-import Moment = moment.Moment;
+import {WorkPackageChangeset} from "core-components/wp-edit/work-package-changeset";
 import {RenderedWorkPackage} from "core-app/modules/work_packages/render-info/rendered-work-package.type";
+import {WorkPackageResource} from 'core-app/modules/hal/resources/work-package-resource';
+import Moment = moment.Moment;
 
 export const timelineElementCssClass = 'timeline-element';
 export const timelineBackgroundElementClass = 'timeline-element--bg';
 export const timelineGridElementCssClass = 'wp-timeline--grid-element';
 export const timelineMarkerSelectionStartClass = 'selection-start';
+export const timelineHeaderCSSClass = 'wp-timeline--header-element';
+export const timelineHeaderSelector = 'wp-timeline-header';
 
 /**
  *
@@ -119,7 +121,7 @@ export class TimelineViewParameters {
 export interface RenderInfo {
   viewParams:TimelineViewParameters;
   workPackage:WorkPackageResource;
-  changeset:WorkPackageChangeset;
+  change:WorkPackageChangeset;
 }
 
 /**

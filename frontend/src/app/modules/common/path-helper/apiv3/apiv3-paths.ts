@@ -1,6 +1,6 @@
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 
 import {ApiV3WorkPackagesPaths} from 'core-app/modules/common/path-helper/apiv3/work_packages/apiv3-work-packages-paths';
@@ -145,7 +145,7 @@ export class ApiV3Paths {
   public principals(projectId:string|number, term:string|null) {
     let filters:ApiV3FilterBuilder = new ApiV3FilterBuilder();
     // Only real and activated users:
-    filters.add('status', '!', ['0', '3']);
+    filters.add('status', '!', ['3']);
     // that are members of that project:
     filters.add('member', '=', [projectId.toString()]);
     // That are users:
@@ -157,7 +157,10 @@ export class ApiV3Paths {
       // Containing the that substring:
       filters.add('name', '~', [term]);
     }
-    return this.apiV3Base + '/principals' + '?' + filters.toParams() + encodeURI('&sortBy=[["name","asc"]]&offset=1&pageSize=10');
+
+    return this.apiV3Base +
+      '/principals?' +
+      filters.toParams({ sortBy: '[["name","asc"]]', offset: '1', pageSize: '10' });
   }
 
   public wpBySubjectOrId(term:string, idOnly:boolean = false) {
@@ -169,6 +172,8 @@ export class ApiV3Paths {
       filters.add('subjectOrId', '**', [term]);
     }
 
-    return this.apiV3Base + '/work_packages' + '?' + filters.toParams() + encodeURI('&sortBy=[["updatedAt","desc"]]&offset=1&pageSize=10');
+    return this.apiV3Base +
+      '/work_packages?' +
+      filters.toParams({ sortBy: '[["updatedAt","desc"]]', offset: '1', pageSize: '10' });
   }
 }

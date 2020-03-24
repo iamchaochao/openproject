@@ -1,6 +1,6 @@
 //-- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,16 +23,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 //++
 
 import {OPContextMenuService} from "core-components/op-context-menu/op-context-menu.service";
 import {Directive, ElementRef, Inject} from "@angular/core";
 import {OpContextMenuTrigger} from "core-components/op-context-menu/handlers/op-context-menu-trigger.directive";
-import {WorkPackageEditingService} from "core-components/wp-edit-form/work-package-editing-service";
+
+import {HalResourceEditingService} from "core-app/modules/fields/edit/services/hal-resource-editing.service";
 import {States} from "core-components/states.service";
 import {FormResource} from 'core-app/modules/hal/resources/form-resource';
-import {IWorkPackageEditingServiceToken} from "../../wp-edit-form/work-package-editing.service.interface";
 
 @Directive({
   selector: '[wpCreateSettingsMenu]'
@@ -42,7 +42,7 @@ export class WorkPackageCreateSettingsMenuDirective extends OpContextMenuTrigger
   constructor(readonly elementRef:ElementRef,
               readonly opContextMenu:OPContextMenuService,
               readonly states:States,
-              @Inject(IWorkPackageEditingServiceToken) protected wpEditing:WorkPackageEditingService) {
+              readonly halEditing:HalResourceEditingService) {
 
     super(elementRef, opContextMenu);
   }
@@ -51,8 +51,8 @@ export class WorkPackageCreateSettingsMenuDirective extends OpContextMenuTrigger
     const wp = this.states.workPackages.get('new').value;
 
     if (wp) {
-      const changeset = this.wpEditing.changesetFor(wp);
-      changeset.getForm().then(
+      const change = this.halEditing.changeFor(wp);
+      change.getForm().then(
         (loadedForm:FormResource) => {
           this.buildItems(loadedForm);
           this.opContextMenu.show(this, evt);

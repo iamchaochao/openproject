@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -52,7 +52,7 @@ describe 'Project description widget on dashboard', type: :feature, js: true do
   end
   let(:image_fixture) { Rails.root.join('spec/fixtures/files/image.png') }
   let(:editor) { ::Components::WysiwygEditor.new 'body' }
-  let(:field) { WorkPackageEditorField.new(page, 'description', selector: '.wp-inline-edit--active-field') }
+  let(:field) { TextEditorField.new(page, 'description', selector: '.inline-edit--active-field') }
 
   before do
     login_as user
@@ -82,7 +82,7 @@ describe 'Project description widget on dashboard', type: :feature, js: true do
 
       within custom_text_widget.area do
         expect(page)
-          .to have_selector('.wp-edit-field--display-field', text: 'My own little text')
+          .to have_selector('.inline-edit--display-field', text: 'My own little text')
 
         find('.inplace-editing--container').click
 
@@ -90,7 +90,7 @@ describe 'Project description widget on dashboard', type: :feature, js: true do
         field.cancel_by_click
 
         expect(page)
-          .to have_selector('.wp-edit-field--display-field', text: 'My own little text')
+          .to have_selector('.inline-edit--display-field', text: 'My own little text')
       end
 
       dashboard_page.expect_no_notification message: I18n.t('js.notice_successful_update')

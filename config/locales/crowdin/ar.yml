@@ -1,3 +1,24 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
 ar:
   no_results_title_text: لا يوجد حالياً أي شيء لعرضه.
   activities:
@@ -7,21 +28,40 @@ ar:
     plugins:
       no_results_title_text: لا يوجد حالياً أية إضافات متاحة.
     custom_styles:
+      color_theme: "Color theme"
+      color_theme_custom: "(Custom)"
+      colors:
+        alternative-color: "Alternative"
+        content-link-color: "Link font"
+        primary-color: "Primary"
+        primary-color-dark: "Primary (dark)"
+        header-bg-color: "Header background"
+        header-item-bg-hover-color: "Header background on hover"
+        header-item-font-color: "Header font"
+        header-item-font-hover-color: "Header font on hover"
+        header-border-bottom-color: "Header border"
+        main-menu-bg-color: "Main menu background"
+        main-menu-bg-selected-background: "Main menu when selected"
+        main-menu-bg-hover-background: "Main menu on hover"
+        main-menu-font-color: "Main menu font"
+        main-menu-selected-font-color: "Main menu font when selected"
+        main-menu-hover-font-color: "Main menu font on hover"
+        main-menu-border-color: "Main menu border"
       custom_colors: "تخصيص الألوان"
       customize: "عدل مشروعك الخاص بالشعار الذي تريده.ملاحظه:هذا الشعار سوف يكون مرئي لجميع المستخدمين"
       enterprise_notice: "As a special 'Thank you!' for their financial contribution to develop OpenProject, this tiny feature is only available for Enterprise Edition support subscribers."
       manage_colors: "Edit color select options"
       instructions:
-        alternative_color: "Strong accent color, typically used for most the important button on a screen."
-        content_link_color: "Font color of most of the links."
-        primary_color: "Main color."
-        primary_color_dark: "Typically a darker version of the main color used for hover effects."
-        header_bg_color: "Background color of the header."
-        header_item_bg_hover_color: "Background color of clickable header items when hovered with the mouse."
-        header_item_font_color: "Font color of clickable header items."
-        header_item_font_hover_color: "Font color of clickable header items when hovered with the mouse."
-        header_border_bottom_color: "Thin line under the header. Leave this field empty if you don't want any line."
-        main_menu_bg_color: "Left side menu's background color."
+        alternative-color: "Strong accent color, typically used for the most important button on a screen."
+        content-link-color: "Font color of most of the links."
+        primary-color: "Main color."
+        primary-color-dark: "Typically a darker version of the main color used for hover effects."
+        header-item-bg-hover-color: "Background color of clickable header items when hovered with the mouse."
+        header-item-font-color: "Font color of clickable header items."
+        header-item-font-hover-color: "Font color of clickable header items when hovered with the mouse."
+        header-border-bottom-color: "Thin line under the header. Leave this field empty if you don't want any line."
+        main-menu-bg-color: "Left side menu's background color."
+      theme_warning: Changing the theme will overwrite you custom style. The design will then be lost. Are you sure you want to continue?
     enterprise:
       upgrade_to_ee: "Upgrade to Enterprise Edition"
       add_token: "Upload an Enterprise Edition support token"
@@ -45,7 +85,39 @@ ar:
       no_results_content_title: لا يوجد حالياً أنماط تحقيق.
       no_results_content_text: أنشئ نمط تحقيق جديد
   ldap_auth_sources:
+    technical_warning_html: |
+      This LDAP form requires technical knowledge of your LDAP / Active Directory setup.
+      <br/>
+      <a href="https://www.openproject.org/help/administration/manage-ldap-authentication/">Please visit our documentation for detailed instructions</a>.
+    attribute_texts:
+      name: Arbitrary name of the LDAP connection
+      host: LDAP host name or IP address
+      login_map: The attribute key in LDAP that is used to identify the unique user login. Usually, this will be `uid` or `samAccountName`.
+      generic_map: The attribute key in LDAP that is mapped to the OpenProject `%{attribute}` attribute
+      admin_map_html: "Optional: The attribute key in LDAP that <strong>if present</strong> marks the OpenProject user an admin. Leave empty when in doubt."
+      system_user_dn_html: |
+        Enter the DN of the system user used for read-only access.
+        <br/>
+        Example: uid=openproject,ou=system,dc=example,dc=com
+      system_user_password: Enter the bind password of the system user
+      base_dn: |
+        Enter the Base DN of the subtree in LDAP you want OpenProject to look for users and groups.
+        OpenProject will filter for provided usernames in this subtree only.
+        Example: ou=users,dc=example,dc=com
+      onthefly_register: |
+        If you check this box, OpenProject will automatically create new users from their LDAP entries
+        when they first authenticate with OpenProject.
+        Leave this unchecked to only allow existing accounts in OpenProject to authenticate through LDAP!
     connection_encryption: 'Connection encryption'
+    system_account: 'System account'
+    system_account_legend: |
+      OpenProject requires read-only access through a system account to lookup users and groups in your LDAP tree.
+      Please specify the bind credentials for that system user in the following section.
+    ldap_details: 'LDAP details'
+    user_settings: 'Attribute mapping'
+    user_settings_legend: |
+      The following fields are related to how users are created in OpenProject from LDAP entries and
+      what LDAP attributes are used to define the attributes of an OpenProject user (attribute mapping).
     tls_mode:
       plain: 'لا شيء'
       simple_tls: 'simple_tls'
@@ -283,7 +355,7 @@ ar:
       changeset:
         repository: "مستودع البيانات"
       comment:
-        commented: "علّق"
+        commented: "علّق" #an object that this comment belongs to
       custom_action:
         actions: "Actions"
       custom_field:
@@ -331,6 +403,13 @@ ar:
         types: "الأنواع"
         versions: "الإصدارات"
         work_packages: "مجموعات العمل"
+      project/status:
+        code: 'الحالة'
+        explanation: 'Status description'
+        codes:
+          on_track: 'On track'
+          at_risk: 'At risk'
+          off_track: 'Off track'
       query:
         column_names: "الأعمدة"
         relations_to_type_column: "Relations to %{type}"
@@ -422,6 +501,8 @@ ar:
         confirmation: "لا يتطابق مع %{attribute}."
         could_not_be_copied: "لا يمكن أن ينسخ بشكل كامل."
         does_not_exist: "غير موجود."
+        error_unauthorized: "may not be accessed."
+        error_readonly: "was attempted to be written but is not writable."
         empty: "لا يمكن أن تكون فارغة."
         even: "يجب أن يكون زوجي."
         exclusion: "محجوز."
@@ -485,6 +566,8 @@ ar:
               invalid_values: "A value is invalid."
               id_filter_required: "An 'id' filter is required."
         project:
+          archived_ancestor: 'The project has an archived ancestor.'
+          foreign_wps_reference_version: 'Work packages in non descendant projects reference versions of the project or its descendants.'
           attributes:
             types:
               in_use_by_work_packages: "لا يزال قيد الاستخدام من قبل مجموعات العمل: %{types}"
@@ -518,6 +601,10 @@ ar:
         role:
           permissions:
             dependency_missing: "need to also include '%{dependency}' as '%{permission}' is selected."
+        time_entry:
+          attributes:
+            hours:
+              day_limit: "is too high as a maximum of 24 hours can be logged per date."
         work_package:
           is_not_a_valid_target_for_time_entries: "مجموعة العمل #%{id} ليست هدفًا صالحًا لإعادة تعيين إدخالات الوقت."
           attributes:
@@ -625,6 +712,7 @@ ar:
   activity:
     created: "الإنشاء: %{title}"
     updated: "التحديث: %{title}"
+  #common attributes of all models
   attributes:
     active: "مفعّل"
     assigned_to: "المُسند إليه"
@@ -634,7 +722,7 @@ ar:
     base: "خطأ عام:"
     blocks_ids: "مُعرِّفات مجموعات العمل المحظورة"
     category: "الفئة"
-    comment: "التعليق"
+    comment: "تعليق"
     comments: "تعليق"
     content: "المحتوى"
     color: "اللون"
@@ -657,6 +745,7 @@ ar:
     is_default: "القيمة الافتراضية"
     is_for_all: "لكافة المشاريع"
     is_public: "عام"
+    #kept for backwards compatibility
     issue: "مجموعة العمل"
     lastname: "الاسم الأخير"
     login: "Username"
@@ -665,6 +754,7 @@ ar:
     password: "كلمة المرور"
     priority: "الأولوية"
     project: "مشروع"
+    public: "عام"
     responsible: "Accountable"
     role: "الدور"
     roles: "دور"
@@ -676,6 +766,7 @@ ar:
     type: "النّوع"
     updated_at: "تم التحديث بتاريخ"
     updated_on: "تم التحديث بتاريخ"
+    uploader: "Uploader"
     user: "المستخدم"
     version: "الإصدار"
     work_package: "مجموعة العمل"
@@ -713,7 +804,7 @@ ar:
   button_generate: "أنتج"
   button_list: "القائمة"
   button_lock: "إغلاق"
-  button_log_time: "وقت التسجيل"
+  button_log_time: "وقت السجل"
   button_login: "تسجيل الدخول"
   button_move: "نقل"
   button_move_and_follow: "نقل ومتابعة"
@@ -800,9 +891,13 @@ ar:
       - "الجمعة"
       - "السبت"
     formats:
+      #Use the strftime parameters for formats.
+      #When no format has been given, it uses default.
+      #You can provide other formats here if you like!
       default: "%m/%d/%Y"
       long: "%B %d, %Y"
       short: "%b %d"
+    #Don't forget the nil at the beginning; there's no such thing as a 0th month
     month_names:
       - null
       - "كانون الثاني"
@@ -817,6 +912,7 @@ ar:
       - "تشرين الأول"
       - "تشرين الثاني"
       - "كانون الأول"
+    #Used in date_select and datime_select.
     order:
       - ':السنة'
       - ':الشهر'
@@ -994,6 +1090,7 @@ ar:
   description_sub_work_package: "مجموعة العمل الفرعية للمجموعة الحالية"
   description_toc_toggle: "إظهار/إخفاء جدول المحتويات"
   description_wiki_subpages_reassign: "اختر صفحة الاصل الجيدة"
+  #Text direction: Left-to-Right (ltr) or Right-to-Left (rtl)
   direction: ltr
   ee:
     upsale:
@@ -1002,13 +1099,12 @@ ar:
         add_groups: "Add new attribute groups"
         rename_groups: "Rename attributes groups"
       project_filters:
-        description_html: "Upgrade to %{link} to filter and sort on custom fields"
-  enumeration_activities: "الأنشطة (تتبع الوقت)"
+        description_html: "Filtering and sorting on custom fields is an enterprise edition feature."
+  enumeration_activities: "Time tracking activities"
   enumeration_work_package_priorities: "أولويات مجموعة العمل"
-  enumeration_system_activity: "نشاط النظام"
   enumeration_reported_project_statuses: "حالة للمشروع المبلغ عنه"
   error_auth_source_sso_failed: "Single Sign-On (SSO) for user '%{value}' failed"
-  error_can_not_archive_project: "This project cannot be archived: There is at least one work package assigned to a version defined in this project."
+  error_can_not_archive_project: "This project cannot be archived: %{errors}"
   error_can_not_delete_entry: "Unable to delete entry"
   error_can_not_delete_custom_field: "غير قادر على حذف الحقل المخصص"
   error_can_not_delete_type: "هذا النوع يحتوي على مجموعة عمل ولا يمكن حذفه."
@@ -1017,6 +1113,7 @@ ar:
   error_can_not_remove_role: "هذا الدور هو قيد الاستخدام ولا يمكن حذفه."
   error_can_not_reopen_work_package_on_closed_version: "لا يمكن إعادة فتح مجموعة العمل المسندة الى نسخة مغلقة"
   error_can_not_find_all_resources: "Could not find all related resources to this request."
+  error_can_not_unarchive_project: "This project cannot be unarchived: %{errors}"
   error_check_user_and_role: "الرجاءاختر مستخدم ودور."
   error_code: "Error %{code}"
   error_cookie_missing: 'ملف تعريف الارتباط "كوكي" لأوبن بروجكت مفقود. من فضلك تأكد من أن يتم تمكين ملفات تعريف الارتباط "كوكيز"، لأن هذا التطبيق لن يعمل بشكل صحيح دون ذلك.'
@@ -1074,6 +1171,8 @@ ar:
       pdf_with_descriptions: "PDF مع مواصفات"
       pdf_with_descriptions_and_attachments: "PDF with descriptions and attachments"
       pdf_with_attachments: "PDF with attachments"
+    image:
+      omitted: "Image not exported."
   extraction:
     available:
       pdftotext: "Pdftotext available (optional)"
@@ -1121,6 +1220,8 @@ ar:
       blog: "مدونة أوبِن بروجِكت"
       forums: "منتدى المجتمع"
       newsletter: "Security alerts / Newsletter"
+  journals:
+    changes_retracted: "The changes where retracted."
   links:
     configuration_guide: 'Configuration guide'
   instructions_after_registration: "يمكنك تسجيل الدخول بمجرد أن تم تنشيط الحساب الخاص بك عن طريق النقر فوق %{signin}."
@@ -1654,6 +1755,7 @@ ar:
   label_workflow_plural: "تدفقات العمل"
   label_workflow_summary: "مُلخّص"
   label_x_closed_work_packages_abbr:
+    zero: "0 closed"
     zero: "%{count} مغلق"
     one: "1 مغلقة"
     two: "%{count} مغلق"
@@ -1661,6 +1763,7 @@ ar:
     many: "%{count} مغلق"
     other: "%{count} مغلق"
   label_x_comments:
+    zero: "no comments"
     zero: "%{count} تعليقات"
     one: "1 comment"
     two: "%{count} تعليقات"
@@ -1668,6 +1771,7 @@ ar:
     many: "%{count} تعليقات"
     other: "%{count} تعليقات"
   label_x_open_work_packages_abbr:
+    zero: "0 open"
     zero: "%{count} مفتوح"
     one: "1 open"
     two: "%{count} مفتوح"
@@ -1675,6 +1779,7 @@ ar:
     many: "%{count} مفتوح"
     other: "%{count} مفتوح"
   label_x_projects:
+    zero: "no projects"
     zero: "%{count} مشاريع"
     one: "1 project"
     two: "%{count} مشاريع"
@@ -1739,12 +1844,14 @@ ar:
   mail_body_lost_password: "لتغيير كلمة المرور الخاصة بك، انقر فوق الارتباط التالي:"
   mail_body_register: "لتغيير كلمة المرور الخاصة بك، انقر فوق الارتباط التالي:"
   mail_body_reminder: "%{count} عمل الحزمة (الحزم) التي تم تعيينها لك الواجبة في الأيام المقبلة %{days}:"
+  mail_body_group_reminder: "%{count} work package(s) that are assigned to group \"%{group}\" are due in the next %{days} days:"
   mail_body_wiki_content_added: "تم إضافة صفحة wiki '%{id}' من %{author}."
   mail_body_wiki_content_updated: "تم تحديث صفحة wiki '%{id}' من %{author}."
   mail_subject_account_activation_request: "طلب تنشيط حساب %{value}"
   mail_subject_lost_password: "كلمة المرور %{value}"
   mail_subject_register: "تنشيط الحساب الخاص بك %{value}"
   mail_subject_reminder: "الحزمة (الحزم) %{count} العمل الواجب في الأيام القادمة %{days}"
+  mail_subject_group_reminder: "For group \"%{group}\" %{count} work package(s) due in the next %{days} days"
   mail_subject_wiki_content_added: "تم إضافة صفحة wiki '%{id}'"
   mail_subject_wiki_content_updated: "تم تحديث صفحة wiki '%{id}'"
   mail_user_activation_limit_reached:
@@ -1754,8 +1861,8 @@ ar:
       The user cannot activate their account since the user limit has been reached.
     steps:
       label: "To allow the user to sign in you can either: "
-      a: "Upgrade your payment plan ([here](upgrade_url))"
-      b: "Lock or delete an existing user ([here](users_url))"
+      a: "Upgrade your payment plan ([here](upgrade_url))" #here turned into a link
+      b: "Lock or delete an existing user ([here](users_url))" #here turned into a link
   more_actions: "المزيد من الوظائف"
   noscript_description: "تحتاج إلى تفعيل جافا سكريبت لاستخدام open project!"
   noscript_heading: "جافا سكريبت"
@@ -1822,6 +1929,7 @@ ar:
   notice_project_cannot_update_custom_fields: "لا يمكنك تحديث الحقول المخصصة المتوفرة للمشروع. المشروع غير صالح: %{errors}"
   notice_attachment_migration_wiki_page: >
     This page was generated automatically during the update of OpenProject. It contains all attachments previously associated with the %{container_type} "%{container_name}".
+  #Default format for numbers
   number:
     format:
       delimiter: ""
@@ -1931,6 +2039,7 @@ ar:
       title: تغيير معرف المشروع
     archive:
       are_you_sure: "هل أنت متأكد من أنك تريد أرشفة المشروع '%{name}'؟"
+      archived: "Archived"
   project_module_activity: "النشاط"
   project_module_forums: "منتديات"
   project_module_calendar: "التقويم"
@@ -1942,6 +2051,8 @@ ar:
   project_module_wiki: "Wiki"
   query:
     attribute_and_direction: "%{attribute} (%{direction})"
+  #possible query parameters (e.g. issue queries),
+  #which are not attributes of an AR-Model.
   query_fields:
     active_or_archived: "Active or archived"
     assigned_to_role: "دور الموكل إليه"
@@ -2183,6 +2294,7 @@ ar:
   status_invited: مدعوّ
   status_locked: مقفل
   status_registered: تم التسجيل
+  #Used in array.to_sentence.
   support:
     array:
       sentence_connector: "و"
@@ -2218,7 +2330,7 @@ ar:
   text_destroy_with_associated: "وهناك كائنات إضافية مرتبطة مع الحزمة (الحزم) العمل الموجودة المراد حذفها. هذه الكائنات من الأنواع التالية: "
   text_destroy_what_to_do: "ماذا تريد أن تفعل؟"
   text_diff_truncated: "... تم اقتطاعه لأنه يتجاوز الحد الأقصى للحجم التي يمكن عرضها."
-  text_email_delivery_not_configured: "لم يتم تكوين تسليم البريد الإلكتروني و تم تعطيل إعلامات. كون ملقم SMTP الخاص بك في config/configuration.yml وإعادة تشغيل التطبيق لتمكينها."
+  text_email_delivery_not_configured: "Email delivery is not configured, and notifications are disabled.\nConfigure your SMTP server to enable them."
   text_enumeration_category_reassign_to: "إعادة تعيينهم إلى هذه القيمة:"
   text_enumeration_destroy_question: "يتم تعيين الكائنات %{count} لهذه القيمة."
   text_file_repository_writable: "مرفقات دليل قابل للكتابة"
@@ -2231,7 +2343,8 @@ ar:
   text_work_package_category_destroy_question: "يتم تعيين بعض حزم العمل (%{count}) لهذه الفئة. ماذا تريد أن تفعل؟"
   text_work_package_category_reassign_to: "إعادة تعيين مجموعات العمل لهذه الفئة"
   text_work_package_updated: "تم تحديث %{id} مجموعة العمل بواسطة %{author}."
-  text_work_package_watcher_added: "تمت إضافتك كمراقب لحزمة العمل %{id} بواسطة %{watcher_setter}."
+  text_work_package_watcher_added: "You have been added as a watcher to Work package %{id} by %{watcher_changer}."
+  text_work_package_watcher_removed: "You have been removed from watchers of Work package %{id} by %{watcher_changer}."
   text_work_packages_destroy_confirmation: "هل أنت متأكد من أنك تريد حذف العناصر المحددة؟"
   text_work_packages_ref_in_commit_messages: "تحديد المراجع وتثبيت مجموعات العمل في رسائل commit"
   text_journal_added: "%{value} %{label} أضيف"
@@ -2519,6 +2632,17 @@ ar:
     User limit reached. You cannot activate any more users. Please <a href="%{upgrade_url}">upgrade your plan</a> or block members to allow for additional users.
   warning_user_limit_reached_instructions: >
     You reached your user limit (%{current}/%{max} active users). Please contact sales@openproject.com to upgrade your Enterprise Edition plan and add additional users.
+  0: >
+
+  warning_bar:
+    protocol_mismatch:
+      title: 'Protocol setting mismatch'
+      text_html: >
+        Your application is running with its protocol setting set to <code>%{set_protocol}</code>, but the request is an <code>%{actual_protocol}</code> request. This will result in errors! Go to <a href="%{setting_path}">System settings</a> and change the "Protocol" setting to correct this.
+    hostname_mismatch:
+      title: 'Hostname setting mismatch'
+      text_html: >
+        Your application is running with its host name setting set to <code>%{set_hostname}</code>, but the request is a <code>%{actual_hostname}</code> hostname. This will result in errors! Go to <a href="%{setting_path}">System settings</a> and change the "Host name" setting to correct this.
   menu_item: "عناصر القائمة"
   menu_item_setting: "الظهور"
   wiki_menu_item_for: "عنصر القائمة \"%{title}\""
@@ -2527,6 +2651,7 @@ ar:
     يتم حذف عنصر القائمة Wiki الرئيسي فقط. لديك الآن لاختيار صفحة wiki التي سيتم إنشاء عنصر جديد الرئيسي. لحذف صفحة wiki يمكن إلغاء تنشيط الوحدة النمطية Wiki بواسطة المسؤولين عن المشروع.
   wiki_menu_item_delete_not_permitted: لا يمكن حذف عنصر القائمة ويكي لصفحة wiki فقط.
   query_menu_item_for: "عنصر القائمة للاستعلام \"%{title}\""
+  #TODO: merge with work_packages top level key
   work_package:
     updated_automatically_by_child_changes: |
       محدث تلقائياً بتغيير القيم داخل حزمة العمل الفرعية %{child}_
@@ -2571,7 +2696,9 @@ ar:
         estimated_hours: "لا يمكن تعيين الساعات المقدرة على حزم العمل."
         invalid_user_assigned_to_work_package: "غير مسموح للمستخدم الذي تم اختياره أن يكون '%{property}' لمجموعة العمل هذه."
         start_date: "الوقت لإتمام المشروع لا يمكن تعيينه في حزم العمل الحالية."
-      writing_read_only_attributes: "لا يجب أن تكتب على سمة للقراءة فقط."
+      eprops:
+        invalid_gzip: "is invalid gzip: %{message}"
+        invalid_json: "is invalid json: %{message}"
     resources:
       schema: 'مخطّط'
   doorkeeper:
@@ -2579,18 +2706,22 @@ ar:
       status: 'Pre-authorization'
     errors:
       messages:
+        #Common error messages
         invalid_request: 'The request is missing a required parameter, includes an unsupported parameter value, or is otherwise malformed.'
-        invalid_redirect_uri: "The requested redirect uri is malformed or doesn't match client redirect URI."
+        invalid_redirect_uri: "The requested redirect URI is malformed or doesn't match client redirect URI."
         unauthorized_client: 'The client is not authorized to perform this request using this method.'
         access_denied: 'The resource owner or authorization server denied the request.'
         invalid_scope: 'The requested scope is invalid, unknown, or malformed.'
         invalid_code_challenge_method: 'The code challenge method must be plain or S256.'
         server_error: 'The authorization server encountered an unexpected condition which prevented it from fulfilling the request.'
         temporarily_unavailable: 'The authorization server is currently unable to handle the request due to a temporary overloading or maintenance of the server.'
+        #Configuration error messages
         credential_flow_not_configured: 'Resource Owner Password Credentials flow failed due to Doorkeeper.configure.resource_owner_from_credentials being unconfigured.'
         resource_owner_authenticator_not_configured: 'Resource Owner find failed due to Doorkeeper.configure.resource_owner_authenticator being unconfigured.'
         admin_authenticator_not_configured: 'Access to admin panel is forbidden due to Doorkeeper.configure.admin_authenticator being unconfigured.'
+        #Access grant errors
         unsupported_response_type: 'The authorization server does not support this response type.'
+        #Access token errors
         invalid_client: 'Client authentication failed due to unknown client, no client authentication included, or unsupported authentication method.'
         invalid_grant: 'The provided authorization grant is invalid, expired, revoked, does not match the redirection URI used in the authorization request, or was issued to another client.'
         unsupported_grant_type: 'The authorization grant type is not supported by the authorization server.'
@@ -2615,6 +2746,7 @@ ar:
         redirect_uri_html: >
           The allowed URLs authorized users can be redirected to. One entry per line. <br/> If you're registering a desktop application, use the following URL.
         confidential: "Check if the application will be used where the client secret can be kept confidential. Native mobile apps and Single Page Apps are assumed non-confidential."
+        scopes: "Check the scopes you want the application to grant access to. If no scope is checked, api_v3 is assumed."
         client_credential_user_id: "Optional user ID to impersonate when clients use this application. Leave empty to allow public access only"
         register_intro: "If you are developing an OAuth API client application for OpenProject, you can register it using this form for all users to use."
         default_scopes: ""
@@ -2629,8 +2761,8 @@ ar:
       wants_to_access_html: >
         This application requests access to your OpenProject account. <br/> <strong>It has requested the following permissions:</strong>
     scopes:
-      api_v3: "Full API access"
-      api_v3_text: "Application will receive full read & write access to the OpenProject API to perform actions on your behalf."
+      api_v3: "Full API v3 access"
+      api_v3_text: "Application will receive full read & write access to the OpenProject API v3 to perform actions on your behalf."
     grants:
       created_date: "Approved on"
       scopes: "السماحيات"

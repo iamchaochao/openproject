@@ -1,3 +1,25 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
+#---
 da:
   activerecord:
     attributes:
@@ -11,14 +33,14 @@ da:
         available: "Tillrådighed"
         budget: "Planlagte"
         budget_ratio: "Forbrugt (ratio)"
-        created_on: "Oprettet d."
+        created_on: "Oprettet den"
         description: "Beskrivelse"
         fixed_date: "Fast dato"
         spent: "Forbrugt"
         status: "Status"
         subject: "Emne"
         type: "Omkostningstype"
-        updated_on: "Opdateret d."
+        updated_on: "Opdateret den"
       cost_type:
         unit: "Enhedsnavn"
         unit_plural: "Pluralistisk enhedsnavn"
@@ -66,7 +88,7 @@ da:
   button_cancel_edit_budget: "Annullér budgetredigering"
   button_cancel_edit_costs: "Annullér omkostningsredigering"
   button_log_costs: "Registrér enhedsomkostninger"
-  button_log_time: "Registrér tid"
+  button_log_time: "Tidsregistrering"
   caption_booked_on_project: "Reservationer til projekt"
   caption_default: "Forhåndsvalgt"
   caption_default_rate_history_for: "Standardsatshistorik for %{user}"
@@ -82,9 +104,6 @@ da:
   caption_set_rate: "Indstil nuværende sats"
   caption_show_locked: "Vis låste typer"
   cost_objects_title: "Budgetter"
-  label_cost_type_plural: "Omkostningstyper"
-  currency_delimiter: ","
-  currency_separator: "."
   description_date_for_new_rate: "Dato for ny sats"
   events:
     cost_object: "Budget redigeret"
@@ -102,18 +121,19 @@ da:
   label_cost_plural: "Omkostninger"
   label_cost_report: "Omkostningsrapport"
   label_cost_type_specific: "Budget #%{id}: %{name}"
+  label_cost_type_plural: "Omkostningstyper"
   label_costs_per_page: "Omkostninger pr. side"
   label_currency: "Valuta"
   label_currency_format: "Valutaformat"
   label_current_default_rate: "Nuværende standardsats"
-  label_date_on: "d."
+  label_date_on: "på"
   label_deleted_cost_types: "Slettede omkostningstyper"
   label_locked_cost_types: "Locked cost types"
   label_deliverable: "Budget"
   label_display_cost_entries: "Vis enhedsomkostninger"
   label_display_time_entries: "Vis indberettede timer"
   label_display_types: "Vis typer"
-  label_edit: "Redigér"
+  label_edit: "Rediger"
   label_fixed_cost_object: "Fast budget"
   label_fixed_date: "Fast dato"
   label_generic_user: "Generisk bruger"
@@ -127,7 +147,7 @@ da:
   label_less_or_equal: "<="
   label_log_costs: "Registrér enhedsomkostninger"
   label_no: "Nej"
-  label_option_plural: "Valgmuligheder"
+  label_option_plural: "Muligheder"
   label_overall_costs: "Samlede omkostninger"
   label_rate: "Sats"
   label_rate_plural: "Satser"
@@ -170,4 +190,4 @@ da:
   text_warning_hidden_elements: "Visse angivelser kan været blevet ekskluderet fra sammenlægning."
   week: "uge"
   js:
-    text_are_you_sure: "Sikker?"
+    text_are_you_sure: "Er du sikker?"

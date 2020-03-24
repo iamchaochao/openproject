@@ -1,3 +1,24 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
 it:
   no_results_title_text: Al momento non c'è niente da visualizzare.
   activities:
@@ -7,21 +28,40 @@ it:
     plugins:
       no_results_title_text: Al momento non vi sono plugin disponibili.
     custom_styles:
+      color_theme: "Tema a colori"
+      color_theme_custom: "(Personalizzato)"
+      colors:
+        alternative-color: "Alternativa"
+        content-link-color: "Collega font"
+        primary-color: "Primario"
+        primary-color-dark: "Primario (scuro)"
+        header-bg-color: "Sfondo intestazione"
+        header-item-bg-hover-color: "Sfondo intestazione al passaggio del mouse"
+        header-item-font-color: "Font intestazione"
+        header-item-font-hover-color: "Font intestazione al passaggio del mouse"
+        header-border-bottom-color: "Bordo intestazione"
+        main-menu-bg-color: "Sfondo del menu principale"
+        main-menu-bg-selected-background: "Menu principale quando selezionato"
+        main-menu-bg-hover-background: "Menu principale al passaggio del mouse"
+        main-menu-font-color: "Font del menu principale"
+        main-menu-selected-font-color: "Font del menu principale quando selezionato"
+        main-menu-hover-font-color: "Font del menu principale al passaggio del mouse"
+        main-menu-border-color: "Bordo del menu principale"
       custom_colors: "Colori personalizzati"
       customize: "Personalizza l'installazione di OpenProject con il tuo logo. Nota: Il logo sarà visibile pubblicamente."
       enterprise_notice: "Questa funzionalità è disponibile solo per chi si è iscritto alla Enterprise Edition, come ringraziamento speciale per il contributo finanziario allo sviluppo di OpenProject."
       manage_colors: "Modifica opzioni di selezione del colore"
       instructions:
-        alternative_color: "Colore forte, utilizzato di solito per far risaltare il tasto principale sullo schermo."
-        content_link_color: "Colore del carattere della maggior parte dei collegamenti."
-        primary_color: "Colore principale."
-        primary_color_dark: "In genere una versione più scura del colore principale utilizzato per effetti hover."
-        header_bg_color: "Colore di sfondo dell'intestazione."
-        header_item_bg_hover_color: "Colore dello sfondo degli elementi cliccabili nelle intestazioni al passaggio del mouse."
-        header_item_font_color: "Colore del carattere degli elementi cliccabili nelle intestazioni."
-        header_item_font_hover_color: "Colore del carattere degli elementi cliccabili nelle intestazioni al passaggio del mouse."
-        header_border_bottom_color: "Sottile linea sotto l'intestazione. Lascia vuoto questo campo se non vuoi nessuna linea."
-        main_menu_bg_color: "Colore di sfondo del menu a sinistra."
+        alternative-color: "Colore forte, utilizzato di solito per far risaltare il tasto principale sullo schermo."
+        content-link-color: "Colore del carattere della maggior parte dei collegamenti."
+        primary-color: "Colore principale."
+        primary-color-dark: "In genere una versione più scura del colore principale utilizzato per effetti hover."
+        header-item-bg-hover-color: "Colore dello sfondo degli elementi cliccabili nelle intestazioni al passaggio del mouse."
+        header-item-font-color: "Colore del carattere degli elementi cliccabili nelle intestazioni."
+        header-item-font-hover-color: "Colore del carattere degli elementi cliccabili nelle intestazioni al passaggio del mouse."
+        header-border-bottom-color: "Sottile linea sotto l'intestazione. Lascia vuoto questo campo se non vuoi nessuna linea."
+        main-menu-bg-color: "Colore di sfondo del menu a sinistra."
+      theme_warning: Changing the theme will overwrite you custom style. The design will then be lost. Are you sure you want to continue?
     enterprise:
       upgrade_to_ee: "Aggiorna ad Enterprise Edition"
       add_token: "Carica un token di assistenza per Enterprise Edition"
@@ -45,7 +85,36 @@ it:
       no_results_content_title: Al momento non vi è alcuna modalità di autenticazione.
       no_results_content_text: Crea una nuova modalità di autenticazione
   ldap_auth_sources:
+    technical_warning_html: |
+      Questo form LDAP richiede una conoscenza tecnica dell'attuale setup LDAP / Active Directory. <br/>
+      <a href="https://www.openproject.org/help/administration/manage-ldap-authentication/">Per favore visita la nostra documentazione per istruzioni dettagliate</a>.
+    attribute_texts:
+      name: Nome della connessione LDAP
+      host: Nome host LDAP o indirizzo IP
+      login_map: L'attributo chiave LDAP usato per identificare il login univoco dell'utente. Solitamente, è il campo 'uid' o 'samAccountName'.
+      generic_map: L'attributo chiave LDAP mappato nell'attributo OpenProject '%{attribute}'
+      admin_map_html: "Opzionale: L'attributo chiave LDAP che <strong>se presente</strong> indica l'utente OpenProject come amministratore. Lasciare vuoto se non sicuri."
+      system_user_dn_html: |
+        Inserire il nome dominio del sistema utilizzato dall'utente per l'accesso in sola lettura.
+        <br/>
+        Esempio: uid=openproject,ou=system,dc=example,dc=com
+      system_user_password: Inserire la password associata all'utente di sistema
+      base_dn: |
+        Inserire il nome dominio del ramo LDAP che si vuole far scansionare da OpenProject per la ricerca di utenti e gruppi.
+        OpenProject scansionerà solo il ramo fornito.
+        Esempio: ou=utenti,dc=esempio,dc=com
+      onthefly_register: |
+        Se selezioni questa spunta, OpenProject creerà automaticamente nuovi utenti dai loro record LDAP quando effettueranno la prima autenticazione con OpenProject.
+        Lasciare vuota questa spunta se si vuole garantire ai soli account presenti su OpenProject di autenticarsi tramite LDAP!
     connection_encryption: 'Crittografia connessione'
+    system_account: 'Account di sistema'
+    system_account_legend: |
+      OpenProject richiede accesso in sola lettura ad un account di sistema per cercare utenti e gruppi nell'albero LDAP.
+      Per favore, specificare le credenziali associate per l'account di sistema nella sezione seguente.
+    ldap_details: 'Dettagli LDAP'
+    user_settings: 'Mappatura attributi'
+    user_settings_legend: |
+      I seguenti campi sono associati a come gli utenti sono creati all'interno di OpenProject dai record LDAP e quali attributi LDAP sono usati per definire gli attributi di un utente OpenProject (mapping degli attributi).
     tls_mode:
       plain: 'nessuno'
       simple_tls: 'simple_tls'
@@ -90,7 +159,7 @@ it:
   concatenation:
     single: 'oppure'
   deprecations:
-    time_entries: "This time entries view is superseded by the 'Cost reports' module. This view now only supports exporting time entry information to csv. For interactive filtering, please activate the 'Cost reports' module in the project settings."
+    time_entries: "Questa visualizzazione di voci sul tempo è superata dal modulo \"Rapporto Costi\". Questa visualizzazione ora supporta solo l'esportazione di informazioni sulle voci sul tempo in csv. Per usare i filtri in modo interattivo, attiva il modulo \"Rapporto Costi\" nelle impostazioni del progetto."
   global_search:
     overwritten_tabs:
       wiki_pages: "Wiki"
@@ -111,7 +180,7 @@ it:
       scheduled: "L'eliminazione è stata programmata e verrà eseguita in background. Verrai avvisato del risultato."
       schedule_failed: "Il progetto non può essere eliminato: %{errors}"
       failed: "Eliminazione del progetto %{name} non riuscita"
-      failed_text: "La richiesta di eliminare il progetto %{name} non è riuscita. Il progetto è stato archiviato."
+      failed_text: "La richiesta di eliminare il progetto %{name} non è riuscita. Il progetto è stato lasciato in archivio."
       completed: "Eliminazione del progetto %{name} completata"
       completed_text: "La richiesta di cancellare il progetto '%{name}' è stata completata."
     index:
@@ -278,7 +347,7 @@ it:
       changeset:
         repository: "Archivio"
       comment:
-        commented: "Commentato"
+        commented: "Commentato" #an object that this comment belongs to
       custom_action:
         actions: "Azioni"
       custom_field:
@@ -326,6 +395,13 @@ it:
         types: "Tipi"
         versions: "Versioni"
         work_packages: "Macro-attività"
+      project/status:
+        code: 'Stato'
+        explanation: 'Descrizione stato'
+        codes:
+          on_track: 'Nei limiti'
+          at_risk: 'A rischio'
+          off_track: 'Fuori limite'
       query:
         column_names: "Colonne"
         relations_to_type_column: "Relazioni con %{type}"
@@ -398,10 +474,10 @@ it:
         watcher: "Osservatore"
       'doorkeeper/application':
         uid: "Client ID"
-        secret: "Segreto del client"
+        secret: "Chiave segreta del client"
         owner: "Proprietario"
-        redirect_uri: "Reindirizzamento URl"
-        client_credentials_user_id: "ID utente credenziali client"
+        redirect_uri: "Reindirizzamento URI"
+        client_credentials_user_id: "ID utente delle credenziali client"
         scopes: "Ambiti"
         confidential: "Confidenziale"
     errors:
@@ -417,6 +493,8 @@ it:
         confirmation: "non coincide con %{attribute}."
         could_not_be_copied: "non possono essere copiati (integralmente)."
         does_not_exist: "non esiste."
+        error_unauthorized: "potrebbe non essere accessibile."
+        error_readonly: "è in sola lettura, pertanto non è stato possibile modificarlo."
         empty: "non può essere vuoto."
         even: "deve essere pari."
         exclusion: "è riservato."
@@ -444,7 +522,7 @@ it:
         too_long: "è troppo lungo (il massimo è %{count} caratteri)."
         too_short: "è troppo breve (il minimo è %{count} caratteri)."
         unchangeable: "non può essere modificato."
-        unremovable: "non può essere rimosso."
+        unremovable: "impossibile rimuovere."
         wrong_length: "è della lunghezza sbagliata (dovrebbe essere %{count} caratteri)."
       models:
         custom_field:
@@ -466,7 +544,7 @@ it:
               secured_uri: 'deve essere un URI HTTPS/SSL.'
               forbidden_uri: 'è vietato dal server.'
             scopes:
-              not_match_configured: "non corrisponde ai campi disponibili."
+              not_match_configured: "non corrisponde a nessuno degli ambiti disponibili."
         enterprise_token:
           unreadable: "non può essere letto. Sei sicuro che si tratta di un token di assistenza?"
         grids/grid:
@@ -480,6 +558,8 @@ it:
               invalid_values: "Valore non valido."
               id_filter_required: "Il filtro \"id\" è obbligatorio."
         project:
+          archived_ancestor: 'Il progetto ha un antenato archiviato.'
+          foreign_wps_reference_version: 'Macro-attività in progetti non discendenti contengono riferimenti a versioni del progetto o dei suoi discendenti.'
           attributes:
             types:
               in_use_by_work_packages: "ancora in uso dalla macro-attività: %{types}"
@@ -513,6 +593,10 @@ it:
         role:
           permissions:
             dependency_missing: "deve includere anche '%{dependency}' in quanto è selezionato '%{permission}'."
+        time_entry:
+          attributes:
+            hours:
+              day_limit: "è troppo alto: puoi registrare fino a 24 ore al giorno."
         work_package:
           is_not_a_valid_target_for_time_entries: "La macro-attività #%{id} non può essere utilizzata per riassegnare la cronologia."
           attributes:
@@ -608,6 +692,7 @@ it:
   activity:
     created: "Creato: %{title}"
     updated: "Aggiornato: %{title}"
+  #common attributes of all models
   attributes:
     active: "Attivo"
     assigned_to: "Assegnatario"
@@ -640,6 +725,7 @@ it:
     is_default: "Valore predefinito"
     is_for_all: "Per tutti progetti"
     is_public: "Pubblico"
+    #kept for backwards compatibility
     issue: "Macro-attività"
     lastname: "Cognome"
     login: "Nome utente"
@@ -648,6 +734,7 @@ it:
     password: "Password"
     priority: "Priorità"
     project: "Progetto"
+    public: "Pubblico"
     responsible: "Responsabile"
     role: "Ruolo"
     roles: "Ruoli"
@@ -659,6 +746,7 @@ it:
     type: "Tipo"
     updated_at: "Aggiornato il"
     updated_on: "Aggiornato il"
+    uploader: "Caricatore"
     user: "Utente"
     version: "Versione"
     work_package: "Macro-attività"
@@ -675,7 +763,7 @@ it:
   button_change_password: "Cambia password"
   button_check_all: "Seleziona tutti"
   button_clear: "Pulisci"
-  button_click_to_reveal: "Clicca per visualizzare"
+  button_click_to_reveal: "Clicca per mostrare"
   button_close: 'Chiuso'
   button_collapse_all: "Comprimi Tutto"
   button_configure: "Configura"
@@ -696,7 +784,7 @@ it:
   button_generate: "Genera"
   button_list: "Elenca"
   button_lock: "Blocca"
-  button_log_time: "Registra tempi"
+  button_log_time: "Registra l'orario effettuato"
   button_login: "Accedi"
   button_move: "Sposta"
   button_move_and_follow: "Sposta e segui"
@@ -783,9 +871,13 @@ it:
       - "Venerdi"
       - "Sabato"
     formats:
+      #Use the strftime parameters for formats.
+      #When no format has been given, it uses default.
+      #You can provide other formats here if you like!
       default: "%m/%d/%Y"
       long: "%B %d %y"
       short: "%b %d"
+    #Don't forget the nil at the beginning; there's no such thing as a 0th month
     month_names:
       - null
       - "Gennaio"
@@ -800,6 +892,7 @@ it:
       - "Ottobre"
       - "Novembre"
       - "Dicembre"
+    #Used in date_select and datime_select.
     order:
       - :anno
       - :mese
@@ -929,6 +1022,7 @@ it:
   description_sub_work_package: "Macro-attività subordinata alla corrente"
   description_toc_toggle: "Mostra/Nascondi tabella dei contenuti"
   description_wiki_subpages_reassign: "Scegli la nuova pagina padre"
+  #Text direction: Left-to-Right (ltr) or Right-to-Left (rtl)
   direction: da sinistra a destra
   ee:
     upsale:
@@ -937,13 +1031,12 @@ it:
         add_groups: "Aggiunta di gruppi di proprietà"
         rename_groups: "Rinominazione di gruppi di proprietà"
       project_filters:
-        description_html: "Aggiorna a %{link} per filtrare ed ordinare utilizzando i campi personalizzati"
-  enumeration_activities: "Attività (monitoraggio tempi)"
+        description_html: "Le opzioni di filtraggio ed ordinamento dei campi personalizzati sono disponibili nella versione enterprise."
+  enumeration_activities: "Attività di monitoraggio dei tempi"
   enumeration_work_package_priorities: "Priorità della macro-attività"
-  enumeration_system_activity: "Attività del sistema"
   enumeration_reported_project_statuses: "Stato di progetto segnalato"
   error_auth_source_sso_failed: "Single Sign-On (SSO) per l'utente '%{value}' non riuscita"
-  error_can_not_archive_project: "Questo progetto non può essere archiviato: non c'è nemmeno una macro-attività assegnata a una versione definita in questo progetto."
+  error_can_not_archive_project: "Questo progetto non può essere archiviato: %{errors}"
   error_can_not_delete_entry: "Impossibile eliminare la voce"
   error_can_not_delete_custom_field: "Impossibile eliminare il campo personalizzato"
   error_can_not_delete_type: "Questo tipo risulta contenere macro-attività e non può essere eliminato."
@@ -952,6 +1045,7 @@ it:
   error_can_not_remove_role: "Questo ruolo è in uso e non può essere eliminato."
   error_can_not_reopen_work_package_on_closed_version: "Una macro-attività assegnata ad una versione chiusa non può essere riaperta"
   error_can_not_find_all_resources: "Impossibile trovare tutte le risorse correlate a questa richiesta."
+  error_can_not_unarchive_project: "Questo progetto non può essere estratto: %{errors}"
   error_check_user_and_role: "Si prega di scegliere un utente e un ruolo."
   error_code: "Errore %{code}"
   error_cookie_missing: 'Il cookie di OpenProject è mancante. Prego, verifica che i cookie siano attivati, questa applicazione non funziona correttamente senza.'
@@ -1009,6 +1103,8 @@ it:
       pdf_with_descriptions: "PDF con descrizioni"
       pdf_with_descriptions_and_attachments: "PDF con descrizioni e allegati"
       pdf_with_attachments: "PDF con allegati"
+    image:
+      omitted: "Immagine non esportata."
   extraction:
     available:
       pdftotext: "Pdfatesto disponibile (opzionale)"
@@ -1056,6 +1152,8 @@ it:
       blog: "Blog di OpenProject"
       forums: "Forum della Comunità"
       newsletter: "Avvisi di sicurezza / Notizie"
+  journals:
+    changes_retracted: "The changes where retracted."
   links:
     configuration_guide: 'Guida di configurazione'
   instructions_after_registration: "Puoi accedere non appena il tuo account è stato attivato cliccando %{signin}."
@@ -1548,12 +1646,12 @@ it:
   label_view_diff: "Mostra le differenze"
   label_view_revisions: "Vedi revisioni"
   label_watched_work_packages: "Macro-attività osservate"
-  label_what_is_this: "Che cos'è questo?"
+  label_what_is_this: "Cos'è questo?"
   label_week: "Settimana"
   label_wiki_content_added: "Pagina wiki aggiunta"
   label_wiki_content_updated: "Pagina wiki aggiornata"
   label_wiki_toc: "Sommario"
-  label_wiki_toc_empty: "Table of Contents is empty as no headings are present."
+  label_wiki_toc_empty: "La tabella dei contenuti è vuota in quanto non è presente nessuna intestazione."
   label_wiki_dont_show_menu_item: "Non mostrare questa pagina wiki nella navigazione del progetto"
   label_wiki_edit: "Modifica wiki"
   label_wiki_edit_plural: "Modifiche wiki"
@@ -1589,15 +1687,19 @@ it:
   label_workflow_plural: "Flussi di lavoro"
   label_workflow_summary: "Sommario"
   label_x_closed_work_packages_abbr:
+    zero: "0 chiusi"
     one: "1 chiuso"
     other: "%{count} chiusi"
   label_x_comments:
+    zero: "nessun commento"
     one: "1 commento"
     other: "%{count} commenti"
   label_x_open_work_packages_abbr:
+    zero: "0 aperti"
     one: "1 aperto"
     other: "%{count} aperti"
   label_x_projects:
+    zero: "nessun progetto"
     one: "1 progetto"
     other: "%{count} progetti"
   label_year: "Anno"
@@ -1640,7 +1742,7 @@ it:
     legacy_warning:
       timeline: 'Questa macro legacy di sequenza temporale è stata rimossa e non è più disponibile. È possibile sostituire la funzionalità con una macro di tabella incorporata.'
     include_wiki_page:
-      removed: 'The macro does no longer exist.'
+      removed: 'La macro non esiste più.'
     wiki_child_pages:
       errors:
         page_not_found: "Impossibile trovare la pagina del wiki \"%{name}\"."
@@ -1658,12 +1760,14 @@ it:
   mail_body_lost_password: "Per cambiare la password, clicca nel link seguente:"
   mail_body_register: "Per attivare il tuo account, clicca sul seguente link:"
   mail_body_reminder: "%{count} macro-attività a te assegnata/e scadono nei prossimi %{days} giorni:"
+  mail_body_group_reminder: "%{count} macro-attività assegnata/e al gruppo \"%{group}\" scadono nei prossimi %{days} giorni:"
   mail_body_wiki_content_added: "La pagina wiki '%{id}' è stata aggiunta da %{author}."
   mail_body_wiki_content_updated: "La pagina wiki '%{id}' è stata aggiornata da %{author}."
   mail_subject_account_activation_request: "%{value} richiesta di attivazione account"
   mail_subject_lost_password: "La tua %{value} password"
   mail_subject_register: "La tua %{value} attivazione dell'account"
   mail_subject_reminder: "%{count} macro-attività in scadenza nei prossimi %{days} giorni"
+  mail_subject_group_reminder: "Per il gruppo \"%{group}\" ci sono %{count} macro-attività in scadenza nei prossimi %{days} giorni"
   mail_subject_wiki_content_added: "La pagina wiki '%{id}' è stata aggiunta"
   mail_subject_wiki_content_updated: "La pagina wiki '%{id}' è stata aggiornata"
   mail_user_activation_limit_reached:
@@ -1673,8 +1777,8 @@ it:
       L'utente non può attivare il proprio account dal momento che è stato raggiunto il limite di utente.
     steps:
       label: "Per consentire all'utente di registrarsi puoi: "
-      a: "Aggiorna il tuo piano di pagamento ([here](upgrade_url))"
-      b: "Bloccare o eliminare un utente esistente ([here](users_url))"
+      a: "Aggiorna il tuo piano di pagamento ([here](upgrade_url))" #here turned into a link
+      b: "Bloccare o eliminare un utente esistente ([here](users_url))" #here turned into a link
   more_actions: "Altre funzioni"
   noscript_description: "È necessario attivare JavaScript per poter usare OpenProject!"
   noscript_heading: "JavaScript disabilitato"
@@ -1741,6 +1845,7 @@ it:
   notice_project_cannot_update_custom_fields: "Non è possibile aggiornare i campi personalizzati del progetto disponibili. Il progetto non è valido: %{errors}"
   notice_attachment_migration_wiki_page: >
     Questa pagina è stata generata automaticamente durante l'aggiornamento di OpenProject. Contiene tutti gli allegati precedentemente connessi con il %{container_type} "%{container_name}".
+  #Default format for numbers
   number:
     format:
       delimiter: ""
@@ -1846,6 +1951,7 @@ it:
       title: Modifica l'identificatore del progetto
     archive:
       are_you_sure: "Sicuro di voler archiviare il progetto '%{name}'?"
+      archived: "Archiviato"
   project_module_activity: "Attività"
   project_module_forums: "Forum"
   project_module_calendar: "Calendario"
@@ -1857,6 +1963,8 @@ it:
   project_module_wiki: "Wiki"
   query:
     attribute_and_direction: "%{attribute} (%{direction})"
+  #possible query parameters (e.g. issue queries),
+  #which are not attributes of an AR-Model.
   query_fields:
     active_or_archived: "Attivo o archiviato"
     assigned_to_role: "Ruolo dell'incaricato"
@@ -2100,6 +2208,7 @@ it:
   status_invited: invitato
   status_locked: bloccato
   status_registered: registrato
+  #Used in array.to_sentence.
   support:
     array:
       sentence_connector: "e"
@@ -2135,7 +2244,7 @@ it:
   text_destroy_with_associated: "Ci sono ulteriori oggetti associati con la/le macro-attività che devono essere eliminati. Tali oggetti sono dei seguenti tipi:"
   text_destroy_what_to_do: "Cosa vuoi fare?"
   text_diff_truncated: "... Questo diff è stato troncato perché supera la dimensione massima che può essere visualizzata."
-  text_email_delivery_not_configured: "L'invio di email non è configurato e le notifiche sono disabilitate.\nConfigura il tuo server SMTP nel file config/configuration.yml e riavvia l'applicazione per abilitare le nuove impostazioni."
+  text_email_delivery_not_configured: "Consegna email non configurata. Le notifiche sono state disabilitate.\nConfigura il tuo server SMTP per abilitarle."
   text_enumeration_category_reassign_to: "Riassegnali a questo valore:"
   text_enumeration_destroy_question: "%{count} oggetti sono assegnati a questo valore."
   text_file_repository_writable: "Cartella allegati scrivibile"
@@ -2148,7 +2257,8 @@ it:
   text_work_package_category_destroy_question: "Alcune macro-attività (%{count}) sono assegnate a questa categoria. Cosa vuoi fare?"
   text_work_package_category_reassign_to: "Riassegna le macro-attività a questa categoria"
   text_work_package_updated: "La macro-attività %{id} è stata aggiornata da %{author}."
-  text_work_package_watcher_added: "Sei stato aggiunto come osservatore della macro-attività %{id} da %{watcher_setter}."
+  text_work_package_watcher_added: "Sei stato aggiunto come supervisore della macro-attività %{id} da %{watcher_changer}."
+  text_work_package_watcher_removed: "Sei stato rimosso dai supervisori della macro-attività %{id} da %{watcher_changer}."
   text_work_packages_destroy_confirmation: "Sei sicuro di che voler eliminare le/le macro-attività selezionata/e?"
   text_work_packages_ref_in_commit_messages: "Macro-attivita che sono correlate e/o modificate nei messaggi di conferma"
   text_journal_added: "%{label} %{value} aggiunto"
@@ -2371,7 +2481,7 @@ it:
     Invia un'altra email di invito con un token nuovo nel caso in cui quello vecchio sia scaduto o l'utente non abbia ricevuto la prima email. Può anche consentire agli utenti attivi di scegliere un nuovo metodo di autenticazione. Se utilizzato da utenti attivi, il loro stato verrà modificato in "invitato".
   tooltip:
     setting_email_login: >
-      Se attivato, un utente non potrà selezionare il login per la registrazione. Invece servirà il suo indirizzo di posta per l'accesso. Un amministratore può ancora modificare il login separatamente.
+      Se attivato, un utente non potrà selezionare un login durante la registrazione. Utilizzerà il suo indirizzo di posta per l'accesso. Un amministratore potrà modificare il login separatamente.
   queries:
     apply_filter: Applica il filtro preconfigurato
   top_menu:
@@ -2428,6 +2538,17 @@ it:
     Raggiunto il limite di utente. Non puoi attivare altri utenti. Per favore<a href="%{upgrade_url}">aggiorna il tuo piano</a> o blocca i membri per consentire altri utenti.
   warning_user_limit_reached_instructions: >
     Raggiunto il limite di utenti (%{current}/%{max} utenti attivi). Si prega di contattare sales@openproject.com per aggiornare il tuo piano Enterprise Edition e aggiungere ulteriori utenti.
+  0: >
+
+  warning_bar:
+    protocol_mismatch:
+      title: 'Mancata corrispondenza delle impostazioni di protocollo'
+      text_html: >
+        La tua applicazione è in esecuzione con le impostazioni del protocollo impostate a <code>%{set_protocol}</code>, ma la richiesta è una richiesta <code>%{actual_protocol}</code>. Ciò causerà degli errori! Vai nelle <a href="%{setting_path}">Impostazioni di sistema</a> e cambia l'impostazione "Protocollo" per correggerlo.
+    hostname_mismatch:
+      title: 'Mancata corrispondenza delle impostazioni del nome host'
+      text_html: >
+        La tua applicazione è in esecuzione con le impostazioni del nome host impostate a <code>%{set_hostname}</code>, ma la richiesta è un nome host <code>%{actual_hostname}</code>. Ciò causerà degli errori! Vai nelle <a href="%{setting_path}">Impostazioni di sistema</a> e modifica l'impostazione "Nome dell'Host" per correggerlo.
   menu_item: "Voce di menu"
   menu_item_setting: "Visibilità"
   wiki_menu_item_for: "Voce di menù per la pagina wiki \"%{title}\""
@@ -2436,6 +2557,7 @@ it:
     Stai eliminando la sola voce del menù principale della wiki. Ora devi scegliere una pagina wiki per il quale verrà generata una nuova voce di menù. Per eliminare la wiki, il modulo wiki può essere disattivato dagli amministratori del progetto.
   wiki_menu_item_delete_not_permitted: La voce di menù wiki dell'unica pagina wiki non può essere eliminata.
   query_menu_item_for: "Voce di menù per la query \"%{title}\""
+  #TODO: merge with work_packages top level key
   work_package:
     updated_automatically_by_child_changes: |
       _Aggiornata automaticamente cambiando i valori all'interno della macro-attività figlia %{child}_
@@ -2480,7 +2602,9 @@ it:
         estimated_hours: "Le ore stimate non può essere impostate sulla macro-attività principale."
         invalid_user_assigned_to_work_package: "All'utente scelto non è consentito di essere '%{property}' per questa macro-attività."
         start_date: "La data di inizio non può essere impostata sulla macro-attività principale."
-      writing_read_only_attributes: "Non puoi scrivere un attributo di sola lettura."
+      eprops:
+        invalid_gzip: "gzip non valido: %{message}"
+        invalid_json: "json non valido: %{message}"
     resources:
       schema: 'Schema'
   doorkeeper:
@@ -2488,18 +2612,22 @@ it:
       status: 'Pre-autorizzazione'
     errors:
       messages:
-        invalid_request: 'Nella richiesta non è presente un parametro richiesto, include un valore di parametro non supportato, o non è valido.'
-        invalid_redirect_uri: "Il reindirizzamento dell'url richiesto non è valido o non corrisponde all'URl di reindirizzamento del client."
+        #Common error messages
+        invalid_request: 'La richiesta manca un parametro obbligatorio, include un valore non supportato in un parametro, o non è scritto correttamente.'
+        invalid_redirect_uri: "Il reindirizzamento dell'URI richiesto non è valido o non corrisponde all'URI di reindirizzamento del client."
         unauthorized_client: 'Il client non è autorizzato ad eseguire questa richiesta usando questo metodo.'
         access_denied: 'Il proprietario della risorsa o il server di autorizzazione hanno rifiutato la richiesta.'
-        invalid_scope: 'Lo scopo richiesto non è non valido, sconosciuto o malformato.'
+        invalid_scope: 'L''ambito richiesto non è valido, è sconosciuto o non è scritto bene.'
         invalid_code_challenge_method: 'Il metodo di sfida del codice deve essere semplice o S256.'
         server_error: 'Il server di autorizzazione ha riscontrato una condizione inaspettata che ha impedito di elaborare la richiesta.'
         temporarily_unavailable: 'Il server di autorizzazione non è attualmente in grado di gestire la richiesta a causa di un sovraccarico temporaneo o della manutenzione del server.'
+        #Configuration error messages
         credential_flow_not_configured: 'Il flusso delle Credenziali del Proprietario della Risorsa non è riuscito a causa della mancata configurazione di Doorkeeper.configure.resource_owner_from_credentials.'
         resource_owner_authenticator_not_configured: 'Ricerca del Proprietario della Risorsa non riuscita a causa della mancata configurazione di Doorkeeper.configure.resource_owner_authenticator.'
         admin_authenticator_not_configured: 'Impossibile accedere al pannello di amministrazione a causa della mancata configurazione di Doorkeeper.configure.admin_authenticator.'
+        #Access grant errors
         unsupported_response_type: 'Il server di autorizzazione non supporta questo tipo di risposta.'
+        #Access token errors
         invalid_client: 'L''autenticazione del client non è riuscita a causa di client sconosciuti, della mancata inclusione dell''autenticazione nel client, o del mancato supporto del metodo di autenticazione.'
         invalid_grant: 'Il permesso di autorizzazione fornito non è valido, è scaduto, è revocato, non corrisponde all''URI di reindirizzamento utilizzato nella richiesta di autorizzazione oppure è stato rilasciato per un altro client.'
         unsupported_grant_type: 'Il tipo di permesso di autorizzazione non è supportato dal server di autorizzazione.'
@@ -2524,6 +2652,7 @@ it:
         redirect_uri_html: >
           Gli URL consentiti a cui possono essere reindirizzati gli utenti autorizzati. Una voce per riga. <br/> Se stai registrando un'applicazione desktop, usa il seguente URL.
         confidential: "Controlla se l'applicazione verrà utilizzata dove il segreto del client può essere tenuto confidenziale. Applicazioni mobili native e app a pagina singola sono considerate non riservate."
+        scopes: "Controlla a cosa avrà accesso l'applicazione. Se non sono selezionati permessi, si assume api_v3."
         client_credential_user_id: "ID utente opzionale da impersonare quando i client usano questa applicazione. Lascia vuoto per consentire solo l'accesso pubblico"
         register_intro: "Se stai sviluppando un'applicazione client OAuth API per OpenProject è possibile registrarla utilizzando questo modulo per consentirne l'uso a tutti gli utenti."
         default_scopes: ""
@@ -2538,8 +2667,8 @@ it:
       wants_to_access_html: >
         Questa applicazione richiede l'accesso al tuo account OpenProject. <br/> <strong>Ha richiesto i seguenti permessi:</strong>
     scopes:
-      api_v3: "Accesso Completo API"
-      api_v3_text: "L'applicazione riceverà l'accesso completo alla lettura e scrittura delle API OpenProject per eseguire azioni a tuo nome."
+      api_v3: "Accesso completo alle API v3"
+      api_v3_text: "L'applicazione riceverà accesso completo in lettura e scrittura alle API v3 per effettuare azioni a tuo nome."
     grants:
       created_date: "Approvato il"
       scopes: "Permessi"

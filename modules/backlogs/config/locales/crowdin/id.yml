@@ -1,3 +1,25 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
+#---
 id:
   activerecord:
     attributes:
@@ -30,11 +52,11 @@ id:
   backlogs:
     add_new_story: "Cerita baru "
     any: "apapun"
-    backlog_settings: "Pengaturan Backlog"
+    backlog_settings: "Backlogs settings"
     burndown_graph: "Grafik Burndown"
     card_paper_size: "Ukuran kertas untuk pencetakan kartu"
     chart_options: "Bagan pilihan"
-    close: "Dekat"
+    close: "Tutup"
     column_width: "Lebar kolom: "
     date: "Hari"
     definition_of_done: "Definisi Selesai"
@@ -95,7 +117,7 @@ id:
   label_backlog: "Jaminan simpanan"
   label_backlogs: "Backlogs"
   label_backlogs_unconfigured: "Anda belum mengkonfigurasi Backlogs. Silakan masuk ke %{administration}> %{plugins}, lalu klik pada link %{configure} untuk plugin ini. Setelah Anda menyetel bidang, kembali ke halaman ini untuk mulai menggunakan alat ini."
-  label_blocks_ids: "ID dari paket pekerjaan yang diblokir"
+  label_blocks_ids: "List ID dari work package yang diblokir"
   label_burndown: "Burndown"
   label_column_in_backlog: "Kolom di backlog"
   label_hours: "jamb"
@@ -130,7 +152,7 @@ id:
   project_module_backlogs: "Backlogs"
   rb_label_copy_tasks: "Salin paket kerja"
   rb_label_copy_tasks_all: "Semua"
-  rb_label_copy_tasks_none: "Tidak ada"
+  rb_label_copy_tasks_none: "Kosong"
   rb_label_copy_tasks_open: "Buka"
   rb_label_link_to_original: "Sertakan link ke cerita asli"
   remaining_hours: "jam yang tersisa"
@@ -140,5 +162,5 @@ id:
   todo_work_package_summary: "%{type}: %{summary}"
   version_settings_display_label: "Kolom di backlog"
   version_settings_display_option_left: "kiri"
-  version_settings_display_option_none: "tidak ada"
+  version_settings_display_option_none: "kosong"
   version_settings_display_option_right: "kanan"

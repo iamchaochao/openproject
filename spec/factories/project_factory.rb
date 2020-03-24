@@ -1,7 +1,7 @@
 # encoding: utf-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -36,24 +36,22 @@ FactoryBot.define do
 
     sequence(:name) { |n| "My Project No. #{n}" }
     sequence(:identifier) { |n| "myproject_no_#{n}" }
-    created_on { Time.now }
-    updated_on { Time.now }
+    created_at { Time.now }
+    updated_at { Time.now }
     enabled_module_names { OpenProject::AccessControl.available_project_modules }
+    public { false }
 
     callback(:after_build) do |project, evaluator|
       disabled_modules = Array(evaluator.disable_modules)
       project.enabled_module_names = project.enabled_module_names - disabled_modules
-    end
 
-    callback(:before_create) do |project, evaluator|
-      unless evaluator.no_types ||
-             ::Type.where(is_standard: true).count > 0
-        project.types << FactoryBot.build(:type_standard)
+      if !evaluator.no_types && project.types.empty?
+        project.types << (::Type.where(is_standard: true).first || FactoryBot.build(:type_standard))
       end
     end
 
     factory :public_project do
-      is_public { true } # Remark: is_public defaults to true
+      public { true } # Remark: public defaults to true
     end
 
     factory :project_with_types do

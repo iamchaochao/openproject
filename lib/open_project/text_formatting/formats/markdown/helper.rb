@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2017 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -25,13 +25,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-# See doc/COPYRIGHT.rdoc for more details.
+# See docs/COPYRIGHT.rdoc for more details.
 #++
 
 module OpenProject::TextFormatting::Formats
   module Markdown
     class Helper
-
       attr_reader :view_context
 
       def initialize(view_context)
@@ -57,10 +56,12 @@ module OpenProject::TextFormatting::Formats
         # Pass an optional resource to the CKEditor instance
         resource = context.fetch(:resource, {})
         helpers.content_tag 'ckeditor-augmented-textarea',
-                                 '',
-                                 'textarea-selector': "##{field_id}",
-                                 'preview-context': context[:preview_context],
-                                 'data-resource': resource.to_json
+                            '',
+                            'textarea-selector': "##{field_id}",
+                            'editor-type': context[:editor_type] || 'full',
+                            'preview-context': context[:preview_context],
+                            'data-resource': resource.to_json,
+                            'macros': context.fetch(:macros, true)
       end
 
       protected

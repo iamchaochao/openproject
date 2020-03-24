@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -47,19 +47,19 @@ class DesignColor < ApplicationRecord
 
   class << self
     def defaults
-      OpenProject::Design.resolved_variables
+      OpenProject::CustomStyles::Design.resolved_variables
     end
 
     def setables
       overwritten_values = self.overwritten
-      OpenProject::Design.customizable_variables.map do |varname|
+      OpenProject::CustomStyles::Design.customizable_variables.map do |varname|
         overwritten_value = overwritten_values.detect { |var| var.variable == varname }
         overwritten_value || new(variable: varname)
       end
     end
 
     def overwritten
-      overridable = OpenProject::Design.customizable_variables
+      overridable = OpenProject::CustomStyles::Design.customizable_variables
 
       all.to_a.select do |color|
         overridable.include?(color.variable) && self.defaults[color] != color.get_hexcode

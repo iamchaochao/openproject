@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -74,7 +74,7 @@ describe ::API::V3::Queries::Schemas::AllPrincipalsFilterDependencyRepresenter, 
 
         context 'within a project with group assignment' do
           let(:filter_query) do
-            [{ status: { operator: '!', values: ['0', '3'] } },
+            [{ status: { operator: '!', values: ['3'] } },
              { member: { operator: '=', values: [project.id.to_s] } }]
           end
           let(:group_assignment_enabled) { true }
@@ -94,7 +94,7 @@ describe ::API::V3::Queries::Schemas::AllPrincipalsFilterDependencyRepresenter, 
 
         context 'within a project without group assignment' do
           let(:filter_query) do
-            [{ status: { operator: '!', values: ['0', '3'] } },
+            [{ status: { operator: '!', values: ['3'] } },
              { type: { operator: '=', values: ['User'] } },
              { member: { operator: '=', values: [project.id.to_s] } }]
           end
@@ -115,7 +115,7 @@ describe ::API::V3::Queries::Schemas::AllPrincipalsFilterDependencyRepresenter, 
         context 'global with no group assignments' do
           let(:project) { nil }
           let(:filter_query) do
-            [{ status: { operator: '!', values: ['0', '3'] } },
+            [{ status: { operator: '!', values: ['3'] } },
              { type: { operator: '=', values: ['User'] } },
              { member: { operator: '*', values: [] } }]
           end
@@ -136,7 +136,7 @@ describe ::API::V3::Queries::Schemas::AllPrincipalsFilterDependencyRepresenter, 
         context 'global with group assignments' do
           let(:project) { nil }
           let(:filter_query) do
-            [{ status: { operator: '!', values: ['0', '3'] } },
+            [{ status: { operator: '!', values: ['3'] } },
              { member: { operator: '*', values: [] } }]
           end
           let(:group_assignment_enabled) { true }

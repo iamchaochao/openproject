@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -38,26 +38,31 @@ describe WorkPackage, type: :model do
     let(:project) { FactoryBot.create :project }
     let(:work_package) do
       FactoryBot.create :work_package,
-                         author: admin,
-                         subject: 'I can see you',
-                         project: project
+                        author: admin,
+                        subject: 'I can see you',
+                        project: project
     end
 
     let(:journal_ids) { [] }
 
-    before do
+    let!(:subscription) do
       OpenProject::Notifications.subscribe(OpenProject::Events::AGGREGATED_WORK_PACKAGE_JOURNAL_READY) do |payload|
-        journal_ids << payload[:journal_id]
+        journal_ids << payload[:journal].id
       end
+    end
+
+    after do
+      OpenProject::Notifications.unsubscribe(OpenProject::Events::AGGREGATED_WORK_PACKAGE_JOURNAL_READY, subscription)
     end
 
     context 'after creation' do
       before do
         work_package
+        perform_enqueued_jobs
       end
 
       it "are triggered" do
-        expect(journal_ids).to include (work_package.journals.last.id)
+        expect(journal_ids).to include(work_package.journals.last.id)
       end
     end
 
@@ -67,11 +72,13 @@ describe WorkPackage, type: :model do
 
         journal_ids.clear
 
-        work_package.update_attributes subject: 'the wind of change'
+        work_package.update subject: 'the wind of change'
+
+        perform_enqueued_jobs
       end
 
       it "are triggered" do
-        expect(journal_ids).to include (work_package.journals.last.id)
+        expect(journal_ids).to include(work_package.journals.last.id)
       end
     end
   end

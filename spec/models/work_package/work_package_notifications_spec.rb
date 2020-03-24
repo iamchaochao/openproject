@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -46,6 +46,7 @@ describe WorkPackage, type: :model do
 
     context 'after creation' do
       it "are sent to the work package's author" do
+        perform_enqueued_jobs
         mail = ActionMailer::Base.deliveries.detect { |m| m.subject.include? 'I can see you' }
 
         expect(mail).to be_present
@@ -73,10 +74,11 @@ describe WorkPackage, type: :model do
 
     describe 'after update' do
       before do
-        work_package.update_attributes subject: 'the wind of change'
+        work_package.update subject: 'the wind of change'
       end
 
       it "are sent to the work package's author" do
+        perform_enqueued_jobs
         mail = ActionMailer::Base.deliveries.detect { |m| m.subject.include? 'the wind of change' }
 
         expect(mail).to be_present

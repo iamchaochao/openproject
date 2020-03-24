@@ -1,3 +1,24 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
 sk:
   no_results_title_text: Momentálne nič na zobrazenie.
   activities:
@@ -7,21 +28,40 @@ sk:
     plugins:
       no_results_title_text: Momentálne nie sú k dispozícii žiadne zásuvné moduly.
     custom_styles:
+      color_theme: "Color theme"
+      color_theme_custom: "(Custom)"
+      colors:
+        alternative-color: "Alternative"
+        content-link-color: "Link font"
+        primary-color: "Primary"
+        primary-color-dark: "Primary (dark)"
+        header-bg-color: "Header background"
+        header-item-bg-hover-color: "Header background on hover"
+        header-item-font-color: "Header font"
+        header-item-font-hover-color: "Header font on hover"
+        header-border-bottom-color: "Header border"
+        main-menu-bg-color: "Main menu background"
+        main-menu-bg-selected-background: "Main menu when selected"
+        main-menu-bg-hover-background: "Main menu on hover"
+        main-menu-font-color: "Main menu font"
+        main-menu-selected-font-color: "Main menu font when selected"
+        main-menu-hover-font-color: "Main menu font on hover"
+        main-menu-border-color: "Main menu border"
       custom_colors: "Vlastné farby"
       customize: "Prispôsobte si inštaláciu OpenProject s vlastným logom. Poznámka: Toto logo bude verejne prístupné."
       enterprise_notice: "Ďakujeme vám za finančnú podporu pri vývoji OpenProject, táto funkcia je k dispozícii iba v spojení s predplatným Enterprise Edition."
       manage_colors: "Upraviť možnosti výberu farieb"
       instructions:
-        alternative_color: "Silná akcentová farba, zvyčajne používaná pre najdôležitejšie tlačidlo na obrazovke."
-        content_link_color: "Farba písma väčšiny odkazov."
-        primary_color: "Hlavná farba."
-        primary_color_dark: "Obvykle sa používa tmavšia verzia hlavnej farby pre hover efekty."
-        header_bg_color: "Farba pozadia hlavičky."
-        header_item_bg_hover_color: "Farba pozadia kliknuteľnej hlavičky pri umiestnení kurzora nad hlavičku."
-        header_item_font_color: "Farba písma kliknuteľnej hlavičky položky."
-        header_item_font_hover_color: "Farba písma kliknuteľnej hlavičky pri umiestnení kurzora nad hlavičku."
-        header_border_bottom_color: "Hrúbka čiary pod hlavičkou. Nechajte toto pole prázdne ak nechcete žiadnu čiaru."
-        main_menu_bg_color: "Farba pozadia ľavého menu."
+        alternative-color: "Strong accent color, typically used for the most important button on a screen."
+        content-link-color: "Farba písma väčšiny odkazov."
+        primary-color: "Hlavná farba."
+        primary-color-dark: "Obvykle sa používa tmavšia verzia hlavnej farby pre hover efekty."
+        header-item-bg-hover-color: "Farba pozadia kliknuteľnej hlavičky pri umiestnení kurzora nad hlavičku."
+        header-item-font-color: "Farba písma kliknuteľnej hlavičky položky."
+        header-item-font-hover-color: "Farba písma kliknuteľnej hlavičky pri umiestnení kurzora nad hlavičku."
+        header-border-bottom-color: "Hrúbka čiary pod hlavičkou. Nechajte toto pole prázdne ak nechcete žiadnu čiaru."
+        main-menu-bg-color: "Farba pozadia ľavého menu."
+      theme_warning: Changing the theme will overwrite you custom style. The design will then be lost. Are you sure you want to continue?
     enterprise:
       upgrade_to_ee: "Upgrade na Enterprise Edition"
       add_token: "Nahrajte token podpory Enterprise Edition"
@@ -45,7 +85,39 @@ sk:
       no_results_content_title: Momentálne nie sú žiadne metódy overovania identity.
       no_results_content_text: Vytvoriť novú metódu overovania identity
   ldap_auth_sources:
+    technical_warning_html: |
+      This LDAP form requires technical knowledge of your LDAP / Active Directory setup.
+      <br/>
+      <a href="https://www.openproject.org/help/administration/manage-ldap-authentication/">Please visit our documentation for detailed instructions</a>.
+    attribute_texts:
+      name: Arbitrary name of the LDAP connection
+      host: LDAP host name or IP address
+      login_map: The attribute key in LDAP that is used to identify the unique user login. Usually, this will be `uid` or `samAccountName`.
+      generic_map: The attribute key in LDAP that is mapped to the OpenProject `%{attribute}` attribute
+      admin_map_html: "Optional: The attribute key in LDAP that <strong>if present</strong> marks the OpenProject user an admin. Leave empty when in doubt."
+      system_user_dn_html: |
+        Enter the DN of the system user used for read-only access.
+        <br/>
+        Example: uid=openproject,ou=system,dc=example,dc=com
+      system_user_password: Enter the bind password of the system user
+      base_dn: |
+        Enter the Base DN of the subtree in LDAP you want OpenProject to look for users and groups.
+        OpenProject will filter for provided usernames in this subtree only.
+        Example: ou=users,dc=example,dc=com
+      onthefly_register: |
+        If you check this box, OpenProject will automatically create new users from their LDAP entries
+        when they first authenticate with OpenProject.
+        Leave this unchecked to only allow existing accounts in OpenProject to authenticate through LDAP!
     connection_encryption: 'Šifrovanie pripojenia'
+    system_account: 'System account'
+    system_account_legend: |
+      OpenProject requires read-only access through a system account to lookup users and groups in your LDAP tree.
+      Please specify the bind credentials for that system user in the following section.
+    ldap_details: 'LDAP details'
+    user_settings: 'Attribute mapping'
+    user_settings_legend: |
+      The following fields are related to how users are created in OpenProject from LDAP entries and
+      what LDAP attributes are used to define the attributes of an OpenProject user (attribute mapping).
     tls_mode:
       plain: 'žiadne'
       simple_tls: 'simple_tls'
@@ -199,10 +271,10 @@ sk:
       no_results_title_text: Momentálne neexistujú žiadne toky činností.
   work_packages:
     x_descendants:
-      one: 'One descendant work package'
-      few: '%{count} work package descendants'
-      many: '%{count} work package descendants'
-      other: '%{count} work package descendants'
+      one: 'Podradený pracovný balíček'
+      few: '%{count} podradené pracovné balíčky'
+      many: '%{count} podradených pracovných balíčkov'
+      other: '%{count} podradených pracovných balíčkov'
     bulk:
       could_not_be_saved: "Nasledujúce pracovné balíčky sa nepodarilo uložiť:"
     move:
@@ -281,7 +353,7 @@ sk:
       changeset:
         repository: "Repozitár"
       comment:
-        commented: "Komentované"
+        commented: "Komentované" #an object that this comment belongs to
       custom_action:
         actions: "Akcie"
       custom_field:
@@ -329,6 +401,13 @@ sk:
         types: "Typy"
         versions: "Verzie"
         work_packages: "Pracovné balíčky"
+      project/status:
+        code: 'Stav'
+        explanation: 'Status description'
+        codes:
+          on_track: 'On track'
+          at_risk: 'At risk'
+          off_track: 'Off track'
       query:
         column_names: "Stĺpce"
         relations_to_type_column: "Vzťahy k %{type}"
@@ -420,6 +499,8 @@ sk:
         confirmation: "%{attribute} sa nezhoduje."
         could_not_be_copied: "Nepodarilo sa (úplne) skopírovať."
         does_not_exist: "neexistuje."
+        error_unauthorized: "may not be accessed."
+        error_readonly: "was attempted to be written but is not writable."
         empty: "nemôže byť prázdny."
         even: "musí byť párne."
         exclusion: "patrí medzi vyhradené výrazy."
@@ -483,6 +564,8 @@ sk:
               invalid_values: "Hodnota je neplatná."
               id_filter_required: "Vyžaduje sa filter 'id'."
         project:
+          archived_ancestor: 'The project has an archived ancestor.'
+          foreign_wps_reference_version: 'Work packages in non descendant projects reference versions of the project or its descendants.'
           attributes:
             types:
               in_use_by_work_packages: "stále používané týmito pracovnými balíkmi: %{types}"
@@ -516,6 +599,10 @@ sk:
         role:
           permissions:
             dependency_missing: "need to also include '%{dependency}' as '%{permission}' is selected."
+        time_entry:
+          attributes:
+            hours:
+              day_limit: "is too high as a maximum of 24 hours can be logged per date."
         work_package:
           is_not_a_valid_target_for_time_entries: "Pracovný balík #%{id} nepredstavuje platný cieľ pre pridelené položky času."
           attributes:
@@ -617,6 +704,7 @@ sk:
   activity:
     created: "Vytvoril: %{title}"
     updated: "Aktualizované: %{title}"
+  #common attributes of all models
   attributes:
     active: "Aktívny"
     assigned_to: "Priradené"
@@ -649,6 +737,7 @@ sk:
     is_default: "Predvolená hodnota"
     is_for_all: "Pre všetky projekty"
     is_public: "Verejný"
+    #kept for backwards compatibility
     issue: "Pracovný balíček"
     lastname: "Priezvisko"
     login: "Username"
@@ -657,6 +746,7 @@ sk:
     password: "Heslo"
     priority: "Priorita"
     project: "Projekt"
+    public: "Verejný"
     responsible: "Zodpovedný"
     role: "Rola"
     roles: "Roly"
@@ -668,6 +758,7 @@ sk:
     type: "Typ"
     updated_at: "Aktualizované"
     updated_on: "Aktualizované"
+    uploader: "Uploader"
     user: "Užívateľ(ka)"
     version: "Verzia"
     work_package: "Pracovný balíček"
@@ -792,9 +883,13 @@ sk:
       - "Piatok"
       - "Sobota"
     formats:
+      #Use the strftime parameters for formats.
+      #When no format has been given, it uses default.
+      #You can provide other formats here if you like!
       default: "%m/%d/%Y"
       long: "%B %d, %Y"
       short: "%b %d"
+    #Don't forget the nil at the beginning; there's no such thing as a 0th month
     month_names:
       - null
       - "Január"
@@ -809,6 +904,7 @@ sk:
       - "Október"
       - "November"
       - "December"
+    #Used in date_select and datime_select.
     order:
       - :rok
       - :mesiac
@@ -962,6 +1058,7 @@ sk:
   description_sub_work_package: "Podriadený pracovný balíček aktuálneho"
   description_toc_toggle: "Zobraziť / skryť obsah"
   description_wiki_subpages_reassign: "Vybrať novú nadradenú stránku"
+  #Text direction: Left-to-Right (ltr) or Right-to-Left (rtl)
   direction: zľava doprava
   ee:
     upsale:
@@ -970,13 +1067,12 @@ sk:
         add_groups: "Pridajte nové skupiny atribútov"
         rename_groups: "Premenovať skupiny atribútov"
       project_filters:
-        description_html: "Aktualizujte na %{link} ak chcete filtrovať a triediť podľa vlastných polí"
-  enumeration_activities: "Činnosti (sledovanie času)"
+        description_html: "Filtering and sorting on custom fields is an enterprise edition feature."
+  enumeration_activities: "Time tracking activities"
   enumeration_work_package_priorities: "Priority Pracovného balíka"
-  enumeration_system_activity: "Systémové aktivity"
   enumeration_reported_project_statuses: "Nahlásený stav projektu"
   error_auth_source_sso_failed: "Jednoduché prihlásenie (SSO) pre používateľa '%{value}' zlyhalo"
-  error_can_not_archive_project: "Tento projekt nie je možné archivovať: pre verziu definovanú v tomto projekte je pridelený aspoň jeden pracovný balíček."
+  error_can_not_archive_project: "This project cannot be archived: %{errors}"
   error_can_not_delete_entry: "Záznam sa nedá odstrániť"
   error_can_not_delete_custom_field: "Nepodarilo sa odstrániť vlastné pole"
   error_can_not_delete_type: "Tento typ obsahuje pracovné balíky a nedá sa odstrániť."
@@ -985,6 +1081,7 @@ sk:
   error_can_not_remove_role: "Táto rola sa používa a nedá sa odstrániť."
   error_can_not_reopen_work_package_on_closed_version: "Pracovný balíček, ktorý je priradený na uzatvorenú verziu sa nedá znovu-otvoriť"
   error_can_not_find_all_resources: "Could not find all related resources to this request."
+  error_can_not_unarchive_project: "This project cannot be unarchived: %{errors}"
   error_check_user_and_role: "Zvoľte si, prosím, používateľ a rolu."
   error_code: "Error %{code}"
   error_cookie_missing: 'Chýbajú súbory cookie pre OpenProject. Skontrolujte, či sú povolené súbory cookie, nakoľko bez nich táto aplikácia nebude správne fungovať.'
@@ -1042,6 +1139,8 @@ sk:
       pdf_with_descriptions: "PDF s popisom"
       pdf_with_descriptions_and_attachments: "PDF s popiskami a prílohami"
       pdf_with_attachments: "PDF s prílohami"
+    image:
+      omitted: "Image not exported."
   extraction:
     available:
       pdftotext: "Pdftotext k dispozícii (voliteľné)"
@@ -1089,6 +1188,8 @@ sk:
       blog: "OpenProject blog"
       forums: "Komunitné fórum"
       newsletter: "Bezpečnostné upozornenia / Newsletter"
+  journals:
+    changes_retracted: "The changes where retracted."
   links:
     configuration_guide: 'Sprievodca konfiguráciou'
   instructions_after_registration: "Môžete prihlásiť ihneď potom, ako váš účet bude aktivovaný. Akciu iniciujete kliknutí na %{signin}."
@@ -1554,7 +1655,7 @@ sk:
   label_used_by: "Používané"
   label_used_by_types: "Používa sa podľa typov"
   label_used_in_projects: "Použité v projektoch"
-  label_user: "Užívateľ"
+  label_user: "Užívateľ(ka)"
   label_user_and_permission: "Users & Permissions"
   label_user_named: "Užívateľ %{name}"
   label_user_activity: "Aktivita používateľa %{value}"
@@ -1622,21 +1723,25 @@ sk:
   label_workflow_plural: "Pracovné postupy"
   label_workflow_summary: "Zhrnutie"
   label_x_closed_work_packages_abbr:
+    zero: "0 closed"
     one: "1 uzatvorený"
     few: "%{count} uzatvorených"
     many: "%{count} uzatvorených"
     other: "%{count} uzatvorených"
   label_x_comments:
+    zero: "no comments"
     one: "1 komentár"
     few: "%{count} komentárov"
     many: "%{count} komentárov"
     other: "%{count} komentárov"
   label_x_open_work_packages_abbr:
+    zero: "0 open"
     one: "1 otvorený"
     few: "%{count} otvorených"
     many: "%{count} otvorených"
     other: "%{count} otvorených"
   label_x_projects:
+    zero: "no projects"
     one: "1 projekt"
     few: "%{count} projektov"
     many: "%{count} projektov"
@@ -1699,12 +1804,14 @@ sk:
   mail_body_lost_password: "Na zmenu hesla kliknite na nasledujúci odkaz:"
   mail_body_register: "Ak si želáte aktivovať váš účet, kliknite na nasledujúci odkaz:"
   mail_body_reminder: "%{count} pracovné balíčky (balíček), ktoré sú priradené vám a finišujú v najbližších %{days} dňoch:"
+  mail_body_group_reminder: "%{count} work package(s) that are assigned to group \"%{group}\" are due in the next %{days} days:"
   mail_body_wiki_content_added: "Používateľ %{author} pridal wikistránku '%{id}'."
   mail_body_wiki_content_updated: "Používateľ %{author} aktualizoval wikistránku '%{id}'."
   mail_subject_account_activation_request: "Požiadavka na aktiváciu účtu %{value}"
   mail_subject_lost_password: "Vaše heslo %{value}"
   mail_subject_register: "Aktivácia vášho účtu %{value}"
   mail_subject_reminder: "%{count} pracovných balíčkov, ktoré finišujú v najbližších %{days} dňoch"
+  mail_subject_group_reminder: "For group \"%{group}\" %{count} work package(s) due in the next %{days} days"
   mail_subject_wiki_content_added: "Bola pridaná wikistránka '%{id}'"
   mail_subject_wiki_content_updated: "Wikistránka '%{id}' bola aktualizovaná"
   mail_user_activation_limit_reached:
@@ -1713,8 +1820,8 @@ sk:
       Nový užívateľ (%{email}) se pokúsil vytvoriť účet v prostredí OpenProject spravovanom Vami (%{host}). Užívateľ nemôže aktivovať svoj účet, pretože bol dosiahnutý limit počtu užívateľov.
     steps:
       label: "Môžete vykonať nasledujúce kroky, aby ste mohli používateľa prihlásiť: "
-      a: "Upgrade plánu platieb ([here](upgrade_url))"
-      b: "Zamknúť alebo odstrániť existujúceho používateľa ([here](users_url))"
+      a: "Upgrade plánu platieb ([here](upgrade_url))" #here turned into a link
+      b: "Zamknúť alebo odstrániť existujúceho používateľa ([here](users_url))" #here turned into a link
   more_actions: "Ďalšie funkcie"
   noscript_description: "Musíte aktivovať JavaScript, aby ste mohli používať OpenProject!"
   noscript_heading: "JavaScript vypnutý"
@@ -1781,6 +1888,7 @@ sk:
   notice_project_cannot_update_custom_fields: "Dostupné vlastné polia projektu sa nedajú aktualizovať. Projekt je neplatný: %{errors}"
   notice_attachment_migration_wiki_page: >
     Táto stránka bola vygenerovaná automaticky počas aktualizácie OpenProject. Obsahuje všetky prílohy, ktoré boli predtým priradené k %{container_type} "%{container_name}".
+  #Default format for numbers
   number:
     format:
       delimiter: ""
@@ -1888,6 +1996,7 @@ sk:
       title: Zmeniť identifikátor projektu
     archive:
       are_you_sure: "Naozaj chcete archivovať projekt \"%{name}\"?"
+      archived: "Archived"
   project_module_activity: "Činnosť"
   project_module_forums: "Diskusie"
   project_module_calendar: "Kalendár"
@@ -1899,6 +2008,8 @@ sk:
   project_module_wiki: "Wiki"
   query:
     attribute_and_direction: "%{attribute} (%{direction})"
+  #possible query parameters (e.g. issue queries),
+  #which are not attributes of an AR-Model.
   query_fields:
     active_or_archived: "Aktívne alebo archivované"
     assigned_to_role: "Priradená rola"
@@ -2142,6 +2253,7 @@ sk:
   status_invited: pozvaný
   status_locked: zamknuté
   status_registered: registrovaný
+  #Used in array.to_sentence.
   support:
     array:
       sentence_connector: "a"
@@ -2177,7 +2289,7 @@ sk:
   text_destroy_with_associated: "Existujú ďalšie objekty spojené s pracovným balíčkom(-ami), ktoré sa majú vymazať. Tieto objekty sú z týchto typov:"
   text_destroy_what_to_do: "Čo chcete urobiť?"
   text_diff_truncated: "... Tento výpis rozdielov bol skrátený, pretože prekračuje maximálny počet riadkov, ktorý môže byť zobrazený."
-  text_email_delivery_not_configured: "Doručovanie e-mailov nie je nakonfigurované a upozornenia sú zakázané.\nNakonfigurujte server SMTP v konfigurácii / configuration.yml a reštartujte aplikáciu, aby ste ich povolili."
+  text_email_delivery_not_configured: "Email delivery is not configured, and notifications are disabled.\nConfigure your SMTP server to enable them."
   text_enumeration_category_reassign_to: "Znova ich priradiť k tejto hodnote:"
   text_enumeration_destroy_question: "%{count} objekty sú priradené k tejto hodnote."
   text_file_repository_writable: "Povolený zápis do priečinka s prílohami"
@@ -2190,7 +2302,8 @@ sk:
   text_work_package_category_destroy_question: "Niektoré pracovné balíčky (%{count}) sú priradené k tejto kategórii. Čo chcete urobiť?"
   text_work_package_category_reassign_to: "Priraďte pracovné balíčky do tejto kategórie"
   text_work_package_updated: "Pracovný balíček %{id} bol aktualizovaný %{author}."
-  text_work_package_watcher_added: "Byli ste pridaný ako pozorovateľ pre pracovný balíček %{id} užívateľom %{watcher_setter}."
+  text_work_package_watcher_added: "You have been added as a watcher to Work package %{id} by %{watcher_changer}."
+  text_work_package_watcher_removed: "You have been removed from watchers of Work package %{id} by %{watcher_changer}."
   text_work_packages_destroy_confirmation: "Naozaj chcete odstrániť vybraný pracovný balíček(y)?"
   text_work_packages_ref_in_commit_messages: "Odkazovanie a oprava pracovných balíčkov v podrobnejšom vysvetľujúcom texte"
   text_journal_added: "%{label} %{value} pridaných"
@@ -2474,6 +2587,17 @@ sk:
     Váš limit počtu užívateľov bol dosiahnutý. Nie je možné aktivovať viac užívateľov. Prosím <a href="%{upgrade_url}">upgradujte váš cenový plán</a> alebo zablokujte niektorých stávajúcich členov aby bolo možné pridanie ďalších užívateľov.
   warning_user_limit_reached_instructions: >
     Limit počtu užívateľov (%{current}/%{max} aktívnych užívateľov) dosiahnutý. Prosím kontaktujte sales@openproject.com a upgradujte Vašu Enterprise Edition a pridajte ďalších užívateľov.
+  0: >
+
+  warning_bar:
+    protocol_mismatch:
+      title: 'Protocol setting mismatch'
+      text_html: >
+        Your application is running with its protocol setting set to <code>%{set_protocol}</code>, but the request is an <code>%{actual_protocol}</code> request. This will result in errors! Go to <a href="%{setting_path}">System settings</a> and change the "Protocol" setting to correct this.
+    hostname_mismatch:
+      title: 'Hostname setting mismatch'
+      text_html: >
+        Your application is running with its host name setting set to <code>%{set_hostname}</code>, but the request is a <code>%{actual_hostname}</code> hostname. This will result in errors! Go to <a href="%{setting_path}">System settings</a> and change the "Host name" setting to correct this.
   menu_item: "Položka menu"
   menu_item_setting: "Viditeľnosť"
   wiki_menu_item_for: "Položka menu pre wiki \"%{title}\""
@@ -2483,6 +2607,7 @@ sk:
     Modul pre odstránenie wiki môže byť deaktivovaný správcami projektu.
   wiki_menu_item_delete_not_permitted: Položku ponuky wiki na stránke s jednou wiki nemožno odstrániť.
   query_menu_item_for: "Položka menu pre dopyt \"%{title}\""
+  #TODO: merge with work_packages top level key
   work_package:
     updated_automatically_by_child_changes: |
       _Modifikované automaticky z dôvodu zmeny hodnôt v rámci podradeného pracovného balíčka %{child}_
@@ -2527,7 +2652,9 @@ sk:
         estimated_hours: "Odhad hodín nie je možné nastaviť na pracovnom balíčku obsahujúcom podriadené pracovné balíčky."
         invalid_user_assigned_to_work_package: "Zvolený používateľ nemôže byť \"%{property}\" v prípade tohto pracovného balíčka."
         start_date: "Dátum \"Od\" nie je možné nastaviť na pracovnom balíčku obsahujúcom podriadené pracovné balíčky."
-      writing_read_only_attributes: "Nie je možné meniť atribút, ktorý je určený len na čítanie."
+      eprops:
+        invalid_gzip: "is invalid gzip: %{message}"
+        invalid_json: "is invalid json: %{message}"
     resources:
       schema: 'Schéma'
   doorkeeper:
@@ -2535,18 +2662,22 @@ sk:
       status: 'Pre-Autorizácia'
     errors:
       messages:
+        #Common error messages
         invalid_request: 'V žiadosti chýba požadovaný parameter, obsahuje nepodporovanú hodnotu parametra alebo inak je chybný.'
-        invalid_redirect_uri: "Požadovane presmerovanie uri je poškodený alebo sa nezhoduje s URI presmerovania klienta."
+        invalid_redirect_uri: "The requested redirect URI is malformed or doesn't match client redirect URI."
         unauthorized_client: 'Klient nie je oprávnený vykonať túto požiadavku pomocou tejto metódy.'
         access_denied: 'Vlastník zdroja alebo autorizačný server žiadosť zamietol.'
         invalid_scope: 'Požadovaný rozsah je neplatný, neznámy alebo chybný.'
         invalid_code_challenge_method: 'Metóda kódovej výzvy musí byť jednoduchá alebo S256.'
         server_error: 'Autorizačný server narazil na neočakávaný stav, ktorý mu bránil v splnení požiadavky.'
         temporarily_unavailable: 'Autorizačný server momentálne nemôže spracovať žiadosť v dôsledku dočasného preťaženia alebo údržby servera.'
+        #Configuration error messages
         credential_flow_not_configured: 'Protokol poverení vlastníka prostriedkov narazil na chybu z dôvodu nesprávnej konfigurácie Doorkeeper.configure.resource_owner_from_credentials.'
         resource_owner_authenticator_not_configured: 'Vyhľadávanie vlastníkov zdrojov zlyhalo, pretože Doorkeeper.configure.resource_owner_authenticator nie je nakonfigurovaný.'
         admin_authenticator_not_configured: 'Prístup k administrátorskému panelu je zakázaný, pretože Doorkeeper.configure.admin_authenticator nie je nakonfigurovaný.'
+        #Access grant errors
         unsupported_response_type: 'Autorizačný server tento typ odpovede nepodporuje.'
+        #Access token errors
         invalid_client: 'Overenie klienta zlyhalo z dôvodu neznámeho klienta, nebolo zahrnuté overenie klienta, alebo nie je podporovaná metóda overovania.'
         invalid_grant: 'Poskytnutý grant na autorizáciu je neplatný, vypršal, zrušil, nezodpovedal URI presmerovania použitému v žiadosti o autorizáciu alebo bol vydaný inému klientovi.'
         unsupported_grant_type: 'Typ autorizácie nie je podporovaný autorizačným serverom.'
@@ -2571,6 +2702,7 @@ sk:
         redirect_uri_html: >
           Povolené adresy URL môžu byť presmerované na oprávnených používateľov. Jeden záznam na riadok.<br/> Ak registrujete aplikáciu pre stolné počítače, použite nasledujúcu adresu URL.
         confidential: "Overte, či sa aplikácia používa tam, kde môže byť dôverné tajomstvo klienta. Natívne mobilné aplikácie a aplikácie na jednej stránke nie sú dôverné."
+        scopes: "Check the scopes you want the application to grant access to. If no scope is checked, api_v3 is assumed."
         client_credential_user_id: "Voliteľný používateľ, ktorý je súčasťou používania tejto aplikácie. Nechajte prázdne, ak chcete povoliť iba verejný prístup"
         register_intro: "Ak vyvíjate klientskú aplikáciu OAuth API pre OpenProject, môžete ju zaregistrovať pomocou tohto formulára pre všetkých používateľov."
         default_scopes: ""
@@ -2585,17 +2717,17 @@ sk:
       wants_to_access_html: >
         Táto aplikácia vyžaduje prístup k vášmu účtu OpenProject. <br/> <strong>Požiadala o nasledujúce povolenia:</strong>
     scopes:
-      api_v3: "Úplný prístup API"
-      api_v3_text: "Aplikácia dostane plný prístup na čítanie a zápis do rozhrania OpenProject API na vykonanie akcií vo vašom mene."
+      api_v3: "Full API v3 access"
+      api_v3_text: "Application will receive full read & write access to the OpenProject API v3 to perform actions on your behalf."
     grants:
       created_date: "Schválené"
       scopes: "Oprávnenia"
       successful_application_revocation: "Zrušenie aplikácie %{application_name} bolo úspešné."
       none_given: "Žiadnym aplikáciám OAuth nebol udelený prístup k vášmu používateľskému účtu."
     x_active_tokens:
-      one: 'one active token'
-      few: '%{count} aktívne tokeny'
-      many: '%{count} aktívne tokeny'
+      one: 'jeden aktívny token'
+      few: '%{count} aktívnych tokenov'
+      many: '%{count} aktívnych tokenov'
       other: '%{count} aktívne tokeny'
     flows:
       authorization_code: "Tok autorizácie"

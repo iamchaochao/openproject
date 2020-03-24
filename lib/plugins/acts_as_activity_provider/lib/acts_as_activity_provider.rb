@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -156,7 +156,7 @@ module Redmine
           def restrict_projects_by_permission(permission, query)
             perm = OpenProject::AccessControl.permission(permission)
 
-            query = query.where(projects_table[:status].eq(Project::STATUS_ACTIVE))
+            query = query.where(projects_table[:active].eq(true))
 
             if perm && perm.project_module
               m = EnabledModule.arel_table
@@ -187,7 +187,7 @@ module Redmine
             end
 
             if perm && (Role.anonymous.allowed_to?(perm.name) || Role.non_member.allowed_to?(perm.name)) && !is_member
-              public_project = projects_table[:is_public].eq(true)
+              public_project = projects_table[:public].eq(true)
 
               stmt = stmt ? stmt.or(public_project) : public_project
             end

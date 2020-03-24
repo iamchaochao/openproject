@@ -1,6 +1,6 @@
 //-- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,16 +23,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 //++
 
 import {HalResource} from 'core-app/modules/hal/resources/hal-resource';
 import {AttachmentCollectionResource} from 'core-app/modules/hal/resources/attachment-collection-resource';
 import {OpenProjectFileUploadService, UploadFile} from 'core-components/api/op-file-upload/op-file-upload.service';
-import {WorkPackageNotificationService} from 'core-components/wp-edit/wp-notification.service';
+import {HalResourceNotificationService} from "core-app/modules/hal/services/hal-resource-notification.service";
 import {PathHelperService} from 'core-app/modules/common/path-helper/path-helper.service';
 import {NotificationsService} from 'core-app/modules/common/notifications/notifications.service';
 import {HttpErrorResponse} from "@angular/common/http";
+import {WorkPackageCacheService} from "core-components/work-packages/work-package-cache.service";
 
 type Constructor<T = {}> = new (...args:any[]) => T;
 
@@ -41,7 +42,7 @@ export function Attachable<TBase extends Constructor<HalResource>>(Base:TBase) {
     public attachments:AttachmentCollectionResource;
 
     private NotificationsService:NotificationsService;
-    private wpNotificationsService:WorkPackageNotificationService;
+    private halNotification:HalResourceNotificationService;
     private opFileUpload:OpenProjectFileUploadService;
     private pathHelper:PathHelperService;
 
@@ -101,7 +102,7 @@ export function Attachable<TBase extends Constructor<HalResource>>(Base:TBase) {
             }
           })
           .catch((error:any) => {
-            this.wpNotificationsService.handleRawError(error, this as any);
+            this.halNotification.handleRawError(error, this as any);
             this.attachments.elements.push(attachment);
           });
       }
@@ -109,27 +110,40 @@ export function Attachable<TBase extends Constructor<HalResource>>(Base:TBase) {
     }
 
     /**
+     * Get updated attachments from the server and push the state
+     *
+     * Return a promise that returns the attachments. Reject, if the work package has
+     * no attachments.
+     */
+    public updateAttachments():Promise<HalResource> {
+      return this
+        .attachments
+        .updateElements()
+        .then(() => {
+          this.updateState();
+          return this.attachments;
+        });
+    }
+
+    /**
      * Upload the given attachments, update the resource and notify the user.
      * Return an updated AttachmentCollectionResource.
      */
     public uploadAttachments(files:UploadFile[]):Promise<{ response:HalResource, uploadUrl:string }[]> {
-      const { uploads, finished } = this.performUpload(files);
+      const {uploads, finished} = this.performUpload(files);
 
       const message = I18n.t('js.label_upload_notification');
       const notification = this.NotificationsService.addAttachmentUpload(message, uploads);
 
       return finished
-        .then((result:{response:HalResource, uploadUrl:string }[]) => {
+        .then((result:{ response:HalResource, uploadUrl:string }[]) => {
           setTimeout(() => this.NotificationsService.remove(notification), 700);
 
-          if (!!this.attachmentsBackend && !this.isNew) {
-            this.updateAttachments();
-          } else {
-            this.attachments.count += result.length;
-            result.forEach(r => {
-              this.attachments.elements.push(r.response);
-            });
-          }
+          this.attachments.count += result.length;
+          result.forEach(r => {
+            this.attachments.elements.push(r.response);
+          });
+          this.updateState();
 
           return result;
         })
@@ -139,7 +153,7 @@ export function Attachable<TBase extends Constructor<HalResource>>(Base:TBase) {
 
           if (error.error instanceof ErrorEvent) {
             // A client-side or network error occurred.
-            message = this.I18n.t('js.error_attachment_upload', { error: error });
+            message = this.I18n.t('js.error_attachment_upload', {error: error});
           } else if (_.get(error, 'error._type') === 'Error') {
             message = error.error.message;
           } else {
@@ -147,7 +161,7 @@ export function Attachable<TBase extends Constructor<HalResource>>(Base:TBase) {
             message = error.error;
           }
 
-          this.wpNotificationsService.handleRawError(message);
+          this.halNotification.handleRawError(message);
           return message || I18n.t('js.error.internal');
         });
     }
@@ -164,15 +178,30 @@ export function Attachable<TBase extends Constructor<HalResource>>(Base:TBase) {
       return this.opFileUpload.uploadAndMapResponse(href, files);
     }
 
+    private updateState() {
+      if (this.state) {
+        this.state.putValue(this as any);
+      }
+    }
+
     public $initialize(source:any) {
-      this.NotificationsService = this.injector.get(NotificationsService);
-      this.wpNotificationsService = this.injector.get( WorkPackageNotificationService);
-      this.opFileUpload = this.injector.get(OpenProjectFileUploadService);
-      this.pathHelper = this.injector.get(PathHelperService);
+      if (!this.NotificationsService) {
+        this.NotificationsService = this.injector.get(NotificationsService);
+      }
+      if (!this.halNotification) {
+        this.halNotification = this.injector.get(HalResourceNotificationService);
+      }
+      if (!this.opFileUpload) {
+        this.opFileUpload = this.injector.get(OpenProjectFileUploadService);
+      }
+
+      if (!this.pathHelper) {
+        this.pathHelper = this.injector.get(PathHelperService);
+      }
 
       super.$initialize(source);
 
-      let attachments = this.attachments || { $source: {}, elements: [] };
+      let attachments = this.attachments || {$source: {}, elements: []};
       this.attachments = new AttachmentCollectionResource(
         this.injector,
         attachments,

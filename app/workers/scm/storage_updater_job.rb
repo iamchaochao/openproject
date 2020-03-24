@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,27 +27,21 @@
 # See docs/COPYRIGHT.rdoc for more details.
 #++
 
-class Scm::StorageUpdaterJob < ApplicationJob
-  def initialize(repository)
-    @id = repository.id
+class SCM::StorageUpdaterJob < ApplicationJob
+  queue_with_priority :low
 
+  def perform(repository)
     unless repository.scm.storage_available?
-      raise OpenProject::Scm::Exceptions::ScmError.new(
-        I18n.t('repositories.storage.not_available')
-      )
+      Rails.logger.warn "Storage is not available for repository #{repository.id}"
+      return
     end
-  end
 
-  def perform
-    repository = Repository.find @id
     bytes = repository.scm.count_repository!
 
-    repository.update_attributes!(
+    repository.update!(
       required_storage_bytes: bytes,
       storage_updated_at: Time.now,
     )
-  rescue ActiveRecord::RecordNotFound
-    Rails.logger.warn("StorageUpdater requested for Repository ##{@id}, which could not be found.")
   end
 
   ##

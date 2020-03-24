@@ -1,20 +1,13 @@
 #-- copyright
-# OpenProject Backlogs Plugin
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
-# Copyright (C)2013-2014 the OpenProject Foundation (OPF)
-# Copyright (C)2011 Stephan Eckardt, Tim Felgentreff, Marnen Laibow-Koser, Sandro Munda
-# Copyright (C)2010-2011 friflaj
-# Copyright (C)2010 Maxime Guilbot, Andrew Vit, Joakim Kolsjö, ibussieres, Daniel Passos, Jason Vasquez, jpic, Emiliano Heyns
-# Copyright (C)2009-2010 Mark Maglana
-# Copyright (C)2009 Joe Heck, Nate Lowrie
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License version 3.
 #
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License version 3.
-#
-# OpenProject Backlogs is a derivative work based on ChiliProject Backlogs.
-# The copyright follows:
-# Copyright (C) 2010-2011 - Emiliano Heyns, Mark Maglana, friflaj
-# Copyright (C) 2011 - Jens Ulferts, Gregor Schmidt - Finn GmbH - Berlin, Germany
+# OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+# Copyright (C) 2006-2017 Jean-Philippe Lang
+# Copyright (C) 2010-2013 the ChiliProject Team
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -30,7 +23,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-# See doc/COPYRIGHT.rdoc for more details.
+# See docs/COPYRIGHT.rdoc for more details.
 #++
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
@@ -207,9 +200,12 @@ describe Sprint, type: :model do
         @sprint3 = FactoryBot.create(:sprint, name: 'sprint3', project: project, start_date: Date.today + 1.day, effective_date: Date.today + 2.days)
       end
 
-      it { expect(Sprint.order_by_date[0]).to eql @sprint3 }
-      it { expect(Sprint.order_by_date[1]).to eql @sprint2 }
-      it { expect(Sprint.order_by_date[2]).to eql @sprint1 }
+      it 'sorts the dates correctly', :aggregate_failures do
+        expect(Sprint.order_by_date[0]).to eql @sprint3
+        expect(Sprint.order_by_date[1]).to eql @sprint2
+        expect(Sprint.order_by_date[2]).to eql @sprint1
+      end
+
     end
 
     describe '#apply_to' do
@@ -229,7 +225,8 @@ describe Sprint, type: :model do
 
       describe 'WITH the version beeing shared from a parent project' do
         before(:each) do
-          project.set_parent!(@other_project)
+          project.update(parent: @other_project)
+          project.reload
           @version = FactoryBot.create(:sprint, name: 'descended', project: @other_project, sharing: 'descendants')
         end
 
@@ -240,9 +237,9 @@ describe Sprint, type: :model do
       describe 'WITH the version beeing shared within the tree' do
         before(:each) do
           @parent_project = FactoryBot.create(:project)
-          # Setting the parent has to be in this order, don't know why yet
-          @other_project.set_parent!(@parent_project)
-          project.set_parent!(@parent_project)
+          @other_project.update(parent: @parent_project)
+          project.update(parent: @parent_project)
+          project.reload
           @version = FactoryBot.create(:sprint, name: 'treed', project: @other_project, sharing: 'tree')
         end
 
@@ -252,8 +249,8 @@ describe Sprint, type: :model do
 
       describe 'WITH the version beeing shared within the tree' do
         before(:each) do
-          @descendant_project = FactoryBot.create(:project)
-          @descendant_project.set_parent!(project)
+          @descendant_project = FactoryBot.create(:project, parent: project)
+          project.reload
           @version = FactoryBot.create(:sprint, name: 'hierar', project: @descendant_project, sharing: 'hierarchy')
         end
 

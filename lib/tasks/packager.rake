@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -68,9 +68,14 @@ namespace :packager do
     Setting.sys_api_key = ENV['SYS_API_KEY']
     Setting.host_name = ENV.fetch('SERVER_HOSTNAME', Setting.host_name)
 
-    # Allow overriding the protocol setting from ENV
-    # to allow instances where SSL is terminated earlier to respect that setting
-    if ENV['SERVER_PROTOCOL_FORCE_HTTPS'] || ENV.fetch('SERVER_PROTOCOL', Setting.protocol) == 'https'
+    if ENV['SERVER_PROTOCOL_HTTPS_NO_HSTS']
+      # Allow setting only the Setting.protocol without enabling FORCE__SSL
+      # due to external proxy configuration
+      Setting.protocol = 'https'
+      shell_setup(['config:unset', "OPENPROJECT_RAILS__FORCE__SSL"])
+    elsif ENV['SERVER_PROTOCOL_FORCE_HTTPS'] || ENV.fetch('SERVER_PROTOCOL', Setting.protocol) == 'https'
+      # Allow overriding the protocol setting from ENV
+      # to allow instances where SSL is terminated earlier to respect that setting
       Setting.protocol = 'https'
       shell_setup(['config:set', "OPENPROJECT_RAILS__FORCE__SSL=true"])
     else

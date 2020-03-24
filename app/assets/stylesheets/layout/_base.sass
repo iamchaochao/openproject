@@ -1,6 +1,6 @@
 //-- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -32,7 +32,6 @@
   display: grid
   grid-template-rows: auto 1fr
 
-
 #main
   display: grid
   grid-template-columns: auto 1fr
@@ -56,10 +55,10 @@
   overflow-y: auto
   overflow-x: hidden
   background-color: #fff
+  position: relative
 
   &.nosidebar
     margin-left: 0
-    padding: 20px 40px
 
   &.nomenus
     margin:     0
@@ -71,6 +70,9 @@
   width: 100%
   z-index: 10
   background-color: $body-background
+
+.content-overlay
+  display: none
 
 .-draggable
   cursor: grab

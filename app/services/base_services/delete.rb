@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,38 +27,33 @@
 #++
 
 module BaseServices
-  class Delete
-    include ::Shared::ServiceContext
-    include ::Concerns::Contracted
+  class Delete < BaseContracted
+    attr_accessor :model
 
-    attr_accessor :user,
-                  :model,
-                  :contract_class
-
-    def initialize(user:, model:, contract_class: nil)
-      self.user = user
+    def initialize(user:, model:, contract_class: nil, contract_options: {})
       self.model = model
-      self.contract_class = contract_class || default_contract
+      super(user: user, contract_class: contract_class, contract_options: contract_options)
     end
 
-    def call
-      in_context(false) do
-        delete
+    def persist(service_result)
+      service_result = super(service_result)
+
+      unless destroy(service_result.result)
+        service_result.errors = service_result.result.errors
+        service_result.success = false
       end
+
+      service_result
     end
 
-    def default_contract
-      "#{model.class.name.demodulize.pluralize}::DeleteContract".constantize
+    def destroy(object)
+      object.destroy
     end
 
     protected
 
-    def delete
-      result, errors = validate_and_yield(model, user) do
-        model.destroy
-      end
-
-      ServiceResult.new(success: result, result: model, errors: errors)
+    def default_contract_class
+      "#{namespace}::DeleteContract".constantize
     end
   end
 end

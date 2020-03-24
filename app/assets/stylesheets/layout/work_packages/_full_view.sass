@@ -1,6 +1,6 @@
 //-- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -25,6 +25,11 @@
 //
 // See docs/COPYRIGHT.rdoc for more details.
 //++
+
+.router--work-packages-full-view:not(.router--work-packages-full-create)
+  @include extended-content--bottom
+  @include extended-content--right
+  @include extended-content--top
 
 .work-packages--show-view
   display: flex
@@ -53,13 +58,7 @@
         ul li
           float: none
 
-  ul.subject-header
-    list-style-type: none
-
-    li
-      margin: 0
-      padding: 0
-
+  .subject-header
     button
       margin-right: 0
 
@@ -164,72 +163,42 @@
     @media only screen and (max-width: 679px)
       width: 100%
     @media only screen and (min-width: 679px)
-      display: flex
       flex: 1 1 auto
-      margin-bottom: 6px
 
   .subject-header
-    width: 100%
-    margin: 0
-
-    .wp-table--cell-span
-      white-space: normal
-      word-break: break-all
-
-    li.inline-edit
-      width: 100%
-
-    .inplace-edit--read-value
-      margin: 0
-      padding-top: 0
-      padding-bottom: 0
-
     .work-packages--subject-element,
-    .work-packages--details--subject .wp-inline-edit--field
+    .work-packages--details--subject .inline-edit--field
       font-size: 20px
       font-weight: bold
       line-height: 34px
 
-    .work-packages--subject-element
-      .wp-inline-edit--field
+    .work-packages--details--subject
+      .inline-edit--field
         height: 34px
+
+      // Style edit field to look like the display field.
+      // Thus we avoid a visual jump when editing the subject.
+      &.-active input
+        height: 36px
+        line-height: 36px
+        padding: 5px 0 5px 5px
+        font-size: 20px
 
   > .toolbar-container
     margin: 10px 0 5px 0
-    padding-right: 15px
 
 .work-packages--subject-type-row
   display: flex
   position: relative
 
-  // Fix: align and size hover border like buttons in toolbar.
-  .wp-edit-field.-no-label:not(.-active) .wp-table--cell-span
-    padding-top: 3px
-    padding-bottom: 3px
-    margin-top: 2px
-
 .work-packages--type-selector:not(.wp-new-top-row--element)
-  .wp-table--cell-span
+  .inline-edit--display-field
     padding-right: 5px !important
 
   // Remove left padding from type
-  .wp-edit-field--display-field
+  .inline-edit--display-field
     padding-left: 0 !important
 
   @media only screen and (min-width: 679px)
-    .wp-edit-field--container.-active
-      margin-right: 80px !important
-      width: 95%
-
-  .inplace-edit--read-value--value-span
-    white-space: nowrap
-
-  .inplace-edit--read-value--value-span:after
-    content: ':'
-
-.edit-all-mode
-  .subject-header .work-packages--details--subject .inplace-edit--text-field
-    padding-left: 0.375rem
-
-  .work-packages--details--title, .work-packages--details--description
-    margin-left: 0
+    .inline-edit--container.-active
+      width: 130px

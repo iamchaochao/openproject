@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -35,11 +35,13 @@ class MenuItem < ApplicationRecord
 
   serialize :options, Hash
 
-  validates_presence_of :title
-  validates_uniqueness_of :title, scope: [:navigatable_id, :type]
+  validates :title,
+            presence: true,
+            uniqueness: { scope: %i[navigatable_id type], case_sensitive: true }
 
-  validates_presence_of :name
-  validates_uniqueness_of :name, scope: [:navigatable_id, :parent_id]
+  validates :name,
+            presence: true,
+            uniqueness: { scope: %i[navigatable_id parent_id], case_sensitive: true }
 
   def setting
     if new_record?

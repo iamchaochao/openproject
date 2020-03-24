@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -24,7 +24,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-# See doc/COPYRIGHT.rdoc for more details.
+# See docs/COPYRIGHT.rdoc for more details.
 
 require 'spec_helper'
 require 'rack/test'
@@ -38,7 +38,7 @@ describe API::V3::WorkPackages::WorkPackagesByProjectAPI, type: :request do
   end
   let(:role) { FactoryBot.create(:role, permissions: permissions) }
   let(:permissions) { [:view_work_packages] }
-  let(:project) { FactoryBot.create(:project_with_types, is_public: false) }
+  let(:project) { FactoryBot.create(:project_with_types, public: false) }
   let(:path) { api_v3_paths.work_packages_by_project project.id }
 
   before do
@@ -137,17 +137,17 @@ describe API::V3::WorkPackages::WorkPackagesByProjectAPI, type: :request do
         let(:work_packages) do
           [
             FactoryBot.create(:work_package,
-                               project: project,
-                               priority: priority1,
-                               estimated_hours: 1),
+                              project: project,
+                              priority: priority1,
+                              estimated_hours: 1),
             FactoryBot.create(:work_package,
-                               project: project,
-                               priority: priority2,
-                               estimated_hours: 2),
+                              project: project,
+                              priority: priority2,
+                              estimated_hours: 2),
             FactoryBot.create(:work_package,
-                               project: project,
-                               priority: priority1,
-                               estimated_hours: 3)
+                              project: project,
+                              priority: priority1,
+                              estimated_hours: 3)
           ]
         end
         let(:expected_group1) do
@@ -295,20 +295,21 @@ describe API::V3::WorkPackages::WorkPackagesByProjectAPI, type: :request do
 
       FactoryBot.create(:user_preference, user: current_user, others: { no_self_notified: false })
       post path, parameters.to_json, 'CONTENT_TYPE' => 'application/json'
+      perform_enqueued_jobs
     end
 
     context 'notifications' do
       let(:permissions) { [:add_work_packages, :view_project, :view_work_packages] }
 
       it 'sends a mail by default' do
-        expect(ActionMailer::Base.deliveries.count).to eq(1)
+        expect(DeliverWorkPackageNotificationJob).to have_been_enqueued
       end
 
       context 'without notifications' do
         let(:path) { "#{api_v3_paths.work_packages_by_project(project.id)}?notify=false" }
 
         it 'should not send a mail' do
-          expect(ActionMailer::Base.deliveries.count).to eq(0)
+          expect(DeliverWorkPackageNotificationJob).not_to have_been_enqueued
         end
       end
 
@@ -316,7 +317,7 @@ describe API::V3::WorkPackages::WorkPackagesByProjectAPI, type: :request do
         let(:path) { "#{api_v3_paths.work_packages_by_project(project.id)}?notify=true" }
 
         it 'should send a mail' do
-          expect(ActionMailer::Base.deliveries.count).to eq(1)
+          expect(DeliverWorkPackageNotificationJob).to have_been_enqueued
         end
       end
     end

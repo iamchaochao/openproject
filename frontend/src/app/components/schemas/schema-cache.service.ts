@@ -1,10 +1,6 @@
-import {Injectable} from '@angular/core';
-import {SchemaResource} from 'core-app/modules/hal/resources/schema-resource';
-import {WorkPackageResource} from 'core-app/modules/hal/resources/work-package-resource';
-import {HalResourceService} from 'core-app/modules/hal/services/hal-resource.service';
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -27,10 +23,14 @@ import {HalResourceService} from 'core-app/modules/hal/services/hal-resource.ser
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 import {InputState, State} from 'reactivestates';
 import {States} from '../states.service';
+import {HalResource} from "core-app/modules/hal/resources/hal-resource";
+import {Injectable} from '@angular/core';
+import {SchemaResource} from 'core-app/modules/hal/resources/schema-resource';
+import {HalResourceService} from 'core-app/modules/hal/services/hal-resource.service';
 
 @Injectable()
 export class SchemaCacheService {
@@ -44,13 +44,13 @@ export class SchemaCacheService {
    * @param href The schema's href.
    * @return A promise with the loaded schema.
    */
-  ensureLoaded(workPackage:WorkPackageResource):Promise<unknown> {
-    const state = this.state(workPackage);
+  ensureLoaded(resource:HalResource):Promise<unknown> {
+    const state = this.state(resource);
 
     if (state.hasValue()) {
       return Promise.resolve(state.value);
     } else {
-      return this.load(workPackage).valuesPromise() as Promise<unknown>;
+      return this.load(resource).valuesPromise() as Promise<unknown>;
     }
   }
 
@@ -58,24 +58,29 @@ export class SchemaCacheService {
    * Get the associated schema state of the work package
    *  without initializing a new resource.
    */
-  state(workPackage:WorkPackageResource):InputState<SchemaResource> {
-    const schema = workPackage.$links.schema;
+  state(resource:HalResource):InputState<SchemaResource> {
+    const schema = resource.$links.schema;
+
+    if (!schema) {
+      throw `Resource ${resource} has no schema!`;
+    }
+
     return this.states.schemas.get(schema.href!);
   }
 
   /**
    * Load the associated schema for the given work package, if needed.
    */
-  load(workPackage:WorkPackageResource, forceUpdate = false):State<SchemaResource> {
-    const state = this.state(workPackage);
+  load(resource:HalResource, forceUpdate = false):State<SchemaResource> {
+    const state = this.state(resource);
 
     if (forceUpdate) {
       state.clear();
     }
 
     state.putFromPromiseIfPristine(() => {
-      const resource = this.halResourceService.createLinkedResource(workPackage, 'schema', workPackage.$links.schema.$link);
-      return resource.$load() as any;
+      const schemaResource = this.halResourceService.createLinkedResource(resource, 'schema', resource.$links.schema.$link);
+      return schemaResource.$load() as any;
     });
 
     return state;

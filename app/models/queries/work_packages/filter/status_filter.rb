@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -42,7 +42,7 @@ class Queries::WorkPackages::Filter::StatusFilter < Queries::WorkPackages::Filte
   end
 
   def available?
-    Status.exists?
+    all_statuses.any?
   end
 
   def type
@@ -70,7 +70,11 @@ class Queries::WorkPackages::Filter::StatusFilter < Queries::WorkPackages::Filte
   private
 
   def all_statuses
-    @all_statuses ||= Status.all
+    key = 'Queries::WorkPackages::Filter::StatusFilter/all_statuses'
+
+    RequestStore.fetch(key) do
+      Status.all.to_a
+    end
   end
 
   def operator_strategy

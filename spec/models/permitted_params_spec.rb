@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -240,6 +240,7 @@ describe PermittedParams, type: :model do
 
     context 'with instance passed' do
       let(:instance) { double('message', project: double('project')) }
+      let(:project) { double('project') }
       let(:allowed_params) do
         { 'subject' => 'value',
           'content' => 'value',
@@ -253,10 +254,10 @@ describe PermittedParams, type: :model do
       end
 
       before do
-        allow(user).to receive(:allowed_to?).with(:edit_messages, instance.project).and_return(true)
+        allow(user).to receive(:allowed_to?).with(:edit_messages, project).and_return(true)
       end
 
-      subject { PermittedParams.new(hash, user).message(instance).to_h }
+      subject { PermittedParams.new(hash, user).message(project).to_h }
 
       it do
         expect(subject).to eq(allowed_params)
@@ -522,6 +523,23 @@ describe PermittedParams, type: :model do
       let(:hash) { { 'custom_field_values' => { 'blubs' => '5', '5' => { '1' => '2' } } } }
 
       it_behaves_like 'forbids params'
+    end
+  end
+
+  describe '#time_entry_activities_project' do
+    let(:attribute) { :time_entry_activities_project }
+    let(:hash) do
+      [
+        { "activity_id" => "5", "active" => "0" },
+        { "activity_id" => "6", "active" => "1" }
+      ]
+    end
+    let(:allowed_params) do
+      [{ "activity_id" => "5", "active" => "0" }, { "activity_id" => "6", "active" => "1" }]
+    end
+
+    it_behaves_like 'allows params' do
+      subject { PermittedParams.new(params, user).send(attribute) }
     end
   end
 
@@ -987,47 +1005,6 @@ describe PermittedParams, type: :model do
       let(:hash) { { 'mail_notification' => 'blubs' } }
 
       it_behaves_like 'forbids params'
-    end
-  end
-
-  describe 'calendar_filter' do
-    let(:attribute) { :calendar_filter }
-    let(:flat) { true }
-
-    describe 'project_id' do
-      let(:hash) { { 'project_id' => 'some_identifier' } }
-
-      it_behaves_like 'allows params'
-    end
-
-    describe 'f' do
-      let(:hash) { { 'f' => ['assigned_to_id', 'subject'] } }
-
-      it_behaves_like 'allows params'
-    end
-
-    describe 'op' do
-      let(:hash) { { 'op' => { 'assigned_to_id' => '=', 'subject' => '~', 'cf_0815' => '=' } } }
-
-      it_behaves_like 'allows params'
-    end
-
-    describe 'v' do
-      let(:hash) { { 'v' => { 'assigned_to_id' => ['1'], 'subject' => ['blubs'], 'cf_0815' => ['a', 'b', 'c'] } } }
-
-      it_behaves_like 'allows params'
-    end
-
-    describe 'month' do
-      let(:hash) { { 'month' => '3' } }
-
-      it_behaves_like 'allows params'
-    end
-
-    describe 'year' do
-      let(:hash) { { 'year' => '3' } }
-
-      it_behaves_like 'allows params'
     end
   end
 

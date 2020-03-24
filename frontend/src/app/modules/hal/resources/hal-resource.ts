@@ -1,6 +1,6 @@
 //-- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 //++
 
 import {InputState} from "reactivestates";
@@ -31,7 +31,7 @@ import {HalLinkInterface} from 'core-app/modules/hal/hal-link/hal-link';
 import {Injector} from '@angular/core';
 import {States} from 'core-components/states.service';
 import {I18nService} from 'core-app/modules/common/i18n/i18n.service';
-
+import {InjectField} from "core-app/helpers/angular/inject-field.decorator";
 
 export interface HalResourceClass<T extends HalResource = HalResource> {
   new(injector:Injector,
@@ -42,10 +42,18 @@ export interface HalResourceClass<T extends HalResource = HalResource> {
 }
 
 export class HalResource {
+  // TODO this is the source of many issues in the frontend
+  // because it no longer properly type checks stuff
+  // Since 2019-10-21 I'm documenting what bugs this caused:
+  // https://community.openproject.com/wp/31462
   [attribute:string]:any;
 
   // The API type reported from API
   public _type:string;
+
+  // Internal initialization time for objects
+  // created in the frontend
+  public __initialized_at:Number;
 
   // The HalResource that this type maps to
   // This will almost always be equal to _type, however may be different for dynamic types
@@ -54,8 +62,8 @@ export class HalResource {
   // This is required for attributes to be correctly mapped according to their configuration.
   public $halType:string;
 
-  protected readonly states:States = this.injector.get(States);
-  protected readonly I18n:I18nService = this.injector.get(I18nService);
+  @InjectField() states:States;
+  @InjectField() I18n:I18nService;
 
   /**
    * Constructs and initializes the HalResource. For this, the halResoureFactory is required.
@@ -79,8 +87,8 @@ export class HalResource {
     this.$initialize($source);
   }
 
-  public static getEmptyResource(self:{ href:string|null } = { href: null }):any {
-    return { _links: { self: self } };
+  public static getEmptyResource(self:{ href:string|null } = {href: null}):any {
+    return {_links: {self: self}};
   }
 
   public $links:any = {};
@@ -107,6 +115,18 @@ export class HalResource {
   }
 
   /**
+   * Override toString to ensure the resource can
+   * be printed nicely on console and in errors
+   */
+  public toString() {
+    if (this.$href) {
+      return `[HalResource href=${this.$href}]`;
+    } else {
+      return `[HalResource id=${this.id}]`;
+    }
+  }
+
+  /**
    * Returns the ID and ensures it's a string, null.
    * Returns a string when:
    *  - The embedded ID is actually set
@@ -129,9 +149,38 @@ export class HalResource {
     this.$source.id = val;
   }
 
+  public get isNew():boolean {
+    return this.id === 'new';
+  }
+
   public get persisted() {
     return !!(this.id && this.id !== 'new');
   }
+
+  /**
+   * Return whether the resource is editable with the user's permission
+   * on the given resource package attribute.
+   * In order to be editable, there needs to be an update link on the resource and the schema for
+   * the attribute needs to indicate the writability.
+   *
+   * @param property
+   */
+  public isAttributeEditable(property:string):boolean {
+    const fieldSchema = this.schema[property];
+    return this.$links.update && fieldSchema && fieldSchema.writable;
+  }
+
+  /**
+   * Retain the internal tracking identifier from the given other work package.
+   * This is due to us needing to identify a work package beyond its actual ID,
+   * because that changes upon saving.
+   *
+   * @param other
+   */
+  public retainFrom(other:HalResource) {
+    this.__initialized_at = other.__initialized_at;
+  }
+
 
   /**
    * Create a HalResource from the copied source of the given, other HalResource.
@@ -140,7 +189,7 @@ export class HalResource {
    * @returns A HalResource with the identitical copied source of other.
    */
   public $copy<T extends HalResource = HalResource>(source:Object = {}):T {
-    let clone:HalResourceClass<T>  = this.constructor as any;
+    let clone:HalResourceClass<T> = this.constructor as any;
 
     return new clone(this.injector, _.merge(this.$plain(), source), this.$loaded, this.halInitializer, this.$halType);
   }
@@ -183,6 +232,27 @@ export class HalResource {
     return null;
   }
 
+  /**
+   * Update the state
+   */
+  public push(newValue:this):void {
+    if (this.state) {
+      this.state.putValue(newValue);
+    }
+  }
+
+  public previewPath():string|undefined {
+    if (this.isNew && this.project) {
+      return this.project.href;
+    }
+
+    return undefined;
+  }
+
+  public getEditorTypeFor(_fieldName:string):'full'|'constrained' {
+    return 'constrained';
+  }
+
   public $load(force = false):Promise<this> {
     if (!this.state) {
       return this.$loadResource(force);
@@ -198,7 +268,7 @@ export class HalResource {
     // Otherwise, we risk returning a promise, that will never be resolved.
     state.putFromPromiseIfPristine(() => this.$loadResource(force));
 
-    return <Promise<this>> state.valuesPromise().then((source:any) => {
+    return <Promise<this>>state.valuesPromise().then((source:any) => {
       this.$initialize(source);
       this.$loaded = true;
       return this;

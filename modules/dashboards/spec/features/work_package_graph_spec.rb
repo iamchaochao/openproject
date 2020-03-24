@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -142,6 +142,16 @@ describe 'Arbitrary WorkPackage query graph widget dashboard', type: :feature, j
       modal.switch_to('General')
       general.expect_axis 'Type'
       general.expect_type 'Bar'
+
+      # A notification is displayed if no work package is returned for the graph
+      modal.switch_to('Filters')
+      filters.add_filter_by('Subject', 'contains', '!!!!!!!!!!!!!!!!!')
+      modal.save
+
+      within filter_area.area do
+        expect(page)
+          .to have_content(I18n.t('js.work_packages.no_results.title'))
+      end
     end
   end
 

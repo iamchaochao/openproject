@@ -3,7 +3,7 @@
     draggable="true"
     (dragstart)="setDragData($event)"
     [title]="text.dragHint"
-    focusWithinSelector=".inplace-edit--icon-wrapper">
+    focusWithinSelector=".inplace-editing--trigger-icon">
   <span class="form--selected-value">
     <op-icon icon-classes="icon-context icon-attachment"></op-icon>
     <a
@@ -29,5 +29,5 @@
              [icon-title]="text.removeFile({fileName: attachment.fileName})"></op-icon>
   </a>
 
-  <input type="hidden" name="attachments[{{index}}][id]" value="{{attachment.id}}" *ngIf="!attachment.container">
+  <input type="hidden" name="attachments[{{index}}][id]" value="{{attachment.id}}">
 </li>

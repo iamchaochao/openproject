@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -39,17 +39,14 @@ module API
           end
 
           schema :id,
-                 type: 'Integer',
-                 visibility: false
+                 type: 'Integer'
 
           schema :created_at,
-                 type: 'DateTime',
-                 visibility: false
+                 type: 'DateTime'
 
           schema_with_allowed_link :project,
                                    has_default: false,
                                    required: true,
-                                   visibility: false,
                                    href_callback: ->(*) {
                                      allowed_projects_href
                                    }
@@ -57,7 +54,6 @@ module API
           schema_with_allowed_link :principal,
                                    has_default: false,
                                    required: true,
-                                   visibility: false,
                                    href_callback: ->(*) {
                                      allowed_principal_href
                                    }
@@ -67,7 +63,6 @@ module API
                                    name_source: :role,
                                    has_default: false,
                                    required: true,
-                                   visibility: false,
                                    href_callback: ->(*) {
                                      api_v3_paths.path_for(:roles, filters: [{ unit: { operator: '=', values: ['project'] } }])
                                    }
@@ -95,8 +90,7 @@ module API
           end
 
           def allowed_principals_filters
-            statuses = [Principal::STATUSES[:builtin].to_s,
-                        Principal::STATUSES[:locked].to_s]
+            statuses = [Principal::STATUSES[:locked].to_s]
             status_filter = { status: { operator: '!', values: statuses } }
 
             filters = [status_filter]

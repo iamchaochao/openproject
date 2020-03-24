@@ -6,14 +6,14 @@ import {HalResource} from "core-app/modules/hal/resources/hal-resource";
 @Injectable()
 export class HalAwareErrorHandler extends ErrorHandler {
   private text = {
-    internal_error: this.I18n.t('js.errors.internal')
+    internal_error: this.I18n.t('js.error.internal')
   };
 
   constructor(private readonly I18n:I18nService) {
     super();
   }
 
-  public handleError(error:any) {
+  public handleError(error:unknown) {
     let message:string = this.text.internal_error;
 
     if (error instanceof ErrorResource) {
@@ -22,7 +22,10 @@ export class HalAwareErrorHandler extends ErrorHandler {
     } else if (error instanceof HalResource) {
       console.error("Returned hal resource %O", error);
       message += `Resource returned ${error.name}`;
-    } else {
+    } else if (error instanceof Error) {
+      window.ErrorReporter.captureException(error);
+    } else if (typeof error === 'string') {
+      window.ErrorReporter.captureMessage(error);
       message = error;
     }
 

@@ -2,7 +2,6 @@ import {Injector} from '@angular/core';
 import {I18nService} from 'core-app/modules/common/i18n/i18n.service';
 import {WorkPackageResource} from 'core-app/modules/hal/resources/work-package-resource';
 import {States} from '../states.service';
-import {WorkPackageEditForm} from '../wp-edit-form/work-package-edit-form';
 import {
   commonRowClassName,
   SingleRowBuilder,
@@ -13,8 +12,10 @@ import {WorkPackageTable} from '../wp-fast-table/wp-fast-table';
 import {WorkPackageViewSelectionService} from "core-app/modules/work_packages/routing/wp-view-base/view-services/wp-view-selection.service";
 import {WorkPackageViewColumnsService} from "core-app/modules/work_packages/routing/wp-view-base/view-services/wp-view-columns.service";
 import {QueryColumn} from "core-components/wp-query/query-column";
-import {wpCellTdClassName} from "core-components/wp-fast-table/builders/cell-builder";
+import {tdClassName} from "core-components/wp-fast-table/builders/cell-builder";
 import {internalContextMenuColumn} from "core-components/wp-fast-table/builders/internal-sort-columns";
+import {EditForm} from "core-app/modules/fields/edit/edit-form/edit-form";
+import {InjectField} from "core-app/helpers/angular/inject-field.decorator";
 
 export const inlineCreateRowClassName = 'wp-inline-create-row';
 export const inlineCreateCancelClassName = 'wp-table--cancel-create-link';
@@ -22,10 +23,10 @@ export const inlineCreateCancelClassName = 'wp-table--cancel-create-link';
 export class InlineCreateRowBuilder extends SingleRowBuilder {
 
   // Injections
-  public states = this.injector.get(States);
-  public wpTableSelection = this.injector.get(WorkPackageViewSelectionService);
-  public wpTableColumns = this.injector.get(WorkPackageViewColumnsService);
-  public I18n = this.injector.get(I18nService);
+  @InjectField() public states:States;
+  @InjectField() public wpTableSelection:WorkPackageViewSelectionService;
+  @InjectField() public wpTableColumns:WorkPackageViewColumnsService;
+  @InjectField() public I18n:I18nService;
 
   protected text:{ cancelButton:string };
 
@@ -48,7 +49,7 @@ export class InlineCreateRowBuilder extends SingleRowBuilder {
     }
   }
 
-  public buildNew(workPackage:WorkPackageResource, form:WorkPackageEditForm):[HTMLElement, boolean] {
+  public buildNew(workPackage:WorkPackageResource, form:EditForm):[HTMLElement, boolean] {
     // Get any existing edit state for this work package
     const [row, hidden] = this.buildEmpty(workPackage);
 
@@ -78,7 +79,7 @@ export class InlineCreateRowBuilder extends SingleRowBuilder {
 
   protected buildCancelButton() {
     const td = document.createElement('td');
-    td.classList.add(wpCellTdClassName, 'wp-table--cancel-create-td');
+    td.classList.add(tdClassName, 'wp-table--cancel-create-td');
 
     td.innerHTML = `
     <a

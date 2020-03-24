@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -79,7 +79,7 @@ describe 'index users', type: :feature do
     index_page.expect_listed(active_user)
 
     # temporarily block user
-    active_user.update_attributes(failed_login_count: 6,
+    active_user.update(failed_login_count: 6,
                                   last_failed_login_on: 9.minutes.ago)
     index_page.clear_filters
     index_page.expect_listed(admin, active_user, registered_user, invited_user)
@@ -92,7 +92,7 @@ describe 'index users', type: :feature do
 
     # temporarily block user and lock permanently
     active_user.reload
-    active_user.update_attributes(failed_login_count: 6,
+    active_user.update(failed_login_count: 6,
                                   last_failed_login_on: 9.minutes.ago)
     index_page.clear_filters
 

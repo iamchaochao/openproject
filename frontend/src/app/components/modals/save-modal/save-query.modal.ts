@@ -1,6 +1,6 @@
 //-- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,11 +23,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 //++
 
 import {States} from '../../states.service';
-import {WorkPackageNotificationService} from '../../wp-edit/wp-notification.service';
+import {HalResourceNotificationService} from "core-app/modules/hal/services/hal-resource-notification.service";
 import {QueryResource} from 'core-app/modules/hal/resources/query-resource';
 import {NotificationsService} from "core-app/modules/common/notifications/notifications.service";
 import {OpModalComponent} from "core-components/op-modals/op-modal.component";
@@ -67,7 +67,7 @@ export class SaveQueryModal extends OpModalComponent {
               readonly states:States,
               readonly querySpace:IsolatedQuerySpace,
               readonly wpListService:WorkPackagesListService,
-              readonly wpNotificationsService:WorkPackageNotificationService,
+              readonly halNotification:HalResourceNotificationService,
               readonly cdRef:ChangeDetectorRef,
               readonly notificationsService:NotificationsService) {
     super(locals, cdRef, elementRef);
@@ -105,7 +105,7 @@ export class SaveQueryModal extends OpModalComponent {
         this.closeMe($event);
         return Promise.resolve(true);
       })
-      .catch((error:any) => this.wpNotificationsService.handleRawError(error))
+      .catch((error:any) => this.halNotification.handleRawError(error))
       .then(() => this.isBusy = false); // Same as .finally()
   }
 }

@@ -1,6 +1,6 @@
 //-- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,31 +23,29 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 //++
 
 
 import {QueryFilterResource} from 'core-app/modules/hal/resources/query-filter-resource';
 import {QueryFilterInstanceResource} from 'core-app/modules/hal/resources/query-filter-instance-resource';
-import {Component, EventEmitter, Inject, Input, OnDestroy, Output} from '@angular/core';
+import {Component, Input, Output} from '@angular/core';
 import {I18nService} from 'core-app/modules/common/i18n/i18n.service';
 import {DebouncedEventEmitter} from 'core-components/angular/debounced-event-emitter';
-import {componentDestroyed} from 'ng2-rx-componentdestroyed';
+import {UntilDestroyedMixin} from "core-app/helpers/angular/until-destroyed.mixin";
+import {componentDestroyed} from "@w11k/ngx-componentdestroyed";
 
 @Component({
   selector: 'filter-integer-value',
   templateUrl: './filter-integer-value.component.html'
 })
-export class FilterIntegerValueComponent implements OnDestroy {
+export class FilterIntegerValueComponent extends UntilDestroyedMixin {
   @Input() public shouldFocus:boolean = false;
   @Input() public filter:QueryFilterInstanceResource;
   @Output() public filterChanged = new DebouncedEventEmitter<QueryFilterInstanceResource>(componentDestroyed(this));
 
   constructor(readonly I18n:I18nService) {
-  }
-
-  ngOnDestroy() {
-    // Nothing to do, added for interface compatibility
+    super();
   }
 
   public get value() {
@@ -55,7 +53,7 @@ export class FilterIntegerValueComponent implements OnDestroy {
   }
 
   public set value(val) {
-    if (typeof(val) === 'number') {
+    if (typeof (val) === 'number') {
       this.filter.values = [val.toString()];
     } else {
       this.filter.values = [];

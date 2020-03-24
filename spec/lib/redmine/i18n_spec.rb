@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -187,6 +187,22 @@ module OpenProject
           expect(translated).to eq(
             "There is a <a href=\"http://openproject.com/foobar\">link</a> in this translation!" +
             " Maybe even <a href=\"/baz\">two</a>?")
+        end
+      end
+    end
+
+    describe '#format_date' do
+      context 'without a date_format setting', with_settings: { date_format: '' } do
+        it 'uses the locale formate' do
+          expect(format_date(Date.today))
+            .to eql I18n.l(Date.today)
+        end
+      end
+
+      context 'with a date_format setting', with_settings: { date_format: '%d %m %Y' } do
+        it 'adheres to the format' do
+          expect(format_date(Date.today))
+            .to eql Date.today.strftime('%d %m %Y')
         end
       end
     end

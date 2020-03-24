@@ -1,7 +1,8 @@
 #-- encoding: UTF-8
+
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -35,20 +36,12 @@ class Project < ApplicationRecord
   include Project::Storage
   include Project::Activity
 
-  # Project statuses
-  STATUS_ACTIVE     = 1
-  STATUS_ARCHIVED   = 9
-
-  enum status: { active: STATUS_ACTIVE, archived: STATUS_ARCHIVED }
-
   # Maximum length for project identifiers
   IDENTIFIER_MAX_LENGTH = 100
 
   # reserved identifiers
   RESERVED_IDENTIFIERS = %w(new).freeze
 
-  # Specific overridden Activities
-  has_many :time_entry_activities
   has_many :members, -> {
     includes(:principal, :roles)
       .where(
@@ -130,6 +123,7 @@ class Project < ApplicationRecord
     order("#{Version.table_name}.effective_date DESC, #{Version.table_name}.name DESC")
   }, dependent: :destroy
   has_many :time_entries, dependent: :delete_all
+  has_many :time_entry_activities_projects, dependent: :delete_all
   has_many :queries, dependent: :delete_all
   has_many :news, -> { includes(:author) }, dependent: :destroy
   has_many :categories, -> { order("#{Category.table_name}.name") }, dependent: :delete_all
@@ -143,50 +137,60 @@ class Project < ApplicationRecord
   }, class_name: 'WorkPackageCustomField',
      join_table: "#{table_name_prefix}custom_fields_projects#{table_name_suffix}",
      association_foreign_key: 'custom_field_id'
+  has_one :status, class_name: 'Project::Status', dependent: :destroy
 
   acts_as_nested_set order_column: :name, dependent: :destroy
 
   acts_as_customizable
-  acts_as_searchable columns: ["#{table_name}.name", "#{table_name}.identifier", "#{table_name}.description"], project_key: 'id', permission: nil
+  acts_as_searchable columns: %W(#{table_name}.name #{table_name}.identifier #{table_name}.description),
+                     date_column: "#{table_name}.created_at",
+                     project_key: 'id',
+                     permission: nil
   acts_as_event title: Proc.new { |o| "#{Project.model_name.human}: #{o.name}" },
-                url: Proc.new { |o| { controller: '/projects', action: 'show', id: o } },
+                url: Proc.new { |o| { controller: 'overviews/overviews', action: 'show', project_id: o } },
                 author: nil,
-                datetime: :created_on
+                datetime: :created_at
 
-  validates_presence_of :name, :identifier
+  validates :name,
+            presence: true,
+            length: { maximum: 255 }
   # TODO: we temporarily disable this validation because it leads to failed tests
   # it implicitly assumes a db:seed-created standard type to be present and currently
   # neither development nor deployment setups are prepared for this
   # validates_presence_of :types
-  validates_uniqueness_of :identifier
+  validates :identifier,
+            presence: true,
+            uniqueness: { case_sensitive: true },
+            length: { maximum: IDENTIFIER_MAX_LENGTH },
+            exclusion: RESERVED_IDENTIFIERS
+
   validates_associated :repository, :wiki
-  validates_length_of :name, maximum: 255
-  validates_length_of :identifier, in: 1..IDENTIFIER_MAX_LENGTH
   # starts with lower-case letter, a-z, 0-9, dashes and underscores afterwards
   validates :identifier,
             format: { with: /\A[a-z][a-z0-9\-_]*\z/ },
             if: ->(p) { p.identifier_changed? }
   # reserved words
-  validates_exclusion_of :identifier, in: RESERVED_IDENTIFIERS
 
   friendly_id :identifier, use: :finders
-
-  before_destroy :delete_all_members
-  before_destroy :destroy_all_work_packages
 
   scope :has_module, ->(mod) {
     where(["#{Project.table_name}.id IN (SELECT em.project_id FROM #{EnabledModule.table_name} em WHERE em.name=?)", mod.to_s])
   }
-  scope :public_projects, -> { where(is_public: true) }
-  scope :visible, ->(user = User.current) { Project.visible_by(user) }
-  scope :newest, -> { order(created_on: :desc) }
+  scope :public_projects, -> { where(public: true) }
+  scope :visible, ->(user = User.current) { merge(Project.visible_by(user)) }
+  scope :newest, -> { order(created_at: :desc) }
+  scope :active, -> { where(active: true) }
 
   def visible?(user = User.current)
-    active? and (is_public? or user.admin? or user.member_of?(self))
+    active? and (public? or user.admin? or user.member_of?(self))
+  end
+
+  def archived?
+    !active?
   end
 
   def copy_allowed?
-    User.current.allowed_to?(:copy_projects, self) && (parent.nil? || User.current.allowed_to?(:add_subprojects, parent))
+    User.current.allowed_to?(:copy_projects, self)
   end
 
   def self.selectable_projects
@@ -196,25 +200,6 @@ class Project < ApplicationRecord
   def self.search_scope(query)
     # overwritten from Pagination::Model
     visible.like(query)
-  end
-
-  # end timelines
-  def initialize(attributes = nil)
-    super
-
-    initialized = (attributes || {}).stringify_keys
-    if !initialized.key?('identifier') && Setting.sequential_project_identifiers?
-      self.identifier = Project.next_identifier
-    end
-    if !initialized.key?('is_public')
-      self.is_public = Setting.default_projects_public?
-    end
-    if !initialized.key?('enabled_module_names')
-      self.enabled_module_names = Setting.default_projects_modules
-    end
-    if !initialized.key?('types') && !initialized.key?('type_ids')
-      self.types = ::Type.default
-    end
   end
 
   def possible_members(criteria, limit)
@@ -255,52 +240,6 @@ class Project < ApplicationRecord
     super
   end
 
-  # Returns the Systemwide and project specific activities
-  def activities(include_inactive = false)
-    if include_inactive
-      all_activities
-    else
-      active_activities
-    end
-  end
-
-  # Will create a new Project specific Activity or update an existing one
-  #
-  # This will raise a ActiveRecord::Rollback if the TimeEntryActivity
-  # does not successfully save.
-  def update_or_create_time_entry_activity(id, activity_hash)
-    if activity_hash.respond_to?(:has_key?) && activity_hash.has_key?('parent_id')
-      create_time_entry_activity_if_needed(activity_hash)
-    else
-      activity = project.time_entry_activities.find_by(id: id.to_i)
-      activity.update_attributes(activity_hash) if activity
-    end
-  end
-
-  # Create a new TimeEntryActivity if it overrides a system TimeEntryActivity
-  #
-  # This will raise a ActiveRecord::Rollback if the TimeEntryActivity
-  # does not successfully save.
-  def create_time_entry_activity_if_needed(activity)
-    if activity['parent_id']
-
-      parent_activity = TimeEntryActivity.find(activity['parent_id'])
-      activity['name'] = parent_activity.name
-      activity['position'] = parent_activity.position
-
-      if Enumeration.overridding_change?(activity, parent_activity)
-        project_activity = time_entry_activities.create(activity)
-
-        if project_activity.new_record?
-          raise ActiveRecord::Rollback, 'Overridding TimeEntryActivity was not successfully saved'
-        else
-          time_entries.where(['activity_id = ?', parent_activity.id])
-            .update_all("activity_id = #{project_activity.id}")
-        end
-      end
-    end
-  end
-
   # Returns a :conditions SQL string that can be used to find the issues associated with this project.
   #
   # Examples:
@@ -312,109 +251,19 @@ class Project < ApplicationRecord
     cond
   end
 
-  # Archives the project and its descendants
-  def archive
-    # Check that there is no issue of a non descendant project that is assigned
-    # to one of the project or descendant versions
-    v_ids = self_and_descendants.map(&:version_ids).flatten
-    if v_ids.any? && WorkPackage.includes(:project)
-                     .where(["(#{Project.table_name}.lft < ? OR #{Project.table_name}.rgt > ?)" +
-                        " AND #{WorkPackage.table_name}.fixed_version_id IN (?)", lft, rgt, v_ids])
-                     .references(:projects)
-                     .first
-      return false
-    end
-
-    Project.transaction do
-      archive!
-    end
-
-    true
-  end
-
-  # Unarchives the project
-  # All its ancestors must be active
-  def unarchive
-    return false if ancestors.detect { |a| !a.active? }
-
-    update_attribute :status, STATUS_ACTIVE
-  end
-
-  # Returns an array of projects the project can be moved to
-  # by the current user
-  def allowed_parents
-    return @allowed_parents if @allowed_parents
-
-    @allowed_parents = Project.allowed_to(User.current, :add_subprojects)
-    @allowed_parents = @allowed_parents - self_and_descendants
-    if User.current.allowed_to?(:add_project, nil, global: true) || (!new_record? && parent.nil?)
-      @allowed_parents << nil
-    end
-    unless parent.nil? || @allowed_parents.empty? || @allowed_parents.include?(parent)
-      @allowed_parents << parent
-    end
-    @allowed_parents
-  end
-
-  def allowed_parent?(p)
-    p = guarantee_project_or_nil_or_false(p)
-    return false if p == false # have to explicitly check for false
-
-    !((p.nil? && persisted? && allowed_parents.empty?) ||
-      (p.present? && allowed_parents.exclude?(p)))
-  end
-
-  # Sets the parent of the project with authorization check
-  def set_allowed_parent!(p)
-    set_parent!(p) if allowed_parent?(p)
-  end
-
-  # Sets the parent of the project
-  # Argument can be either a Project, a String, a Fixnum or nil
-  def set_parent!(p)
-    p = guarantee_project_or_nil_or_false(p)
-    return false if p == false # have to explicitly check for false
-
-    if p == parent && !p.nil?
-      # Nothing to do
-      true
-    elsif p.nil? || (p.active? && move_possible?(p))
-      # Insert the project so that target's children or root projects stay alphabetically sorted
-      sibs = (p.nil? ? self.class.roots : p.children)
-      to_be_inserted_before = sibs.detect { |c| c.name.to_s.downcase > name.to_s.downcase }
-      if to_be_inserted_before
-        move_to_left_of(to_be_inserted_before)
-      elsif p.nil?
-        if sibs.empty?
-          # move_to_root adds the project in first (ie. left) position
-          move_to_root
-        else
-          move_to_right_of(sibs.last) unless self == sibs.last
-        end
-      else
-        # move_to_child_of adds the project in last (ie.right) position
-        move_to_child_of(p)
-      end
-      WorkPackage.update_versions_from_hierarchy_change(self)
-      true
-    else
-      # Can not move to the given target
-      false
-    end
-  end
-
   def types_used_by_work_packages
     ::Type.where(id: WorkPackage.where(project_id: project.id)
                                 .select(:type_id)
                                 .distinct)
   end
 
-  # Returns an array of the types used by the project and its active sub projects
+  # Returns a scope of the types used by the project and its active sub projects
   def rolled_up_types
-    @rolled_up_types ||=
-      ::Type.joins(:projects)
+    ::Type
+      .joins(:projects)
       .select("DISTINCT #{::Type.table_name}.*")
-      .where(["#{Project.table_name}.lft >= ? AND #{Project.table_name}.rgt <= ? AND #{Project.table_name}.status = #{STATUS_ACTIVE}", lft, rgt])
+      .where(projects: { id: self_and_descendants.select(:id) })
+      .merge(Project.active)
       .order("#{::Type.table_name}.position")
   end
 
@@ -431,26 +280,19 @@ class Project < ApplicationRecord
 
   # Returns a scope of the Versions on subprojects
   def rolled_up_versions
-    @rolled_up_versions ||=
-      Version.includes(:project)
-      .where(["#{Project.table_name}.lft >= ? AND #{Project.table_name}.rgt <= ? AND #{Project.table_name}.status = #{STATUS_ACTIVE}", lft, rgt])
-      .references(:projects)
+    shared_versions_base_scope
+      .merge(Project.active)
+      .where(projects: { id: self_and_descendants.select(:id) })
   end
 
   # Returns a scope of the Versions used by the project
   def shared_versions
     @shared_versions ||= begin
-      r = root? ? self : root
-
-      Version.includes(:project)
-      .where("#{Project.table_name}.id = #{id}" +
-                                    " OR (#{Project.table_name}.status = #{Project::STATUS_ACTIVE} AND (" +
-                                          " #{Version.table_name}.sharing = 'system'" +
-                                          " OR (#{Project.table_name}.lft >= #{r.lft} AND #{Project.table_name}.rgt <= #{r.rgt} AND #{Version.table_name}.sharing = 'tree')" +
-                                          " OR (#{Project.table_name}.lft < #{lft} AND #{Project.table_name}.rgt > #{rgt} AND #{Version.table_name}.sharing IN ('hierarchy', 'descendants'))" +
-                                          " OR (#{Project.table_name}.lft > #{lft} AND #{Project.table_name}.rgt < #{rgt} AND #{Version.table_name}.sharing = 'hierarchy')" +
-                                          '))')
-      .references(:projects)
+      if persisted?
+        shared_versions_on_persisted
+      else
+        shared_versions_by_system
+      end
     end
   end
 
@@ -464,7 +306,7 @@ class Project < ApplicationRecord
   # reduce the number of db queries when performing operations including the
   # project's versions.
   def assignable_versions
-    @all_shared_versions ||= shared_versions.with_status_open.to_a
+    @all_shared_versions ||= shared_versions.with_status_open.order_by_newest_date.to_a
   end
 
   # Returns a hash of project users grouped by role
@@ -475,24 +317,6 @@ class Project < ApplicationRecord
         h[r] << m.principal
       end
       h
-    end
-  end
-
-  # Deletes all project's members
-  def delete_all_members
-    me = Member.table_name
-    mr = MemberRole.table_name
-    self.class.connection.delete("DELETE FROM #{mr} WHERE #{mr}.member_id IN (SELECT #{me}.id FROM #{me} WHERE #{me}.project_id = #{id})")
-    Member.where(project_id: id).destroy_all
-  end
-
-  def destroy_all_work_packages
-    work_packages.each do |wp|
-      begin
-        wp.reload
-        wp.destroy
-      rescue ActiveRecord::RecordNotFound => e
-      end
     end
   end
 
@@ -543,55 +367,6 @@ class Project < ApplicationRecord
     name
   end
 
-  # Returns a short description of the projects (first lines)
-  def short_description(length = 255)
-    unless description.present?
-      return ''
-    end
-
-    description.gsub(/\A(.{#{length}}[^\n\r]*).*\z/m, '\1...').strip
-  end
-
-  # The earliest start date of a project, based on it's issues and versions
-  def start_date
-    [
-      work_packages.minimum('start_date'),
-      shared_versions.map(&:effective_date),
-      shared_versions.map(&:start_date)
-    ].flatten.compact.min
-  end
-
-  # The latest finish date of an issue or version
-  def due_date
-    [
-      work_packages.maximum('due_date'),
-      shared_versions.map(&:effective_date),
-      shared_versions.map { |v| v.fixed_issues.maximum('due_date') }
-    ].flatten.compact.max
-  end
-
-  def overdue?
-    active? && !due_date.nil? && (due_date < Date.today)
-  end
-
-  # Returns the percent completed for this project, based on the
-  # progress on it's versions.
-  def completed_percent(options = { include_subprojects: false })
-    if options.delete(:include_subprojects)
-      total = self_and_descendants.map(&:completed_percent).sum
-
-      total / self_and_descendants.count
-    else
-      if versions.count > 0
-        total = versions.map(&:completed_percent).sum
-
-        total / versions.count
-      else
-        100
-      end
-    end
-  end
-
   # Return true if this project is allowed to do the specified action.
   # action can be:
   # * a parameter-like Hash (eg. controller: '/projects', action: 'edit')
@@ -610,7 +385,7 @@ class Project < ApplicationRecord
   end
 
   def enabled_module_names=(module_names)
-    if module_names && module_names.is_a?(Array)
+    if module_names&.is_a?(Array)
       module_names = module_names.map(&:to_s).reject(&:blank?)
       self.enabled_modules = module_names.map { |name| enabled_modules.detect { |mod| mod.name == name } || EnabledModule.new(name: name) }
     else
@@ -632,80 +407,94 @@ class Project < ApplicationRecord
     parents | descendants # Set union
   end
 
-  # Returns an auto-generated project identifier based on the last identifier used
-  def self.next_identifier
-    p = Project.order(Arel.sql('created_on DESC')).first
-    p.nil? ? nil : p.identifier.to_s.succ
-  end
+  class << self
+    # Returns an auto-generated project identifier based on the last identifier used
+    def next_identifier
+      p = Project.newest.first
+      p.nil? ? nil : p.identifier.to_s.succ
+    end
 
-  # builds up a project hierarchy helper structure for use with #project_tree_from_hierarchy
-  #
-  # it expects a simple list of projects with a #lft column (awesome_nested_set)
-  # and returns a hierarchy based on #lft
-  #
-  # the result is a nested list of root level projects that contain their child projects
-  # but, each entry is actually a ruby hash wrapping the project and child projects
-  # the keys are :project and :children where :children is in the same format again
-  #
-  #   result = [ root_level_project_info_1, root_level_project_info_2, ... ]
-  #
-  # where each entry has the form
-  #
-  #   project_info = { project: the_project, children: [ child_info_1, child_info_2, ... ] }
-  #
-  # if a project has no children the :children array is just empty
-  #
-  def self.build_projects_hierarchy(projects)
-    ancestors = []
-    result    = []
+    # builds up a project hierarchy helper structure for use with #project_tree_from_hierarchy
+    #
+    # it expects a simple list of projects with a #lft column (awesome_nested_set)
+    # and returns a hierarchy based on #lft
+    #
+    # the result is a nested list of root level projects that contain their child projects
+    # but, each entry is actually a ruby hash wrapping the project and child projects
+    # the keys are :project and :children where :children is in the same format again
+    #
+    #   result = [ root_level_project_info_1, root_level_project_info_2, ... ]
+    #
+    # where each entry has the form
+    #
+    #   project_info = { project: the_project, children: [ child_info_1, child_info_2, ... ] }
+    #
+    # if a project has no children the :children array is just empty
+    #
+    def build_projects_hierarchy(projects)
+      ancestors = []
+      result    = []
 
-    projects.sort_by(&:lft).each do |project|
-      while ancestors.any? && !project.is_descendant_of?(ancestors.last[:project])
-        # before we pop back one level, we sort the child projects by name
-        ancestors.last[:children] = ancestors.last[:children].sort_by { |h| h[:project].name.downcase if h[:project].name }
-        ancestors.pop
+      projects.sort_by(&:lft).each do |project|
+        while ancestors.any? && !project.is_descendant_of?(ancestors.last[:project])
+          # before we pop back one level, we sort the child projects by name
+          ancestors.last[:children] = sort_by_name(ancestors.last[:children])
+          ancestors.pop
+        end
+
+        current_hierarchy = { project: project, children: [] }
+        current_tree      = ancestors.any? ? ancestors.last[:children] : result
+
+        current_tree << current_hierarchy
+        ancestors << current_hierarchy
       end
 
-      current_hierarchy = { project: project, children: [] }
-      current_tree      = ancestors.any? ? ancestors.last[:children] : result
-
-      current_tree << current_hierarchy
-      ancestors << current_hierarchy
+      # When the last project is deeply nested, we need to sort
+      # all layers we are in.
+      ancestors.each do |level|
+        level[:children] = sort_by_name(level[:children])
+      end
+      # we need one extra element to ensure sorting at the end
+      # at the end the root level must be sorted as well
+      sort_by_name(result)
     end
 
-    # at the end the root level must be sorted as well
-    result.sort_by { |h| h[:project].name.downcase if h[:project].name }
-  end
-
-  def self.project_tree_from_hierarchy(projects_hierarchy, level, &block)
-    projects_hierarchy.each do |hierarchy|
-      project = hierarchy[:project]
-      children = hierarchy[:children]
-      yield project, level
-      # recursively show children
-      project_tree_from_hierarchy(children, level + 1, &block) if children.any?
+    def project_tree_from_hierarchy(projects_hierarchy, level, &block)
+      projects_hierarchy.each do |hierarchy|
+        project = hierarchy[:project]
+        children = hierarchy[:children]
+        yield project, level
+        # recursively show children
+        project_tree_from_hierarchy(children, level + 1, &block) if children.any?
+      end
     end
-  end
 
-  # Yields the given block for each project with its level in the tree
-  def self.project_tree(projects, &block)
-    projects_hierarchy = build_projects_hierarchy(projects)
-    project_tree_from_hierarchy(projects_hierarchy, 0, &block)
-  end
-
-  def self.project_level_list(projects)
-    list = []
-    project_tree(projects) do |project, level|
-      element = {
-        project: project,
-        level:   level
-      }
-
-      element.merge!(yield(project)) if block_given?
-
-      list << element
+    # Yields the given block for each project with its level in the tree
+    def project_tree(projects, &block)
+      projects_hierarchy = build_projects_hierarchy(projects)
+      project_tree_from_hierarchy(projects_hierarchy, 0, &block)
     end
-    list
+
+    def project_level_list(projects)
+      list = []
+      project_tree(projects) do |project, level|
+        element = {
+          project: project,
+          level: level
+        }
+
+        element.merge!(yield(project)) if block_given?
+
+        list << element
+      end
+      list
+    end
+
+    private
+
+    def sort_by_name(project_hashes)
+      project_hashes.sort_by { |h| h[:project].name&.downcase }
+    end
   end
 
   def allowed_permissions
@@ -720,53 +509,6 @@ class Project < ApplicationRecord
     @actions_allowed ||= allowed_permissions
                          .map { |permission| OpenProject::AccessControl.allowed_actions(permission) }
                          .flatten
-  end
-
-  # Returns all the active Systemwide and project specific activities
-  def active_activities
-    overridden_activity_ids = time_entry_activities.map(&:parent_id)
-
-    if overridden_activity_ids.empty?
-      TimeEntryActivity.shared.active
-    else
-      system_activities_and_project_overrides
-    end
-  end
-
-  # Returns all the Systemwide and project specific activities
-  # (inactive and active)
-  def all_activities
-    overridden_activity_ids = time_entry_activities.map(&:parent_id)
-
-    if overridden_activity_ids.empty?
-      TimeEntryActivity.shared
-    else
-      system_activities_and_project_overrides(true)
-    end
-  end
-
-  # Returns the systemwide active activities merged with the project specific overrides
-  def system_activities_and_project_overrides(include_inactive = false)
-    if include_inactive
-      TimeEntryActivity
-        .shared
-        .where(['id NOT IN (?)', time_entry_activities.map(&:parent_id)]) +
-        time_entry_activities
-    else
-      TimeEntryActivity
-        .shared
-        .active
-        .where(['id NOT IN (?)', time_entry_activities.map(&:parent_id)]) +
-        time_entry_activities.active
-    end
-  end
-
-  # Archives subprojects recursively
-  def archive!
-    children.each do |subproject|
-      subproject.send :archive!
-    end
-    update_attribute :status, STATUS_ARCHIVED
   end
 
   def self.possible_principles_condition
@@ -786,16 +528,45 @@ class Project < ApplicationRecord
 
   protected
 
-  def guarantee_project_or_nil_or_false(p)
-    if p.is_a?(Project)
-      p
-    elsif p.to_s.blank?
-      nil
-    else
-      p = Project.find_by(id: p)
-      return false unless p
+  def shared_versions_on_persisted
+    shared_versions_base_scope
+      .where(projects: { id: id })
+      .or(shared_versions_by_system)
+      .or(shared_versions_by_tree)
+      .or(shared_versions_by_hierarchy_or_descendants)
+      .or(shared_versions_by_hierarchy)
+  end
 
-      p
-    end
+  def shared_versions_by_tree
+    r = root? ? self : root
+
+    shared_versions_base_scope
+      .merge(Project.active)
+      .where(projects: { id: r.self_and_descendants.select(:id) })
+      .where(sharing: 'tree')
+  end
+
+  def shared_versions_by_hierarchy_or_descendants
+    shared_versions_base_scope
+      .merge(Project.active)
+      .where(projects: { id: ancestors.select(:id) })
+      .where(sharing: %w(hierarchy descendants))
+  end
+
+  def shared_versions_by_hierarchy
+    rolled_up_versions
+      .where(sharing: 'hierarchy')
+  end
+
+  def shared_versions_by_system
+    shared_versions_base_scope
+      .merge(Project.active)
+      .where(sharing: 'system')
+  end
+
+  def shared_versions_base_scope
+    Version
+      .includes(:project)
+      .references(:projects)
   end
 end

@@ -1,6 +1,6 @@
 //-- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,25 +23,22 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 //++
 
 /*jshint expr: true*/
 
-import {CurrentProjectService} from "core-components/projects/current-project.service";
-import {GlobalSearchService} from "core-app/modules/global_search/services/global-search.service";
-import {I18nService} from "core-app/modules/common/i18n/i18n.service";
 import {async, TestBed} from "@angular/core/testing";
-import {PathHelperService} from "core-app/modules/common/path-helper/path-helper.service";
 import {States} from "core-components/states.service";
 import {IsolatedQuerySpace} from "core-app/modules/work_packages/query-space/isolated-query-space";
 import {WorkPackageViewHierarchiesService} from "core-app/modules/work_packages/routing/wp-view-base/view-services/wp-view-hierarchy.service";
 import {WorkPackageRelationsHierarchyService} from "core-components/wp-relations/wp-relations-hierarchy/wp-relations-hierarchy.service";
 import {WorkPackageViewHierarchyIdentationService} from "core-app/modules/work_packages/routing/wp-view-base/view-services/wp-view-hierarchy-indentation.service";
+import {WorkPackageCacheService} from "core-components/work-packages/work-package-cache.service";
+import {WorkPackageViewDisplayRepresentationService} from "core-app/modules/work_packages/routing/wp-view-base/view-services/wp-view-display-representation.service";
 import SpyObj = jasmine.SpyObj;
-import {WorkPackageResource} from "core-app/modules/hal/resources/work-package-resource";
 
-describe('WorkPackageViewIndentation service', function() {
+describe('WorkPackageViewIndentation service', function () {
   let service:WorkPackageViewHierarchyIdentationService;
   let states:States;
   let querySpace:IsolatedQuerySpace;
@@ -51,6 +48,12 @@ describe('WorkPackageViewIndentation service', function() {
   class HierarchyServiceStub {
     get isEnabled() {
       return true;
+    }
+  }
+
+  class WorkPackageCacheServiceStub {
+    require(wpId:string) {
+      return Promise.resolve(states.workPackages.get(wpId).value);
     }
   }
 
@@ -67,18 +70,21 @@ describe('WorkPackageViewIndentation service', function() {
       providers: [
         States,
         IsolatedQuerySpace,
+        WorkPackageCacheService,
+        { provide: WorkPackageViewDisplayRepresentationService, useValue: { isList: true } },
+        { provide: WorkPackageCacheService, useClass: WorkPackageCacheServiceStub },
         { provide: WorkPackageViewHierarchiesService, useClass: HierarchyServiceStub },
-        { provide: WorkPackageRelationsHierarchyService, useValue: parentServiceSpy  },
+        { provide: WorkPackageRelationsHierarchyService, useValue: parentServiceSpy },
         WorkPackageViewHierarchyIdentationService
       ]
     })
-    .compileComponents()
-    .then(() => {
-      service = TestBed.get(WorkPackageViewHierarchyIdentationService);
-      querySpace = TestBed.get(IsolatedQuerySpace);
-      hierarchyServiceStub = TestBed.get(WorkPackageViewHierarchiesService);
-      states = TestBed.get(States);
-    });
+      .compileComponents()
+      .then(() => {
+        service = TestBed.get(WorkPackageViewHierarchyIdentationService);
+        querySpace = TestBed.get(IsolatedQuerySpace);
+        hierarchyServiceStub = TestBed.get(WorkPackageViewHierarchiesService);
+        states = TestBed.get(States);
+      });
   }));
 
   describe('canIndent', () => {
@@ -88,7 +94,7 @@ describe('WorkPackageViewIndentation service', function() {
     });
 
     it('Cannot indent when is first index', () => {
-      querySpace.rendered.putValue([
+      querySpace.tableRendered.putValue([
         { workPackageId: '1234', hidden: false, classIdentifier: 'foo' },
         { workPackageId: '2345', hidden: false, classIdentifier: 'foo' }
       ]);
@@ -98,7 +104,7 @@ describe('WorkPackageViewIndentation service', function() {
     });
 
     it('Can indent as second when it has no ancestors', () => {
-      querySpace.rendered.putValue([
+      querySpace.tableRendered.putValue([
         { workPackageId: '2345', hidden: false, classIdentifier: 'foo' },
         { workPackageId: '1234', hidden: false, classIdentifier: 'foo' }
       ]);
@@ -108,7 +114,7 @@ describe('WorkPackageViewIndentation service', function() {
     });
 
     it('Cannot indent when possible but hierarchy disabled', () => {
-      querySpace.rendered.putValue([
+      querySpace.tableRendered.putValue([
         { workPackageId: '2345', hidden: false, classIdentifier: 'foo' },
         { workPackageId: '1234', hidden: false, classIdentifier: 'foo' }
       ]);
@@ -121,7 +127,7 @@ describe('WorkPackageViewIndentation service', function() {
     });
 
     it('Can not indent with a predecessor that is an ancestor already', () => {
-      querySpace.rendered.putValue([
+      querySpace.tableRendered.putValue([
         { workPackageId: '2345', hidden: false, classIdentifier: 'foo' },
         { workPackageId: '1234', hidden: false, classIdentifier: 'foo' }
       ]);
@@ -131,7 +137,7 @@ describe('WorkPackageViewIndentation service', function() {
     });
 
     it('Can indent with a predecessor that is NOT an ancestor already', () => {
-      querySpace.rendered.putValue([
+      querySpace.tableRendered.putValue([
         { workPackageId: '2345', hidden: false, classIdentifier: 'foo' },
         { workPackageId: '5555', hidden: false, classIdentifier: 'foo' },
         { workPackageId: '1234', hidden: false, classIdentifier: 'foo' }
@@ -166,7 +172,7 @@ describe('WorkPackageViewIndentation service', function() {
 
   describe('indent', () => {
     it('Can indent with a predecessor that is NOT an ancestor already', (done) => {
-      querySpace.rendered.putValue([
+      querySpace.tableRendered.putValue([
         { workPackageId: '5555', hidden: false, classIdentifier: 'foo' },
         { workPackageId: '2345', hidden: false, classIdentifier: 'foo' },
         { workPackageId: '1234', hidden: false, classIdentifier: 'foo' }
@@ -184,7 +190,7 @@ describe('WorkPackageViewIndentation service', function() {
     });
 
     it('Can indent with a predecessor that shares an ancestor chain', (done) => {
-      querySpace.rendered.putValue([
+      querySpace.tableRendered.putValue([
         { workPackageId: '5555', hidden: false, classIdentifier: 'foo' },
         { workPackageId: '2345', hidden: false, classIdentifier: 'foo' },
         { workPackageId: '1234', hidden: false, classIdentifier: 'foo' }
@@ -202,7 +208,7 @@ describe('WorkPackageViewIndentation service', function() {
     });
 
     it('Can indent with a predecessor that shares an ancestor chain', (done) => {
-      querySpace.rendered.putValue([
+      querySpace.tableRendered.putValue([
         { workPackageId: '5555', hidden: false, classIdentifier: 'foo' },
         { workPackageId: '2345', hidden: false, classIdentifier: 'foo' },
         { workPackageId: '1234', hidden: false, classIdentifier: 'foo' }
@@ -222,7 +228,7 @@ describe('WorkPackageViewIndentation service', function() {
 
   describe('outdent', () => {
     it('will outdent to the previous last ancestorId', (done) => {
-      querySpace.rendered.putValue([
+      querySpace.tableRendered.putValue([
         { workPackageId: '1234', hidden: false, classIdentifier: 'foo' },
       ]);
 
@@ -235,7 +241,7 @@ describe('WorkPackageViewIndentation service', function() {
     });
 
     it('will outdent to null in case of ancestorIds.length < 2', (done) => {
-      querySpace.rendered.putValue([
+      querySpace.tableRendered.putValue([
         { workPackageId: '1234', hidden: false, classIdentifier: 'foo' },
       ]);
 

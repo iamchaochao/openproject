@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -44,7 +44,7 @@ shared_examples 'an APIv3 attachment resource', type: :request, content_type: :j
     current_user
   end
 
-  let(:project) { FactoryBot.create(:project, is_public: false) }
+  let(:project) { FactoryBot.create(:project, public: false) }
   let(:role) { FactoryBot.create(:role, permissions: permissions) }
 
   let(:attachment) { FactoryBot.create(:attachment, container: container, author: author) }
@@ -270,12 +270,20 @@ shared_examples 'an APIv3 attachment resource', type: :request, content_type: :j
           expect(subject.status).to eq 200
         end
 
-        it 'has the necessary headers' do
+        it 'has the necessary headers for content and caching' do
           expect(subject.headers['Content-Disposition'])
             .to eql content_disposition
 
           expect(subject.headers['Content-Type'])
             .to eql mock_file.content_type
+
+          expect(subject.headers["Cache-Control"]).to eq "public, max-age=#{1.year.to_i}"
+          expect(subject.headers["Expires"]).to be_present
+
+          expires_time = Time.parse response.headers["Expires"]
+
+          expect(expires_time < Time.now.utc + 1.year.to_i).to be_truthy
+          expect(expires_time > Time.now.utc + 1.year.to_i - 60).to be_truthy
         end
 
         it 'sends the file in binary' do
@@ -287,14 +295,23 @@ shared_examples 'an APIv3 attachment resource', type: :request, content_type: :j
       context 'for a local text file' do
         it_behaves_like 'for a local file' do
           let(:mock_file) { FileHelpers.mock_uploaded_file name: 'foobar.txt' }
-          let(:content_disposition) { "inline" }
+          let(:content_disposition) { "inline; filename=foobar.txt" }
         end
       end
 
       context 'for a local binary file' do
         it_behaves_like 'for a local file' do
           let(:mock_file) { FileHelpers.mock_uploaded_file name: 'foobar.dat', content_type: "application/octet-stream" }
-          let(:content_disposition) { "attachment" }
+          let(:content_disposition) { "attachment; filename=foobar.dat" }
+        end
+      end
+
+      context 'for a local json file' do
+        it_behaves_like 'for a local file' do
+          let(:mock_file) { FileHelpers.mock_uploaded_file ({ name: 'foobar.json',
+                                                              content_type: "application/json",
+                                                              content: '{"id": "12342"}' }) }
+          let(:content_disposition) { "attachment; filename=foobar.json" }
         end
       end
 
@@ -314,6 +331,14 @@ shared_examples 'an APIv3 attachment resource', type: :request, content_type: :j
           expect(subject.status).to eq 302
           expect(subject.headers['Location'])
             .to eql external_url
+
+          expect(subject.headers["Cache-Control"]).to eq "public, max-age=#{1.year.to_i}"
+          expect(subject.headers["Expires"]).to be_present
+
+          expires_time = Time.parse response.headers["Expires"]
+
+          expect(expires_time < Time.now.utc + 1.year.to_i).to be_truthy
+          expect(expires_time > Time.now.utc + 1.year.to_i - 60).to be_truthy
         end
       end
     end

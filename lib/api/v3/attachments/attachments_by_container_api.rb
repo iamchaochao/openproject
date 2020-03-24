@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -77,13 +77,13 @@ module API
           def build_and_attach(metadata, file)
             uploaded_file = OpenProject::Files.build_uploaded_file file[:tempfile],
                                                                    file[:type],
-                                                                   file_name: metadata.file_name
+                                                                   file_name: metadata.file_name.to_s
 
-            service = AddAttachmentService.new(container, author: current_user)
+            service = ::Attachments::CreateService.new(container, author: current_user)
 
             with_handled_create_errors do
-              service.add_attachment uploaded_file: uploaded_file,
-                                     description: metadata.description
+              service.call uploaded_file: uploaded_file,
+                           description: metadata.description
             end
           end
 

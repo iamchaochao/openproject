@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -277,21 +277,7 @@ describe 'API v3 Grids resource', type: :request, content_type: :json do
         }.with_indifferent_access
       end
 
-      it 'responds with 422 and mentions the error' do
-        expect(subject.status).to eq 422
-
-        expect(subject.body)
-          .to be_json_eql('Error'.to_json)
-          .at_path('_type')
-
-        expect(subject.body)
-          .to be_json_eql("You must not write a read-only attribute.".to_json)
-          .at_path('message')
-
-        expect(subject.body)
-          .to be_json_eql("scope".to_json)
-          .at_path('_embedded/details/attribute')
-      end
+      it_behaves_like 'read-only violation', 'scope', Grids::Grid
     end
 
     context 'with the page not existing' do

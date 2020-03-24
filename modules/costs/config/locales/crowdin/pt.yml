@@ -1,3 +1,25 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
+#---
 pt:
   activerecord:
     attributes:
@@ -51,7 +73,7 @@ pt:
           nullify_is_not_valid_for_cost_entries: "Entradas de custo não podem ser atribuídas a um projeto."
   attributes:
     budget: "Custos planeados"
-    comment: "Comentário"
+    comment: "Comentario"
     cost_object: "Orçamento"
     cost_type: "Tipo de custo"
     costs: "Custos"
@@ -66,7 +88,7 @@ pt:
   button_cancel_edit_budget: "Cancelar a edição de orçamento"
   button_cancel_edit_costs: "Cancelar a edição de custos"
   button_log_costs: "Registar custos unitários"
-  button_log_time: "Hora de registo"
+  button_log_time: "Tempo de registro"
   caption_booked_on_project: "Marcado no projeto"
   caption_default: "Predefinido"
   caption_default_rate_history_for: "História de taxa padrão para %{user}"
@@ -82,9 +104,6 @@ pt:
   caption_set_rate: "Definir taxa atual"
   caption_show_locked: "Mostrar tipos bloqueados"
   cost_objects_title: "Orçamentos"
-  label_cost_type_plural: "Tipos de custos"
-  currency_delimiter: ","
-  currency_separator: "."
   description_date_for_new_rate: "Data para nova taxa"
   events:
     cost_object: "Orçamento editado"
@@ -102,11 +121,12 @@ pt:
   label_cost_plural: "Custos"
   label_cost_report: "Relatório de custo"
   label_cost_type_specific: "Orçamento #%{id}: %{name}"
+  label_cost_type_plural: "Tipos de custos"
   label_costs_per_page: "Custos por página"
   label_currency: "Moeda"
   label_currency_format: "Formato de moeda"
   label_current_default_rate: "Taxa atual por defeito"
-  label_date_on: "em"
+  label_date_on: "on"
   label_deleted_cost_types: "Tipos de custos apagados"
   label_locked_cost_types: "Tipos de custos bloqueados"
   label_deliverable: "Orçamento"

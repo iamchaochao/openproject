@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -47,7 +47,13 @@ module WorkPackage::TypedDagDefaults
     end
 
     def leaf?
-      hierarchy_leaf?
+      # The leaf? implementation relies on the children relations. If that relation is not loaded,
+      # rails will attempt to do the performant check on whether such a relation exists at all. While
+      # This is performant for one call, subsequent calls have to again fetch from the db (cached admittedly)
+      # as the relations are still not loaded.
+      # For reasons I could not find out, adding a #reload method here lead to the virtual attribute management for parent
+      # to no longer work. Resetting the @is_leaf method was hence moved to the WorkPackage::Parent module
+      @is_leaf ||= hierarchy_leaf?
     end
 
     def root
@@ -60,6 +66,12 @@ module WorkPackage::TypedDagDefaults
 
     def root?
       hierarchy_root?
+    end
+
+    private
+
+    def reset_is_leaf
+      @is_leaf = nil
     end
   end
 end

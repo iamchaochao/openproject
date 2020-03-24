@@ -1,6 +1,6 @@
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 
 import {
@@ -51,7 +51,7 @@ import {NgSelectComponent} from "@ng-select/ng-select";
 import {Observable, of} from "rxjs";
 import {Highlighting} from "core-components/wp-fast-table/builders/highlighting/highlighting.functions";
 import {map} from "rxjs/internal/operators";
-import {WorkPackageNotificationService} from "core-components/wp-edit/wp-notification.service";
+import {HalResourceNotificationService} from "core-app/modules/hal/services/hal-resource-notification.service";
 import {DebouncedRequestSwitchmap, errorNotificationHandler} from "core-app/helpers/rxjs/debounced-input-switchmap";
 import {LinkHandling} from "core-app/modules/common/link-handling/link-handling";
 
@@ -83,7 +83,7 @@ export class GlobalSearchInputComponent implements OnInit, OnDestroy {
   /** Keep a switchmap for search term and loading state */
   public requests = new DebouncedRequestSwitchmap<string, SearchResultItem>(
     (searchTerm:string) => this.autocompleteWorkPackages(searchTerm),
-    errorNotificationHandler(this.wpNotification)
+    errorNotificationHandler(this.halNotification)
   );
 
   /** Remember the current value */
@@ -108,7 +108,7 @@ export class GlobalSearchInputComponent implements OnInit, OnDestroy {
               readonly currentProjectService:CurrentProjectService,
               readonly deviceService:DeviceService,
               readonly cdRef:ChangeDetectorRef,
-              readonly wpNotification:WorkPackageNotificationService) {
+              readonly halNotification:HalResourceNotificationService) {
   }
 
   ngOnInit() {
@@ -116,8 +116,6 @@ export class GlobalSearchInputComponent implements OnInit, OnDestroy {
     this.ngSelectComponent.searchTerm = this.currentValue = this.globalSearchService.searchTerm;
     this.expanded = (this.ngSelectComponent.searchTerm.length > 0);
     jQuery('#top-menu').toggleClass('-global-search-expanded', this.expanded);
-
-
   }
 
   ngOnDestroy() {
@@ -217,7 +215,6 @@ export class GlobalSearchInputComponent implements OnInit, OnDestroy {
   public statusHighlighting(statusId:string) {
     return Highlighting.inlineClass('status', statusId);
   }
-
 
   // return all project scope items and all items which contain the search term
   public customSearchFn(term:string, item:any):boolean {
@@ -338,6 +335,4 @@ export class GlobalSearchInputComponent implements OnInit, OnDestroy {
   }
 }
 
-DynamicBootstrapper.register({
-  selector: globalSearchSelector, cls: GlobalSearchInputComponent
-});
+

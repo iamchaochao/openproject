@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2017 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -25,26 +25,27 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-# See doc/COPYRIGHT.rdoc for more details.
+# See docs/COPYRIGHT.rdoc for more details.
 #++
 
 module Projects
   class BaseContract < ::ModelContract
     include AssignableValuesContract
+    include AssignableCustomFieldValues
 
     attribute :name
     attribute :identifier
     attribute :description
-    attribute :is_public
-    attribute :status do
-      validate_status_not_nil
-      validate_status_included
+    attribute :public
+    attribute :active do
+      validate_active_present
     end
     attribute :parent do
-      validate_parent_visible
+      validate_parent_assignable
     end
-
-    attribute_alias :is_public, :public
+    attribute :status do
+      validate_status_code_included
+    end
 
     def validate
       validate_user_allowed_to_manage
@@ -53,15 +54,9 @@ module Projects
     end
 
     def assignable_parents
-      Project.visible
-    end
-
-    def assignable_statuses
-      Project.statuses.keys
-    end
-
-    def assignable_custom_field_values(custom_field)
-      custom_field.possible_values
+      Project
+        .allowed_to(user, :add_subprojects)
+        .where.not(id: model.self_and_descendants)
     end
 
     def available_custom_fields
@@ -72,28 +67,51 @@ module Projects
       end
     end
 
-    private
-
-    def validate_status_not_nil
-      errors.add(:status, :blank) if model.status.nil?
+    def assignable_versions
+      model.assignable_versions
     end
 
-    def validate_status_included
-      if model.status.present? && !assignable_statuses.include?(model.status)
-        errors.add(:status, :inclusion)
+    def assignable_status_codes
+      Project::Status.codes.keys
+    end
+
+    private
+
+    def validate_parent_assignable
+      if model.parent &&
+         model.parent_id_changed? &&
+         !assignable_parents.where(id: parent.id).exists?
+        errors.add(:parent, :does_not_exist)
       end
     end
 
-    def validate_parent_visible
-      errors.add(:parent, :does_not_exist) if model.parent && model.parent_id_changed? && !model.parent.visible?
+    def validate_active_present
+      if model.active.nil?
+        errors.add(:active, :blank)
+      end
     end
 
     def validate_user_allowed_to_manage
-      errors.add :base, :error_unauthorized unless user.allowed_to?(manage_permission, model)
+      with_unchanged_id do
+        errors.add :base, :error_unauthorized unless user.allowed_to?(manage_permission, model)
+      end
+    end
+
+    def validate_status_code_included
+      errors.add :status, :inclusion if model.status&.code && !Project::Status.codes.keys.include?(model.status.code.to_s)
     end
 
     def manage_permission
       raise NotImplementedError
+    end
+
+    def with_unchanged_id
+      project_id = model.id
+      model.id = model.id_was
+
+      yield
+    ensure
+      model.id = project_id
     end
   end
 end

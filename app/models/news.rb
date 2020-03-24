@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -41,11 +41,12 @@ class News < ApplicationRecord
   acts_as_journalized
 
   acts_as_event url: Proc.new { |o| { controller: '/news', action: 'show', id: o.id } },
-                datetime: :created_on
+                datetime: :created_at
 
   acts_as_searchable columns: ["#{table_name}.title", "#{table_name}.summary", "#{table_name}.description"],
                      include: :project,
-                     references: :projects
+                     references: :projects,
+                     date_column: "#{table_name}.created_at"
 
   acts_as_watchable
 
@@ -85,7 +86,7 @@ class News < ApplicationRecord
 
   # table_name shouldn't be needed :(
   def self.newest_first
-    order "#{table_name}.created_on DESC"
+    order "#{table_name}.created_at DESC"
   end
 
   def new_comment(attributes = {})
@@ -109,7 +110,7 @@ class News < ApplicationRecord
   def send_news_added_mail
     if Setting.notified_events.include?('news_added')
       recipients.uniq.each do |user|
-        UserMailer.news_added(user, self, User.current).deliver_now
+        UserMailer.news_added(user, self, User.current).deliver_later
       end
     end
   end

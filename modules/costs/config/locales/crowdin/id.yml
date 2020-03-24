@@ -1,24 +1,46 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
+#---
 id:
   activerecord:
     attributes:
       cost_entry:
-        work_package: "Work Package"
+        work_package: "Paket-Penugasan"
         overridden_costs: "Overridden costs"
         spent: "Dihabiskan"
         spent_on: "Tanggal"
       cost_object:
-        author: "Pembuat"
+        author: "Penulis"
         available: "Tersedia"
         budget: "Terencana"
         budget_ratio: "Spent (rasio)"
-        created_on: "Dibuat pada"
+        created_on: "Dibuat"
         description: "Deskripsi"
         fixed_date: "Tanggal fix"
         spent: "Dihabiskan"
         status: "Status"
-        subject: "Subjek"
+        subject: "Perihal"
         type: "Jenis biaya"
-        updated_on: "Diperbaharui pada"
+        updated_on: "Diperbarui"
       cost_type:
         unit: "Nama unit"
         unit_plural: "Nama plural unit"
@@ -65,7 +87,7 @@ id:
   button_cancel_edit_budget: "Batalkan edit budget"
   button_cancel_edit_costs: "Batalkan edit biaya"
   button_log_costs: "Log biaya unit"
-  button_log_time: "Log waktu"
+  button_log_time: "Catatan waktu"
   caption_booked_on_project: "Telah dipesan pada proyek"
   caption_default: "Default"
   caption_default_rate_history_for: "Default rate history for %{user}"
@@ -81,9 +103,6 @@ id:
   caption_set_rate: "Set rate saat ini"
   caption_show_locked: "Tampilkan tipe yang terkunci"
   cost_objects_title: "Budget"
-  label_cost_type_plural: "Jenis biaya"
-  currency_delimiter: ","
-  currency_separator: "."
   description_date_for_new_rate: "Tanggal berlaku rate"
   events:
     cost_object: "Buget telah di-edit"
@@ -101,6 +120,7 @@ id:
   label_cost_plural: "Biaya"
   label_cost_report: "Laporan biaya"
   label_cost_type_specific: "Budget #%{id}: %{name}"
+  label_cost_type_plural: "Jenis biaya"
   label_costs_per_page: "Tampilan biaya perhalaman"
   label_currency: "Mata Uang"
   label_currency_format: "Format mata uang"
@@ -169,4 +189,4 @@ id:
   text_warning_hidden_elements: "Beberapa entri mungkin tidak dipakai oleh agregasi yang dilakukan."
   week: "minggu"
   js:
-    text_are_you_sure: "Apakah anda yakin?"
+    text_are_you_sure: "Anda yakin?"

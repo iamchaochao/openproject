@@ -1,3 +1,25 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
+#---
 ca:
   activerecord:
     attributes:
@@ -82,9 +104,6 @@ ca:
   caption_set_rate: "Set current rate"
   caption_show_locked: "Show locked types"
   cost_objects_title: "Budgets"
-  label_cost_type_plural: "Cost types"
-  currency_delimiter: ","
-  currency_separator: "."
   description_date_for_new_rate: "Date for new rate"
   events:
     cost_object: "Budget edited"
@@ -102,6 +121,7 @@ ca:
   label_cost_plural: "Costs"
   label_cost_report: "Cost report"
   label_cost_type_specific: "Budget #%{id}: %{name}"
+  label_cost_type_plural: "Cost types"
   label_costs_per_page: "Costs per page"
   label_currency: "Currency"
   label_currency_format: "Format of currency"
@@ -138,7 +158,7 @@ ca:
   label_valid_from: "Valid from"
   label_variable_cost_object: "Variable rate based budget"
   label_view_all_cost_objects: "View all budgets"
-  label_yes: "Si"
+  label_yes: "Sí"
   notice_cost_object_conflict: "WorkPackages must be of the same project."
   notice_no_cost_objects_available: "No budgets available."
   notice_something_wrong: "Something went wrong. Please try again."

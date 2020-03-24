@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -50,9 +50,16 @@ describe OpenProject::TextFormatting::Formats::Markdown::Formatter do
     )
   end
 
-  it 'should escaping' do
+  it 'escapes script tags' do
     assert_html_output(
       'this is a <script>' => 'this is a &lt;script&gt;'
+    )
+  end
+
+  it 'limits `a` tags and hardens them against tabnabbing' do
+    assert_html_output(
+      'this is a <a style="display:none;" href="http://malicious">' =>
+        'this is a <a href="http://malicious" rel="noopener noreferrer">'
     )
   end
 
@@ -128,7 +135,7 @@ describe OpenProject::TextFormatting::Formats::Markdown::Formatter do
           assert_html_output(
             {
               'Link to [relative path](/foo/bar)' =>
-                %(Link to <a href="/foo/bar">relative path</a>),
+                %(Link to <a href="/foo/bar" rel="noopener noreferrer">relative path</a>),
               'An inline image ![](/attachments/123/foobar.png)' =>
                 %(An inline image <img src="/attachments/123/foobar.png" alt="" />)
             },
@@ -152,7 +159,7 @@ describe OpenProject::TextFormatting::Formats::Markdown::Formatter do
           assert_html_output(
             {
               'Link to [relative path](/foo/bar)' =>
-                %(Link to <a href="http://openproject.org/foo/bar">relative path</a>),
+                %(Link to <a href="http://openproject.org/foo/bar" rel="noopener noreferrer">relative path</a>),
               'An inline image ![](/attachments/123/foobar.png)' =>
                 %(An inline image <img src="http://openproject.org/attachments/123/foobar.png" alt="" />)
             },

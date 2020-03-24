@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,32 +26,42 @@
 # See docs/COPYRIGHT.rdoc for more details.
 #++
 
-require 'api/v3/projects/project_representer'
-
 module API
   module V3
     module Projects
       class ProjectsAPI < ::API::OpenProjectAPI
         resources :projects do
           get &::API::V3::Utilities::Endpoints::Index.new(model: Project,
-                                                          scope: -> { Project.visible(User.current).includes(:enabled_modules) })
+                                                          scope: -> {
+                                                            Project
+                                                              .visible(User.current)
+                                                              .includes(ProjectRepresenter.to_eager_load)
+                                                          })
                                                      .mount
 
+          post &::API::V3::Utilities::Endpoints::Create.new(model: Project)
+                                                       .mount
+
           mount ::API::V3::Projects::Schemas::ProjectSchemaAPI
+          mount ::API::V3::Projects::CreateFormAPI
+
+          mount API::V3::Projects::AvailableParentsAPI
 
           params do
             requires :id, desc: 'Project id'
           end
           route_param :id do
             after_validation do
-              @project = Project.find(params[:id])
-
-              authorize(:view_project, context: @project) do
-                raise API::Errors::NotFound.new
-              end
+              @project = Project.visible(current_user).find(params[:id])
             end
 
             get &::API::V3::Utilities::Endpoints::Show.new(model: Project).mount
+            patch &::API::V3::Utilities::Endpoints::Update.new(model: Project).mount
+            delete &::API::V3::Utilities::Endpoints::Delete.new(model: Project,
+                                                                process_service: ::Projects::ScheduleDeletionService)
+                                                           .mount
+
+            mount ::API::V3::Projects::UpdateFormAPI
 
             mount API::V3::Projects::AvailableAssigneesAPI
             mount API::V3::Projects::AvailableResponsiblesAPI

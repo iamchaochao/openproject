@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -34,6 +34,7 @@ class TypesController < ApplicationController
   layout 'admin'
 
   before_action :require_admin
+  helper_method :gon
 
   def index
     @types = ::Type.page(page_param).per_page(per_page_param)
@@ -101,7 +102,7 @@ class TypesController < ApplicationController
   def move
     @type = ::Type.find(params[:id])
 
-    if @type.update_attributes(permitted_params.type_move)
+    if @type.update(permitted_params.type_move)
       flash[:notice] = l(:notice_successful_update)
     else
       flash.now[:error] = t('type_could_not_be_saved')

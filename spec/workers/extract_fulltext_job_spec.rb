@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2017 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -25,7 +25,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-# See doc/COPYRIGHT.rdoc for more details.
+# See docs/COPYRIGHT.rdoc for more details.
 #++
 
 require 'spec_helper'
@@ -34,7 +34,17 @@ describe ExtractFulltextJob, type: :job do
   # These jobs only get created when TSVector is supported by the DB.
   if OpenProject::Database.allows_tsv?
     let(:text) { 'lorem ipsum' }
-    let(:attachment) { FactoryBot.create(:attachment) }
+    let(:attachment) do
+      FactoryBot.create(:attachment).tap do |attachment|
+        expect(ExtractFulltextJob)
+          .to have_been_enqueued
+          .with(attachment.id)
+
+        perform_enqueued_jobs
+
+        attachment.reload
+      end
+    end
 
     context "with successful text extraction" do
       before do

@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -36,27 +36,27 @@ describe Project, 'allowed to', type: :model do
 
   let(:private_project) do
     FactoryBot.build(:project,
-                      is_public: false,
-                      status: project_status)
+                     public: false,
+                     active: project_status)
   end
   let(:public_project) do
     FactoryBot.build(:project,
-                      is_public: true,
-                      status: project_status)
+                     public: true,
+                     active: project_status)
   end
-  let(:project_status) { Project::STATUS_ACTIVE }
+  let(:project_status) { true }
 
   let(:role) do
     FactoryBot.build(:role,
-                      permissions: permissions)
+                     permissions: permissions)
   end
   let(:anonymous_role) do
     FactoryBot.build(:anonymous_role,
-                      permissions: anonymous_permissions)
+                     permissions: anonymous_permissions)
   end
   let(:non_member_role) do
     FactoryBot.build(:non_member,
-                      permissions: non_member_permissions)
+                     permissions: non_member_permissions)
   end
   let(:permissions) { [action] }
   let(:anonymous_permissions) { [action] }
@@ -66,9 +66,9 @@ describe Project, 'allowed to', type: :model do
   let(:public_non_module_action) { :view_project }
   let(:member) do
     FactoryBot.build(:member,
-                      user: user,
-                      roles: [role],
-                      project: project)
+                     user: user,
+                     roles: [role],
+                     project: project)
   end
 
   shared_examples_for 'includes the project' do
@@ -102,7 +102,7 @@ describe Project, 'allowed to', type: :model do
     context 'w/ the user being member
              w/ the role having the permission
              w/o the project being active' do
-      let(:project_status) { Project::STATUS_ARCHIVED }
+      let(:project_status) { false }
 
       before do
         member.save!
@@ -189,14 +189,14 @@ describe Project, 'allowed to', type: :model do
     end
 
     context 'w/o the project being active' do
-      let(:project_status) { Project::STATUS_ARCHIVED }
+      let(:project_status) { false }
 
       it_behaves_like 'is empty'
     end
 
     context 'w/o the project being active
              w/ the permission being public' do
-      let(:project_status) { Project::STATUS_ARCHIVED }
+      let(:project_status) { false }
 
       it 'is empty' do
         expect(Project.allowed_to(user, public_action)).to be_empty
@@ -260,7 +260,7 @@ describe Project, 'allowed to', type: :model do
 
       context 'w/ the anonymous role having the permission
                w/o the project being active' do
-        let(:project_status) { Project::STATUS_ARCHIVED }
+        let(:project_status) { false }
 
         it 'is empty' do
           expect(Project.allowed_to(anonymous, action)).to be_empty
@@ -334,14 +334,14 @@ describe Project, 'allowed to', type: :model do
 
       context 'w/ the non member role having the permission
                w/o the project being active' do
-        let(:project_status) { Project::STATUS_ARCHIVED }
+        let(:project_status) { false}
 
         it_behaves_like 'is empty'
       end
 
       context 'w/ the permission being public and not module bound
                w/o the project being active' do
-        let(:project_status) { Project::STATUS_ARCHIVED }
+        let(:project_status) { false}
 
         it 'is empty' do
           expect(Project.allowed_to(user, public_non_module_action)).to be_empty

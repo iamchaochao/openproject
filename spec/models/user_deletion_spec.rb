@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -358,7 +358,7 @@ describe User, 'deletion', type: :model do
 
   describe 'WHEN the user has a token created' do
     let(:token) {
-      Token::Rss.new(user: user, value: 'loremipsum')
+      Token::RSS.new(user: user, value: 'loremipsum')
     }
 
     before do
@@ -367,7 +367,7 @@ describe User, 'deletion', type: :model do
       user.destroy
     end
 
-    it { expect(Token::Rss.find_by(id: token.id)).to be_nil }
+    it { expect(Token::RSS.find_by(id: token.id)).to be_nil }
   end
 
   describe 'WHEN the user has created a private query' do

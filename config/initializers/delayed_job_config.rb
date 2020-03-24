@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -31,7 +31,7 @@
 Delayed::Worker.logger = Rails.logger
 
 # By default bypass worker queue and execute asynchronous tasks at once
-Delayed::Worker.delay_jobs = !Rails.env.test?
+Delayed::Worker.delay_jobs = true
 
 # Set default priority (lower = higher priority)
 # Example ordering, see ApplicationJob.priority_number

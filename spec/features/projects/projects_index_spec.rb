@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -32,7 +32,6 @@ describe 'Projects index page',
          type: :feature,
          js: true,
          with_settings: { login_required?: false } do
-
   using_shared_fixtures :admin
 
   let!(:manager)   { FactoryBot.create :role, name: 'Manager' }
@@ -50,7 +49,7 @@ describe 'Projects index page',
     project = FactoryBot.create(:project,
                                 name: 'Public project',
                                 identifier: 'public-project',
-                                is_public: true)
+                                public: true)
     project.custom_field_values = { invisible_custom_field.id => 'Secret CF' }
     project.save
     project
@@ -75,6 +74,18 @@ describe 'Projects index page',
 
   def remove_filter(name)
     page.find("li[filter-name='#{name}'] .filter_rem").click
+  end
+
+  def expect_project_at_place(project, place)
+    expect(page)
+      .to have_selector("#project-table .project:nth-of-type(#{place}) td.name",
+                        text: project.name)
+  end
+
+  def expect_projects_in_order(*projects)
+    projects.each_with_index do |project, index|
+      expect_project_at_place(project, index + 1)
+    end
   end
 
   feature 'restricts project visibility' do
@@ -122,7 +133,7 @@ describe 'Projects index page',
 
     feature 'for admins' do
       before do
-        project.update_attributes(created_on: 7.days.ago)
+        project.update(created_at: 7.days.ago)
 
         news
       end
@@ -153,12 +164,24 @@ describe 'Projects index page',
           expect(page)
             .to have_selector('th', text: 'CREATED ON')
           expect(page)
-            .to have_selector('td', text: project.created_on.strftime('%m/%d/%Y'))
+            .to have_selector('td', text: project.created_at.strftime('%m/%d/%Y'))
           expect(page)
             .to have_selector('th', text: 'LATEST ACTIVITY AT')
           expect(page)
-            .to have_selector('td', text: news.created_on.strftime('%m/%d/%Y'))
+            .to have_selector('td', text: news.created_at.strftime('%m/%d/%Y'))
         end
+      end
+
+      scenario 'test that flash sortBy is being escaped' do
+        login_as(admin)
+        visit projects_path(sortBy: "[[\"><script src='/foobar.js'></script>\",\"\"]]")
+
+        error_text = "Orders ><script src='/foobar js'></script> is not set to one of the allowed values. and does not exist."
+        error_html = "Orders &gt;&lt;script src='/foobar js'&gt;&lt;/script&gt; is not set to one of the allowed values. and does not exist."
+        expect(page).to have_selector('.flash.error', text: error_text)
+
+        error_container = page.find('.flash.error')
+        expect(error_container['innerHTML']).to include error_html
       end
     end
   end
@@ -316,12 +339,11 @@ describe 'Projects index page',
         load_and_open_filters admin
 
         # value selection defaults to "active"'
-        expect(page).to have_selector('li[filter-name="status"]')
+        expect(page).to have_selector('li[filter-name="active"]')
 
         # Filter has three operators 'all', 'active' and 'archived'
-        expect(page.find('li[filter-name="status"] select[name="operator"] option[value="*"]')).to have_text('all')
-        expect(page.find('li[filter-name="status"] select[name="operator"] option[value="="]')).to have_text('is')
-        expect(page.find('li[filter-name="status"] select[name="operator"] option[value="!"]')).to have_text('is not')
+        expect(page.find('li[filter-name="active"] select[name="operator"] option[value="="]')).to have_text('is')
+        expect(page.find('li[filter-name="active"] select[name="operator"] option[value="!"]')).to have_text('is not')
 
         expect(page).to have_text(parent_project.name)
         expect(page).to have_text(child_project.name)
@@ -348,7 +370,7 @@ describe 'Projects index page',
 
         load_and_open_filters admin
 
-        projects_page.filter_by_status('archived')
+        projects_page.filter_by_active('no')
 
         expect(page).to have_text("ARCHIVED #{parent_project.name}")
         expect(page).to have_text("ARCHIVED #{child_project.name}")
@@ -374,7 +396,7 @@ describe 'Projects index page',
 
         load_and_open_filters admin
 
-        projects_page.filter_by_status('active')
+        projects_page.filter_by_active('yes')
 
         expect(page).to have_text(parent_project.name)
         expect(page).to have_no_text(child_project.name)
@@ -382,6 +404,89 @@ describe 'Projects index page',
         expect(page).to have_text('Development project')
         expect(page).to have_text('Public project')
       end
+    end
+
+    feature 'project status filter' do
+      let!(:no_status_project) do
+        # A project that never had project status associated.
+        FactoryBot.create(:project,
+                          name: 'No status project')
+      end
+
+      let!(:green_project) do
+        # A project that has a project status associated.
+        FactoryBot.create(:project,
+                          name: 'Green project',
+                          status: FactoryBot.create(:project_status))
+      end
+      let!(:gray_project) do
+        # A project that once had a project status associated, that was later unset.
+        FactoryBot.create(:project,
+                          name: 'Gray project',
+                          status: FactoryBot.create(:project_status, code: nil))
+      end
+
+      scenario 'sort and filter on project status' do
+        login_as(admin)
+        projects_page.visit!
+
+        click_link('Sort by "Status"')
+
+        expect_project_at_place(green_project, 1)
+        expect(page).to have_text('(1 - 8/8)')
+
+        click_link('Ascending sorted by "Status"')
+
+        expect_project_at_place(green_project, 8)
+        expect(page).to have_text('(1 - 8/8)')
+
+        projects_page.open_filters
+
+        projects_page.set_filter('project_status_code',
+                                 'Project status',
+                                 'is',
+                                 ['On track'])
+
+        click_on 'Apply'
+
+        expect(page).to have_text(green_project.name)
+        expect(page).to_not have_text(gray_project.name)
+        expect(page).to_not have_text(no_status_project.name)
+
+        projects_page.set_filter('project_status_code',
+                                 'Project status',
+                                 'all',
+                                 [])
+
+        click_on 'Apply'
+
+        expect(page).to have_text(green_project.name)
+        expect(page).to_not have_text(gray_project.name)
+        expect(page).to_not have_text(no_status_project.name)
+
+        projects_page.set_filter('project_status_code',
+                                 'Project status',
+                                 'none',
+                                 [])
+
+        click_on 'Apply'
+
+        expect(page).to_not have_text(green_project.name)
+        expect(page).to have_text(gray_project.name)
+        expect(page).to have_text(no_status_project.name)
+
+        projects_page.set_filter('project_status_code',
+                                 'Project status',
+                                 'is not',
+                                 ['On track'])
+
+        click_on 'Apply'
+
+        expect(page).to_not have_text(green_project.name)
+        expect(page).to have_text(gray_project.name)
+        expect(page).to have_text(no_status_project.name)
+      end
+
     end
 
     feature 'other filter types' do
@@ -398,7 +503,7 @@ describe 'Projects index page',
       let!(:project_created_on_today) do
         project = FactoryBot.create(:project,
                                     name: 'Created today project',
-                                    created_on: DateTime.now)
+                                    created_at: DateTime.now)
         project.custom_field_values = { list_custom_field.id => list_custom_field.possible_values[2],
                                         date_custom_field.id => '2011-11-11' }
         project.save!
@@ -407,17 +512,17 @@ describe 'Projects index page',
       let!(:project_created_on_this_week) do
         FactoryBot.create(:project,
                           name: 'Created on this week project',
-                          created_on: datetime_of_this_week)
+                          created_at: datetime_of_this_week)
       end
       let!(:project_created_on_six_days_ago) do
         FactoryBot.create(:project,
                           name: 'Created on six days ago project',
-                          created_on: DateTime.now - 6.days)
+                          created_at: DateTime.now - 6.days)
       end
       let!(:project_created_on_fixed_date) do
         FactoryBot.create(:project,
                           name: 'Created on fixed date project',
-                          created_on: fixed_datetime)
+                          created_at: fixed_datetime)
       end
       let!(:todays_wp) do
         # This WP should trigger a change to the project's 'latest activity at' DateTime
@@ -434,7 +539,7 @@ describe 'Projects index page',
 
       scenario 'selecting operator' do
         # created on 'today' shows projects that were created today
-        projects_page.set_filter('created_on',
+        projects_page.set_filter('created_at',
                                  'Created on',
                                  'today')
 
@@ -445,9 +550,9 @@ describe 'Projects index page',
         expect(page).to_not have_text(project_created_on_fixed_date.name)
 
         # created on 'this week' shows projects that were created within the last seven days
-        remove_filter('created_on')
+        remove_filter('created_at')
 
-        projects_page.set_filter('created_on',
+        projects_page.set_filter('created_at',
                                  'Created on',
                                  'this week')
 
@@ -458,9 +563,9 @@ describe 'Projects index page',
         expect(page).to_not have_text(project_created_on_fixed_date.name)
 
         # created on 'on' shows projects that were created within the last seven days
-        remove_filter('created_on')
+        remove_filter('created_at')
 
-        projects_page.set_filter('created_on',
+        projects_page.set_filter('created_at',
                                  'Created on',
                                  'on',
                                  ['2017-11-11'])
@@ -472,9 +577,9 @@ describe 'Projects index page',
         expect(page).to_not have_text(project_created_on_this_week.name)
 
         # created on 'less than days ago'
-        remove_filter('created_on')
+        remove_filter('created_at')
 
-        projects_page.set_filter('created_on',
+        projects_page.set_filter('created_at',
                                  'Created on',
                                  'less than days ago',
                                  ['1'])
@@ -485,9 +590,9 @@ describe 'Projects index page',
         expect(page).to_not have_text(project_created_on_fixed_date.name)
 
         # created on 'more than days ago'
-        remove_filter('created_on')
+        remove_filter('created_at')
 
-        projects_page.set_filter('created_on',
+        projects_page.set_filter('created_at',
                                  'Created on',
                                  'more than days ago',
                                  ['1'])
@@ -498,9 +603,9 @@ describe 'Projects index page',
         expect(page).to_not have_text(project_created_on_today.name)
 
         # created on 'between'
-        remove_filter('created_on')
+        remove_filter('created_at')
 
-        projects_page.set_filter('created_on',
+        projects_page.set_filter('created_at',
                                  'Created on',
                                  'between',
                                  ['2017-11-10', '2017-11-12'])
@@ -511,7 +616,7 @@ describe 'Projects index page',
         expect(page).to_not have_text(project_created_on_today.name)
 
         # Latest activity at 'today'. This spot check would fail if the data does not get collected from multiple tables
-        remove_filter('created_on')
+        remove_filter('created_at')
 
         projects_page.set_filter('latest_activity_at',
                                  'Latest activity at',
@@ -539,10 +644,10 @@ describe 'Projects index page',
         cf_filter = page.find("li[filter-name='cf_#{list_custom_field.id}']")
         within(cf_filter) do
           # Initial filter is a 'single select'
-          expect(cf_filter.find(:select, 'value')[:multiple]).to be_falsey
+          expect(cf_filter.find(:select, 'value')).not_to be_multiple
           click_on 'Toggle multiselect'
           # switching to multiselect keeps the current selection
-          expect(cf_filter.find(:select, 'value')[:multiple]).to be_truthy
+          expect(cf_filter.find(:select, 'value')).to be_multiple
           expect(cf_filter).to have_select('value', selected: list_custom_field.possible_values[2].value)
 
           select list_custom_field.possible_values[3].value, from: 'value'
@@ -553,7 +658,7 @@ describe 'Projects index page',
         cf_filter = page.find("li[filter-name='cf_#{list_custom_field.id}']")
         within(cf_filter) do
           # Query has two values for that filter, so it shoud show a 'multi select'.
-          expect(cf_filter.find(:select, 'value')[:multiple]).to be_truthy
+          expect(cf_filter.find(:select, 'value')).to be_multiple
           expect(cf_filter)
             .to have_select('value',
                             selected: [list_custom_field.possible_values[2].value,
@@ -564,7 +669,7 @@ describe 'Projects index page',
           unselect list_custom_field.possible_values[2].value, from: 'value'
 
           click_on 'Toggle multiselect'
-          expect(cf_filter.find(:select, 'value')[:multiple]).to be_falsey
+          expect(cf_filter.find(:select, 'value')).not_to be_multiple
           expect(cf_filter).to have_select('value', selected: list_custom_field.possible_values[1].value)
           expect(cf_filter).to_not have_select('value', selected: list_custom_field.possible_values[3].value)
         end
@@ -574,7 +679,7 @@ describe 'Projects index page',
         cf_filter = page.find("li[filter-name='cf_#{list_custom_field.id}']")
         within(cf_filter) do
           # Query has one value for that filter, so it should show a 'single select'.
-          expect(cf_filter.find(:select, 'value')[:multiple]).to be_falsey
+          expect(cf_filter.find(:select, 'value')).not_to be_multiple
         end
 
         # CF date filter work (at least for one operator)
@@ -619,7 +724,7 @@ describe 'Projects index page',
                         member_in_project: parent_project,
                         member_through_role: can_add_subprojects_role)
     end
-    let!(:simple_member) do
+    let(:simple_member) do
       FactoryBot.create(:user,
                         member_in_project: parent_project,
                         member_through_role: developer)
@@ -630,9 +735,9 @@ describe 'Projects index page',
       Role.non_member
 
       # Remove public projects from the default list for these scenarios.
-      public_project.update_attribute :status, Project::STATUS_ARCHIVED
+      public_project.update(active: false)
 
-      project.update_attributes(created_on: 7.days.ago)
+      project.update(created_at: 7.days.ago)
 
       news
     end
@@ -693,11 +798,11 @@ describe 'Projects index page',
         expect(page)
           .to have_no_selector('th', text: 'CREATED ON')
         expect(page)
-          .to have_no_selector('td', text: project.created_on.strftime('%m/%d/%Y'))
+          .to have_no_selector('td', text: project.created_at.strftime('%m/%d/%Y'))
         expect(page)
           .to have_no_selector('th', text: 'LATEST ACTIVITY AT')
         expect(page)
-          .to have_no_selector('td', text: news.created_on.strftime('%m/%d/%Y'))
+          .to have_no_selector('td', text: news.created_at.strftime('%m/%d/%Y'))
       end
     end
   end
@@ -710,6 +815,11 @@ describe 'Projects index page',
       FactoryBot.create(:project,
                         parent: project,
                         name: "Z Child")
+    end
+    let!(:child_project_m) do
+      FactoryBot.create(:project,
+                        parent: project,
+                        name: "m Child") # intentionally written lowercase to test for case insensitive sorting
     end
     let!(:child_project_a) do
       FactoryBot.create(:project,
@@ -730,20 +840,10 @@ describe 'Projects index page',
       public_project.save!
       child_project_z.custom_field_values = { integer_custom_field.id => 4 }
       child_project_z.save!
+      child_project_m.custom_field_values = { integer_custom_field.id => 4 }
+      child_project_m.save!
       child_project_a.custom_field_values = { integer_custom_field.id => 4 }
       child_project_a.save!
-    end
-
-    def expect_project_at_place(project, place)
-      expect(page)
-        .to have_selector("#project-table .project:nth-of-type(#{place}) td.name",
-                          text: project.name)
-    end
-
-    def expect_projects_in_order(*projects)
-      projects.each_with_index do |project, index|
-        expect_project_at_place(project, index + 1)
-      end
     end
 
     scenario 'allows to alter the order in which projects are displayed' do
@@ -751,6 +851,7 @@ describe 'Projects index page',
       expect_projects_in_order(development_project,
                                project,
                                child_project_a,
+                               child_project_m,
                                child_project_z,
                                public_project)
 
@@ -759,6 +860,7 @@ describe 'Projects index page',
       # Projects ordered by name asc
       expect_projects_in_order(child_project_a,
                                development_project,
+                               child_project_m,
                                project,
                                public_project,
                                child_project_z)
@@ -769,6 +871,7 @@ describe 'Projects index page',
       expect_projects_in_order(child_project_z,
                                public_project,
                                project,
+                               child_project_m,
                                development_project,
                                child_project_a)
 
@@ -779,6 +882,7 @@ describe 'Projects index page',
                                development_project,
                                public_project,
                                child_project_z,
+                               child_project_m,
                                child_project_a)
 
       click_link('Sort by "Project hierarchy"')
@@ -787,8 +891,19 @@ describe 'Projects index page',
       expect_projects_in_order(development_project,
                                project,
                                child_project_a,
+                               child_project_m,
                                child_project_z,
                                public_project)
+    end
+  end
+
+  feature 'blacklisted filters' do
+    scenario 'are not visible' do
+      load_and_open_filters admin
+
+      expect(page).to_not have_select('add_filter_select', with_options: ["Principal"])
+      expect(page).to_not have_select('add_filter_select', with_options: ["ID"])
+      expect(page).to_not have_select('add_filter_select', with_options: ["Subproject of"])
     end
   end
 end

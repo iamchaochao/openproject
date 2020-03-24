@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -55,7 +55,7 @@ describe 'Work package transitive status workflows', js: true do
                                       created_at: 5.days.ago.to_date.to_s(:db)
 
     note_journal = work_package.journals.last
-    note_journal.update_attributes(created_at: 5.days.ago.to_date.to_s)
+    note_journal.update(created_at: 5.days.ago.to_date.to_s)
 
     work_package
   }

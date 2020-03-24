@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -200,6 +200,15 @@ describe ProjectsHelper, type: :helper do
         is_expected.to be_json_eql(1.to_json).at_path('projects/1/level')
         is_expected.to be_json_eql(0.to_json).at_path('projects/2/level')
       end
+    end
+  end
+
+  context '#short_project_description' do
+    let(:project) { FactoryBot.build_stubbed(:project, description: ('Abcd ' * 5 + "\n") * 11) }
+
+    it 'returns shortened description' do
+      expect(helper.short_project_description(project))
+        .to eql((('Abcd ' * 5 + "\n") * 10)[0..-2] + '...')
     end
   end
 end

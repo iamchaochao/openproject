@@ -3,12 +3,11 @@ import {CardEventHandler} from "core-components/wp-card-view/event-handler/card-
 import {WorkPackageCardViewComponent} from "core-components/wp-card-view/wp-card-view.component";
 import {WorkPackageViewSelectionService} from "core-app/modules/work_packages/routing/wp-view-base/view-services/wp-view-selection.service";
 import {StateService} from "@uirouter/core";
+import {InjectField} from "core-app/helpers/angular/inject-field.decorator";
 
 export class CardDblClickHandler implements CardEventHandler {
-
-  // Injections
-  public $state:StateService = this.injector.get(StateService);
-  public wpTableSelection:WorkPackageViewSelectionService = this.injector.get(WorkPackageViewSelectionService);
+  @InjectField() $state:StateService;
+  @InjectField() wpTableSelection:WorkPackageViewSelectionService;
 
   constructor(public readonly injector:Injector,
               card:WorkPackageCardViewComponent) {
@@ -35,18 +34,23 @@ export class CardDblClickHandler implements CardEventHandler {
     }
 
     // Locate the row from event
-    let element = target.closest(this.SELECTOR);
+    let element = target.closest('wp-single-card');
     let wpId = element.data('workPackageId');
 
     if (!wpId) {
       return true;
     }
 
+    this.handleWorkPackage(wpId);
+
+    return false;
+  }
+
+  protected handleWorkPackage(wpId:string) {
     this.$state.go(
       'work-packages.show',
       {workPackageId: wpId}
     );
-    return false;
   }
 }
 

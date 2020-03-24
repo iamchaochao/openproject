@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,14 +30,11 @@ require 'support/pages/page'
 
 module Pages
   class AbstractWorkPackage < Page
-    attr_reader :project, :work_package, :type_field_selector, :subject_field_selector
+    attr_reader :project, :work_package
 
     def initialize(work_package, project = nil)
       @work_package = work_package
       @project = project
-
-      @type_field_selector = '.wp-edit-field.type'
-      @subject_field_selector = '.wp-edit-field.subject'
     end
 
     def visit_tab!(tab)
@@ -80,7 +77,7 @@ module Pages
 
     def expect_hidden_field(attribute)
       page.within(container) do
-        expect(page).to have_no_selector(".inplace-edit.#{attribute}")
+        expect(page).to have_no_selector(".inline-edit--display-field.#{attribute}")
       end
     end
 
@@ -119,13 +116,13 @@ module Pages
         if label == 'status'
           expect(page).to have_selector(".wp-status-button .button", text: value, wait: 10)
         else
-          expect(page).to have_selector(".wp-edit-field.#{label.camelize(:lower)}", text: value, wait: 10)
+          expect(page).to have_selector(".inline-edit--container.#{label.camelize(:lower)}", text: value, wait: 10)
         end
       end
     end
 
     def expect_no_attribute(label)
-      expect(page).not_to have_selector(".wp-edit-field.#{label.downcase}")
+      expect(page).not_to have_selector(".inline-edit--container.#{label.downcase}")
     end
     alias :expect_attribute_hidden :expect_no_attribute
 
@@ -196,16 +193,16 @@ module Pages
         cf = CustomField.find $1
 
         if cf.field_format == 'text'
-          WorkPackageEditorField.new container, key
+          TextEditorField.new container, key
         else
-          WorkPackageField.new container, key
+          EditField.new container, key
         end
       elsif key == :description
-        WorkPackageEditorField.new container, key
+        TextEditorField.new container, key
       elsif key == :status
         WorkPackageStatusField.new container
       else
-        WorkPackageField.new container, key
+        EditField.new container, key
       end
     end
 
@@ -272,13 +269,13 @@ module Pages
       find('#types-context-menu .menu-item', text: type.name.upcase, wait: 10).click
     end
 
-    def select_type(type)
-      find(@type_field_selector + ' option', text: type.name.upcase).select_option
+    def subject_field
+      expect(page).to have_selector('.inline-edit--container.subject input', wait: 10)
+      find('.inline-edit--container.subject input')
     end
 
-    def subject_field
-      expect(page).to have_selector(@subject_field_selector + ' input', wait: 10)
-      find(@subject_field_selector + ' input')
+    def go_back
+      find('.work-packages-back-button').click
     end
 
     private

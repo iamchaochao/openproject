@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -33,7 +33,7 @@ module Project::Copy
     base.send :include, self::CopyMethods
 
     # things that are explicitly excluded when copying a project
-    base.not_to_copy ['id', 'created_on', 'updated_on', 'name', 'identifier', 'status', 'lft', 'rgt']
+    base.not_to_copy ['id', 'created_at', 'updated_at', 'name', 'identifier', 'active', 'lft', 'rgt']
 
     # specify the order of associations to copy
     base.copy_precedence ['members', 'versions', 'categories', 'work_packages', 'wiki', 'custom_values', 'queries']
@@ -45,7 +45,7 @@ module Project::Copy
       with_model(project) do |project|
         # Clear enabled modules
         self.enabled_modules = []
-        self.enabled_module_names = project.enabled_module_names
+        self.enabled_module_names = project.enabled_module_names - %w[repository]
         self.types = project.types
         self.work_package_custom_fields = project.work_package_custom_fields
         self.custom_field_values = project.custom_value_attributes
@@ -84,6 +84,7 @@ module Project::Copy
       project.wiki.pages.each do |page|
         # Skip pages without content
         next if page.content.nil?
+
         new_wiki_content = WikiContent.new(page.content.attributes.dup.except('id', 'page_id', 'updated_at'))
         new_wiki_page = WikiPage.new(page.attributes.dup.except('id', 'wiki_id', 'created_on', 'parent_id'))
         new_wiki_page.content = new_wiki_content
@@ -156,44 +157,16 @@ module Project::Copy
                 .work_packages
                 .includes(:custom_values, :fixed_version, :assigned_to, :responsible)
                 .order_by_ancestors('asc')
+                .order('id ASC')
 
       user_cf_ids = WorkPackageCustomField.where(field_format: 'user').pluck(:id)
 
       to_copy.each do |wp|
-        parent_id = (work_packages_map[wp.parent_id]&.id) || wp.parent_id
-        custom_value_attributes = wp.custom_value_attributes.map do |id, value|
-          if user_cf_ids.include?(id) && !users.detect { |u| u.id.to_s == value }
-            [id, nil]
-          else
-            [id, value]
-          end
-        end.to_h
+        parent_id = work_packages_map[wp.parent_id]&.id || wp.parent_id
 
-        overrides = {
-          project: self,
-          parent_id: parent_id,
-          fixed_version: wp.fixed_version && versions.detect { |v| v.name == wp.fixed_version.name },
-          assigned_to: wp.assigned_to && possible_assignees.detect { |u| u.id == wp.assigned_to_id },
-          responsible: wp.responsible && possible_responsibles.detect { |u| u.id == wp.responsible_id },
-          custom_field_values: custom_value_attributes
-        }
+        new_wp = copy_work_package(wp, parent_id, user_cf_ids)
 
-        service_call = WorkPackages::CopyService
-                       .new(user: User.current,
-                            work_package: wp,
-                            contract_class: WorkPackages::CopyProjectContract)
-                       .call(overrides)
-
-        if service_call.success?
-          new_work_package = service_call.result
-
-          work_packages_map[wp.id] = new_work_package
-        elsif logger&.info
-          compiled_errors << service_call.errors
-          logger.info <<-MSG
-            Project#copy_work_packages: work package ##{wp.id} could not be copied: #{service_call.errors.full_messages}
-          MSG
-        end
+        work_packages_map[wp.id] = new_wp if new_wp
       end
 
       # reload all work_packages in our map, they might be modified by movement in their tree
@@ -238,7 +211,7 @@ module Project::Copy
     end
 
     # Copies members from +project+
-    def copy_members(project, selected_copies = [])
+    def copy_members(project, _selected_copies = [])
       # Copy users first, then groups to handle members with inherited and given roles
       members_to_copy = []
       members_to_copy += project.memberships.select { |m| m.principal.is_a?(User) }
@@ -250,6 +223,7 @@ module Project::Copy
         # inherited roles will be added when copying the group membership
         role_ids = member.member_roles.reject(&:inherited?).map(&:role_id)
         next if role_ids.empty?
+
         new_member.role_ids = role_ids
         new_member.project = self
         memberships << new_member
@@ -343,6 +317,63 @@ module Project::Copy
           title: source.query_menu_item.title
         )
       end
+    end
+
+    def copy_work_package(source_work_package, parent_id, user_cf_ids)
+      overrides = copy_work_package_attribute_overrides(source_work_package, parent_id, user_cf_ids)
+
+      service_call = WorkPackages::CopyService
+                     .new(user: User.current,
+                          work_package: source_work_package,
+                          contract_class: WorkPackages::CopyProjectContract)
+                     .call(overrides)
+
+      if service_call.success?
+        service_call.result
+      elsif logger&.info
+        log_work_package_copy_error(source_work_package, service_call.errors)
+      end
+    end
+
+    def copy_work_package_attribute_overrides(source_work_package, parent_id, user_cf_ids)
+      custom_value_attributes = source_work_package.custom_value_attributes.map do |id, value|
+        if user_cf_ids.include?(id) && !users.detect { |u| u.id.to_s == value }
+          [id, nil]
+        else
+          [id, value]
+        end
+      end.to_h
+
+      {
+        project: self,
+        parent_id: parent_id,
+        fixed_version: work_package_version(source_work_package),
+        assigned_to: work_package_assigned_to(source_work_package),
+        responsible: work_package_responsible(source_work_package),
+        custom_field_values: custom_value_attributes,
+        # We fetch the value from the global registry to persist it in the job which
+        # will trigger a delayed job for potentially sending the journal notifications.
+        send_notifications: ActionMailer::Base.perform_deliveries
+      }
+    end
+
+    def work_package_version(source_work_package)
+      source_work_package.fixed_version && versions.detect { |v| v.name == source_work_package.fixed_version.name }
+    end
+
+    def work_package_assigned_to(source_work_package)
+      source_work_package.assigned_to && possible_assignees.detect { |u| u.id == source_work_package.assigned_to_id }
+    end
+
+    def work_package_responsible(source_work_package)
+      source_work_package.responsible && possible_responsibles.detect { |u| u.id == source_work_package.responsible_id }
+    end
+
+    def log_work_package_copy_error(source_work_package, errors)
+      compiled_errors << errors
+      logger.info <<-MSG
+          Project#copy_work_packages: work package ##{source_work_package.id} could not be copied: #{errors.full_messages}
+      MSG
     end
   end
 end

@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,6 +29,31 @@
 require 'spec_helper'
 
 describe AccountController, type: :controller do
+
+  class UserHook < Redmine::Hook::ViewListener
+    attr_reader :registered_user
+    attr_reader :first_login_user
+
+    def user_registered(context)
+      @registered_user = context[:user]
+    end
+
+    def user_first_login(context)
+      @first_login_user = context[:user]
+    end
+
+    def reset!
+      @registered_user = nil
+      @first_login_user = nil
+    end
+  end
+
+  let(:hook) { UserHook.instance }
+
+  before do
+    hook.reset!
+  end
+
   let(:user) { FactoryBot.build_stubbed(:user) }
 
   context 'GET #login' do
@@ -84,6 +109,36 @@ describe AccountController, type: :controller do
         expect(response).to be_successful
         expect(response).to render_template 'login'
         expect(flash[:error]).to include 'Invalid user or password'
+      end
+    end
+
+    context 'with first login' do
+      before do
+        admin.update first_login: true
+
+        post :login, params: { username: admin.login, password: 'adminADMIN!' }
+      end
+
+      it 'redirect to default path with ?first_time_user=true' do
+        expect(response).to redirect_to "/?first_time_user=true"
+      end
+
+      it 'calls the user_first_login hook' do
+        expect(hook.first_login_user).to eq admin
+      end
+    end
+
+    context 'without first login' do
+      before do
+        post :login, params: { username: admin.login, password: 'adminADMIN!' }
+      end
+
+      it 'redirect to the my page' do
+        expect(response).to redirect_to "/my/page"
+      end
+
+      it 'does not call the user_first_login hook' do
+        expect(hook.first_login_user).to be_nil
       end
     end
 
@@ -361,10 +416,8 @@ describe AccountController, type: :controller do
     describe "User who is not allowed to change password can't login" do
       before do
         post 'change_password',
-             flash: {
-               _password_change_user_id: admin.id
-             },
              params: {
+               password_change_user_id: admin.id,
                username: admin.login,
                password: 'adminADMIN!',
                new_password: 'adminADMIN!New',
@@ -408,6 +461,10 @@ describe AccountController, type: :controller do
 
     it 'informs the user that registration is disabled' do
       expect(flash[:error]).to eq(I18n.t('account.error_self_registration_disabled'))
+    end
+
+    it 'does not call the user_registered callback' do
+      expect(hook.registered_user).to be_nil
     end
   end
 
@@ -494,7 +551,7 @@ describe AccountController, type: :controller do
                  }
           end
 
-          it 'redirects to my page' do
+          it 'redirects to the expected path' do
             is_expected.to respond_with :redirect
             expect(assigns[:user]).not_to be_nil
             is_expected.to redirect_to(redirect_to_path)
@@ -505,6 +562,23 @@ describe AccountController, type: :controller do
             user = User.where(login: 'register').last
             expect(user).not_to be_nil
             expect(user.status).to eq(User::STATUSES[:active])
+          end
+
+          it 'calls the user_registered callback' do
+            user = hook.registered_user
+
+            expect(user.mail).to eq "register@example.com"
+            expect(user).to be_active
+          end
+        end
+
+        it_behaves_like 'automatic self registration succeeds' do
+          let(:redirect_to_path) { "/?first_time_user=true" }
+
+          it "calls the user_first_login callback" do
+            user = hook.first_login_user
+
+            expect(user.mail).to eq "register@example.com"
           end
         end
 
@@ -537,10 +611,16 @@ describe AccountController, type: :controller do
           end
 
           it "notifies the admins about the issue" do
+            perform_enqueued_jobs
+
             mail = ActionMailer::Base.deliveries.detect { |mail| mail.to.first == admin.mail }
             expect(mail).to be_present
             expect(mail.subject).to match /limit reached/
             expect(mail.body.parts.first.to_s).to match /new user \(#{params[:user][:mail]}\)/
+          end
+
+          it 'does not call the user_registered callback' do
+            expect(hook.registered_user).to be_nil
           end
         end
       end
@@ -587,6 +667,13 @@ describe AccountController, type: :controller do
           expect(token.user.mail).to eq('register@example.com')
           expect(token).not_to be_expired
         end
+
+        it 'calls the user_registered callback' do
+          user = hook.registered_user
+
+          expect(user.mail).to eq "register@example.com"
+          expect(user).to be_registered
+        end
       end
 
       context 'with password login disabled' do
@@ -626,6 +713,13 @@ describe AccountController, type: :controller do
         it "doesn't activate the user" do
           expect(User.find_by_login('register')).not_to be_active
         end
+
+        it 'calls the user_registered callback' do
+          user = hook.registered_user
+
+          expect(user.mail).to eq "register@example.com"
+          expect(user).to be_registered
+        end
       end
 
       context 'with back_url' do
@@ -636,6 +730,13 @@ describe AccountController, type: :controller do
         it 'preserves the back url' do
           expect(response).to redirect_to(
             '/login?back_url=https%3A%2F%2Fexample.net%2Fsome_back_url')
+        end
+
+        it 'calls the user_registered callback' do
+          user = hook.registered_user
+
+          expect(user.mail).to eq "register@example.com"
+          expect(user).to be_registered
         end
       end
 
@@ -764,6 +865,8 @@ describe AccountController, type: :controller do
       end
 
       it "notifies the admins about the issue" do
+        perform_enqueued_jobs
+
         mail = ActionMailer::Base.deliveries.detect { |mail| mail.to.first == admin.mail }
         expect(mail).to be_present
         expect(mail.subject).to match /limit reached/
@@ -865,8 +968,10 @@ describe AccountController, type: :controller do
 
         it 'sends out a new activation email' do
           new_token = Token::Invitation.find_by(user_id: token.user.id)
-          mail = ActionMailer::Base.deliveries.last
 
+          perform_enqueued_jobs
+
+          mail = ActionMailer::Base.deliveries.last
           expect(mail.parts.first.body.raw_source).to include "activate?token=#{new_token.value}"
         end
       end

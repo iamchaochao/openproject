@@ -1,6 +1,6 @@
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,29 +23,34 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 
 import {Injector} from '@angular/core';
 import {States} from '../../../states.service';
-import {WorkPackageChangeset} from '../../../wp-edit-form/work-package-changeset';
 import {WorkPackageTimelineTableController} from '../container/wp-timeline-container.directive';
 import {RenderInfo} from '../wp-timeline';
 import {TimelineCellRenderer} from './timeline-cell-renderer';
 import {TimelineMilestoneCellRenderer} from './timeline-milestone-cell-renderer';
 import {WorkPackageTimelineCell} from './wp-timeline-cell';
+
+import {HalResourceEditingService} from "core-app/modules/fields/edit/services/hal-resource-editing.service";
 import {RenderedWorkPackage} from "core-app/modules/work_packages/render-info/rendered-work-package.type";
+import {WorkPackageChangeset} from "core-components/wp-edit/work-package-changeset";
+import {InjectField} from "core-app/helpers/angular/inject-field.decorator";
 
 export class WorkPackageTimelineCellsRenderer {
 
   // Injections
-  public states = this.injector.get(States);
+  @InjectField() public states:States;
+  @InjectField() public halEditing:HalResourceEditingService;
 
   public cells:{ [classIdentifier:string]:WorkPackageTimelineCell } = {};
 
   private cellRenderers:{ milestone:TimelineMilestoneCellRenderer, generic:TimelineCellRenderer };
 
-  constructor(public readonly injector:Injector, private wpTimeline:WorkPackageTimelineTableController) {
+  constructor(readonly injector:Injector,
+              readonly wpTimeline:WorkPackageTimelineTableController) {
     this.cellRenderers = {
       milestone: new TimelineMilestoneCellRenderer(this.injector, wpTimeline),
       generic: new TimelineCellRenderer(this.injector, wpTimeline)
@@ -140,7 +145,7 @@ export class WorkPackageTimelineCellsRenderer {
     return {
       viewParams: this.wpTimeline.viewParameters,
       workPackage: wp,
-      changeset: new WorkPackageChangeset(this.injector, wp)
-    } as RenderInfo;
+      change: this.halEditing.changeFor(wp) as WorkPackageChangeset
+    };
   }
 }

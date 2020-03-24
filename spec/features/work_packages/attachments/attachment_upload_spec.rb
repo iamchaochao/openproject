@@ -17,7 +17,7 @@ describe 'Upload attachment to work package', js: true do
   let(:work_package) { FactoryBot.create(:work_package, project: project, description: 'Initial description') }
   let(:wp_page) { ::Pages::FullWorkPackage.new(work_package, project) }
   let(:attachments) { ::Components::Attachments.new }
-  let(:field) { WorkPackageEditorField.new wp_page, 'description' }
+  let(:field) { TextEditorField.new wp_page, 'description' }
   let(:image_fixture) { Rails.root.join('spec/fixtures/files/image.png') }
   let(:editor) { Components::WysiwygEditor.new }
 
@@ -29,7 +29,6 @@ describe 'Upload attachment to work package', js: true do
 
   describe 'wysiwyg editor' do
     context 'on an existing page' do
-
       before do
         wp_page.visit!
         wp_page.ensure_page_loaded
@@ -38,7 +37,6 @@ describe 'Upload attachment to work package', js: true do
       it 'can upload an image via drag & drop' do
         # Activate the edit field
         field.activate!
-        target = find('.ck-content')
 
         editor.expect_button 'Insert image'
 
@@ -57,9 +55,9 @@ describe 'Upload attachment to work package', js: true do
         end
         let(:selector) { '.work-packages--activity--add-comment' }
         let(:comment_field) do
-          WorkPackageEditorField.new wp_page,
-                                     'comment',
-                                     selector: selector
+          TextEditorField.new wp_page,
+                              'comment',
+                              selector: selector
         end
         let(:editor) { Components::WysiwygEditor.new '.work-packages--activity--add-comment' }
 
@@ -105,10 +103,13 @@ describe 'Upload attachment to work package', js: true do
           expect(editable).to have_selector('img[src*="/api/v3/attachments/"]', wait: 20)
         end
 
+        sleep 2
+
         # Besides testing caption functionality this also slows down clicking on the submit button
         # so that the image is properly embedded
         caption = page.find('figure.image figcaption')
-        caption.click
+        caption.click(x: 10, y: 10)
+        sleep 0.2
         caption.base.send_keys('Some image caption')
 
         sleep 2

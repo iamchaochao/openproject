@@ -1,3 +1,24 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
 fi:
   no_results_title_text: Ei ole tällä hetkellä näytettävää.
   activities:
@@ -7,21 +28,40 @@ fi:
     plugins:
       no_results_title_text: Tällä hetkellä ei ole liitännäisiä saatavilla.
     custom_styles:
+      color_theme: "Color theme"
+      color_theme_custom: "(Custom)"
+      colors:
+        alternative-color: "Alternative"
+        content-link-color: "Link font"
+        primary-color: "Primary"
+        primary-color-dark: "Primary (dark)"
+        header-bg-color: "Header background"
+        header-item-bg-hover-color: "Header background on hover"
+        header-item-font-color: "Header font"
+        header-item-font-hover-color: "Header font on hover"
+        header-border-bottom-color: "Header border"
+        main-menu-bg-color: "Main menu background"
+        main-menu-bg-selected-background: "Main menu when selected"
+        main-menu-bg-hover-background: "Main menu on hover"
+        main-menu-font-color: "Main menu font"
+        main-menu-selected-font-color: "Main menu font when selected"
+        main-menu-hover-font-color: "Main menu font on hover"
+        main-menu-border-color: "Main menu border"
       custom_colors: "Mukautetut värit"
       customize: "Mukauta OpenProject asennusta omalla logollasi. Huom: Tämä logo tulee olemaan julkisesti saatavilla."
       enterprise_notice: "As a special 'Thank you!' for their financial contribution to develop OpenProject, this tiny feature is only available for Enterprise Edition support subscribers."
       manage_colors: "Muokkaa värin valitsemis asetuksia"
       instructions:
-        alternative_color: "Strong accent color, typically used for most the important button on a screen."
-        content_link_color: "Fontin väri eniten linkkejä."
-        primary_color: "Pääväri."
-        primary_color_dark: "Yleensä tummempi versio pääväristä on käytössä valintatehosteissa."
-        header_bg_color: "Background color of the header."
-        header_item_bg_hover_color: "Taustan väri klikattava otsikko eriä kun leijui hiirellä."
-        header_item_font_color: "Fontin väri klikattava otsikko eriä."
-        header_item_font_hover_color: "Fontin väri klikattava otsikko eriä kun leijui hiirellä."
-        header_border_bottom_color: "Thin line under the header. Leave this field empty if you don't want any line."
-        main_menu_bg_color: "Left side menu's background color."
+        alternative-color: "Strong accent color, typically used for the most important button on a screen."
+        content-link-color: "Fontin väri eniten linkkejä."
+        primary-color: "Pääväri."
+        primary-color-dark: "Yleensä tummempi versio pääväristä on käytössä valintatehosteissa."
+        header-item-bg-hover-color: "Taustan väri klikattava otsikko eriä kun leijui hiirellä."
+        header-item-font-color: "Fontin väri klikattava otsikko eriä."
+        header-item-font-hover-color: "Fontin väri klikattava otsikko eriä kun leijui hiirellä."
+        header-border-bottom-color: "Thin line under the header. Leave this field empty if you don't want any line."
+        main-menu-bg-color: "Left side menu's background color."
+      theme_warning: Changing the theme will overwrite you custom style. The design will then be lost. Are you sure you want to continue?
     enterprise:
       upgrade_to_ee: "Päivitä yritysversioon"
       add_token: "Upload an Enterprise Edition support token"
@@ -45,7 +85,39 @@ fi:
       no_results_content_title: Tällä hetkellä ei ole todennustiloja.
       no_results_content_text: Luo uusi todennustila
   ldap_auth_sources:
+    technical_warning_html: |
+      This LDAP form requires technical knowledge of your LDAP / Active Directory setup.
+      <br/>
+      <a href="https://www.openproject.org/help/administration/manage-ldap-authentication/">Please visit our documentation for detailed instructions</a>.
+    attribute_texts:
+      name: Arbitrary name of the LDAP connection
+      host: LDAP host name or IP address
+      login_map: The attribute key in LDAP that is used to identify the unique user login. Usually, this will be `uid` or `samAccountName`.
+      generic_map: The attribute key in LDAP that is mapped to the OpenProject `%{attribute}` attribute
+      admin_map_html: "Optional: The attribute key in LDAP that <strong>if present</strong> marks the OpenProject user an admin. Leave empty when in doubt."
+      system_user_dn_html: |
+        Enter the DN of the system user used for read-only access.
+        <br/>
+        Example: uid=openproject,ou=system,dc=example,dc=com
+      system_user_password: Enter the bind password of the system user
+      base_dn: |
+        Enter the Base DN of the subtree in LDAP you want OpenProject to look for users and groups.
+        OpenProject will filter for provided usernames in this subtree only.
+        Example: ou=users,dc=example,dc=com
+      onthefly_register: |
+        If you check this box, OpenProject will automatically create new users from their LDAP entries
+        when they first authenticate with OpenProject.
+        Leave this unchecked to only allow existing accounts in OpenProject to authenticate through LDAP!
     connection_encryption: 'Connection encryption'
+    system_account: 'System account'
+    system_account_legend: |
+      OpenProject requires read-only access through a system account to lookup users and groups in your LDAP tree.
+      Please specify the bind credentials for that system user in the following section.
+    ldap_details: 'LDAP details'
+    user_settings: 'Attribute mapping'
+    user_settings_legend: |
+      The following fields are related to how users are created in OpenProject from LDAP entries and
+      what LDAP attributes are used to define the attributes of an OpenProject user (attribute mapping).
     tls_mode:
       plain: 'ei mitään'
       simple_tls: 'simple_tls'
@@ -279,7 +351,7 @@ fi:
       changeset:
         repository: "Tietovarasto"
       comment:
-        commented: "Kommentoitu"
+        commented: "Kommentoitu" #an object that this comment belongs to
       custom_action:
         actions: "Toiminnot"
       custom_field:
@@ -327,6 +399,13 @@ fi:
         types: "Tyypit"
         versions: "Versiot"
         work_packages: "Työpaketit"
+      project/status:
+        code: 'Tila'
+        explanation: 'Status description'
+        codes:
+          on_track: 'On track'
+          at_risk: 'At risk'
+          off_track: 'Off track'
       query:
         column_names: "Sarakkeet"
         relations_to_type_column: "Relations to %{type}"
@@ -418,6 +497,8 @@ fi:
         confirmation: "ei vastaa %{attribute}."
         could_not_be_copied: "kopioiminen ei onnistunut (täysimääräisesti)."
         does_not_exist: "ei ole olemassa."
+        error_unauthorized: "may not be accessed."
+        error_readonly: "was attempted to be written but is not writable."
         empty: "ei voi olla tyhjä."
         even: "täytyy olla parillinen."
         exclusion: "on jo varattu."
@@ -481,6 +562,8 @@ fi:
               invalid_values: "Virheellinen arvo."
               id_filter_required: "An 'id' filter is required."
         project:
+          archived_ancestor: 'The project has an archived ancestor.'
+          foreign_wps_reference_version: 'Work packages in non descendant projects reference versions of the project or its descendants.'
           attributes:
             types:
               in_use_by_work_packages: "edelleen käytössä työpaketeissa: %{types}"
@@ -514,6 +597,10 @@ fi:
         role:
           permissions:
             dependency_missing: "need to also include '%{dependency}' as '%{permission}' is selected."
+        time_entry:
+          attributes:
+            hours:
+              day_limit: "is too high as a maximum of 24 hours can be logged per date."
         work_package:
           is_not_a_valid_target_for_time_entries: "Työpaketti #%{id} ei ole kelvollinen uusi kohde aikakirjauksille."
           attributes:
@@ -609,6 +696,7 @@ fi:
   activity:
     created: "Luotu: %{title}"
     updated: "Päivitetty: %{title}"
+  #common attributes of all models
   attributes:
     active: "Aktiivinen"
     assigned_to: "Vastuuhenkilö"
@@ -641,6 +729,7 @@ fi:
     is_default: "Oletusarvo"
     is_for_all: "Kaikille projekteille"
     is_public: "Julkinen"
+    #kept for backwards compatibility
     issue: "Työpaketti"
     lastname: "Sukunimi"
     login: "Username"
@@ -649,6 +738,7 @@ fi:
     password: "Salasana"
     priority: "Tärkeys"
     project: "Projekti"
+    public: "Julkinen"
     responsible: "Accountable"
     role: "Rooli"
     roles: "Roolit"
@@ -660,6 +750,7 @@ fi:
     type: "Tyyppi"
     updated_at: "Päivitetty vimeksi"
     updated_on: "Päivitetty vimeksi"
+    uploader: "Uploader"
     user: "Käyttäjä"
     version: "Versio"
     work_package: "Työpaketti"
@@ -784,9 +875,13 @@ fi:
       - "Perjantai"
       - "Lauantai"
     formats:
+      #Use the strftime parameters for formats.
+      #When no format has been given, it uses default.
+      #You can provide other formats here if you like!
       default: "%e. %Bta %Y"
       long: "%A%e. %Bta %Y"
       short: "%e.%m.%Y"
+    #Don't forget the nil at the beginning; there's no such thing as a 0th month
     month_names:
       - null
       - "Tammikuu"
@@ -801,6 +896,7 @@ fi:
       - "Lokakuu"
       - "Marraskuu"
       - "Joulukuu"
+    #Used in date_select and datime_select.
     order:
       - :vuosi
       - :kuukausi
@@ -930,6 +1026,7 @@ fi:
   description_sub_work_package: "Osa työstä paketti nykyinen"
   description_toc_toggle: "Show/Hide table of contents"
   description_wiki_subpages_reassign: "Valitse uusi pääsivun"
+  #Text direction: Left-to-Right (ltr) or Right-to-Left (rtl)
   direction: ltr
   ee:
     upsale:
@@ -938,13 +1035,12 @@ fi:
         add_groups: "Add new attribute groups"
         rename_groups: "Rename attributes groups"
       project_filters:
-        description_html: "Upgrade to %{link} to filter and sort on custom fields"
-  enumeration_activities: "Historia (ajan seuranta)"
+        description_html: "Filtering and sorting on custom fields is an enterprise edition feature."
+  enumeration_activities: "Time tracking activities"
   enumeration_work_package_priorities: "Work package priorities"
-  enumeration_system_activity: "Järjestelmän toiminta"
   enumeration_reported_project_statuses: "Reported project status"
   error_auth_source_sso_failed: "Single Sign-On (SSO) for user '%{value}' failed"
-  error_can_not_archive_project: "This project cannot be archived: There is at least one work package assigned to a version defined in this project."
+  error_can_not_archive_project: "This project cannot be archived: %{errors}"
   error_can_not_delete_entry: "Unable to delete entry"
   error_can_not_delete_custom_field: "Mukautettua kenttää ei voi poistaa"
   error_can_not_delete_type: "Tämä tyyppinen työ sisältää pakettia ja ei voi poistaa."
@@ -953,6 +1049,7 @@ fi:
   error_can_not_remove_role: "Tämä rooli on käytössä joten sitä ei voida poistaa."
   error_can_not_reopen_work_package_on_closed_version: "Työn paketti määritetty suljettu versio ei voi avata uudelleen"
   error_can_not_find_all_resources: "Could not find all related resources to this request."
+  error_can_not_unarchive_project: "This project cannot be unarchived: %{errors}"
   error_check_user_and_role: "Please choose a user and a role."
   error_code: "Error %{code}"
   error_cookie_missing: 'OpenProject evästeen puuttuu. Varmista, että evästeet ovat käytössä, koska tämä sovellus ei toimi oikein ilman evästeitä.'
@@ -1010,6 +1107,8 @@ fi:
       pdf_with_descriptions: "PDF kuvauksilla"
       pdf_with_descriptions_and_attachments: "PDF with descriptions and attachments"
       pdf_with_attachments: "PDF with attachments"
+    image:
+      omitted: "Image not exported."
   extraction:
     available:
       pdftotext: "Pdftotext available (optional)"
@@ -1057,6 +1156,8 @@ fi:
       blog: "OpenProject blogi"
       forums: "Keskustelupalsta"
       newsletter: "Suojausvaroitukset / uutiskirje"
+  journals:
+    changes_retracted: "The changes where retracted."
   links:
     configuration_guide: 'Configuration guide'
   instructions_after_registration: "Heti kun tilisi on aktivoitu voit kirjatua painamalla %{signin}."
@@ -1590,15 +1691,19 @@ fi:
   label_workflow_plural: "Työnkulut"
   label_workflow_summary: "Yhteenveto"
   label_x_closed_work_packages_abbr:
+    zero: "0 closed"
     one: "1 suljettu"
     other: "%{count} suljettu"
   label_x_comments:
+    zero: "no comments"
     one: "1 kommentti"
     other: "%{count} kommenttia"
   label_x_open_work_packages_abbr:
+    zero: "0 open"
     one: "1 avoin"
     other: "%{count} avoinna"
   label_x_projects:
+    zero: "no projects"
     one: "1 projekti"
     other: "%{count} projects"
   label_year: "Vuosi"
@@ -1659,12 +1764,14 @@ fi:
   mail_body_lost_password: "Vaihtaaksesi salasanasi, napsauta seuraavaa linkkiä:"
   mail_body_register: "Aktivoidaksesi tilisi, napsauta seuraavaa linkkiä:"
   mail_body_reminder: "%{count} sinulle nimettyä tapahtuma(a) erääntyy %{days} päivä sisään:"
+  mail_body_group_reminder: "%{count} work package(s) that are assigned to group \"%{group}\" are due in the next %{days} days:"
   mail_body_wiki_content_added: "'%{id}' wiki-sivu on lisätty %{author}."
   mail_body_wiki_content_updated: "'%{id}' wiki-sivu on päivitetty %{author}."
   mail_subject_account_activation_request: "%{value} tilin aktivointipyyntö"
   mail_subject_lost_password: "Sinun %{value} salasanasi"
   mail_subject_register: "%{value} tilin aktivointi"
   mail_subject_reminder: "%{count} tapahtuma(a) erääntyy %{days} lähipäivinä"
+  mail_subject_group_reminder: "For group \"%{group}\" %{count} work package(s) due in the next %{days} days"
   mail_subject_wiki_content_added: "'%{id}' wiki-sivu on poistettu"
   mail_subject_wiki_content_updated: "'%{id}' Wiki-sivu on päivitetty"
   mail_user_activation_limit_reached:
@@ -1674,8 +1781,8 @@ fi:
       The user cannot activate their account since the user limit has been reached.
     steps:
       label: "To allow the user to sign in you can either: "
-      a: "Upgrade your payment plan ([here](upgrade_url))"
-      b: "Lock or delete an existing user ([here](users_url))"
+      a: "Upgrade your payment plan ([here](upgrade_url))" #here turned into a link
+      b: "Lock or delete an existing user ([here](users_url))" #here turned into a link
   more_actions: "Enemmän toimintoja"
   noscript_description: "You need to activate JavaScript in order to use OpenProject!"
   noscript_heading: "JavaScript disabled"
@@ -1742,6 +1849,7 @@ fi:
   notice_project_cannot_update_custom_fields: "Et voi päivittää projektin käytettävissä olevia mukautettuja kenttiä. Projekti on virheellinen: %{errors}"
   notice_attachment_migration_wiki_page: >
     This page was generated automatically during the update of OpenProject. It contains all attachments previously associated with the %{container_type} "%{container_name}".
+  #Default format for numbers
   number:
     format:
       delimiter: ""
@@ -1847,6 +1955,7 @@ fi:
       title: Muuta projektin tunnistetta
     archive:
       are_you_sure: "Oletko varma, että haluat arkistoida projektin \"%{name}\"?"
+      archived: "Archived"
   project_module_activity: "Aktiviteetti"
   project_module_forums: "Keskustelupalstat"
   project_module_calendar: "Kalenteri"
@@ -1858,6 +1967,8 @@ fi:
   project_module_wiki: "Wiki"
   query:
     attribute_and_direction: "%{attribute} (%{direction})"
+  #possible query parameters (e.g. issue queries),
+  #which are not attributes of an AR-Model.
   query_fields:
     active_or_archived: "Active or archived"
     assigned_to_role: "Vastuuhenkilön rooli"
@@ -2101,6 +2212,7 @@ fi:
   status_invited: kutsuttu
   status_locked: lukittu
   status_registered: registered
+  #Used in array.to_sentence.
   support:
     array:
       sentence_connector: "and"
@@ -2136,7 +2248,7 @@ fi:
   text_destroy_with_associated: "There are additional objects assossociated with the work package(s) that are to be deleted. Those objects are of the following types:"
   text_destroy_what_to_do: "Mitä sinä haluat tehdä?"
   text_diff_truncated: "... Tämä katkaistiin koska suurin mahdollinen näytettävä määrä tuli täyteen."
-  text_email_delivery_not_configured: "Sähköpostin jakelu ei ole määritelty ja sähköpostimuistutukset eivät ole käytössä.\nKonfiguroi sähköpostipalvelinasetukset (SMTP) config/configuration.yml tiedostosta ja uudelleenkäynnistä sovellus jotta asetukset astuvat voimaan."
+  text_email_delivery_not_configured: "Email delivery is not configured, and notifications are disabled.\nConfigure your SMTP server to enable them."
   text_enumeration_category_reassign_to: "Siirrä täksi arvoksi:"
   text_enumeration_destroy_question: "%{count} kohdetta on liitetty tälle arvolle."
   text_file_repository_writable: "Liitekansioon voi kirjoittaa"
@@ -2149,7 +2261,8 @@ fi:
   text_work_package_category_destroy_question: "Some work packages (%{count}) are assigned to this category. What do you want to do?"
   text_work_package_category_reassign_to: "Reassign work packages to this category"
   text_work_package_updated: "Work package %{id} has been updated by %{author}."
-  text_work_package_watcher_added: "Sinut on lisätty seuraajaksi työpaketille %{id} henkilön %{watcher_setter} toimesta."
+  text_work_package_watcher_added: "You have been added as a watcher to Work package %{id} by %{watcher_changer}."
+  text_work_package_watcher_removed: "You have been removed from watchers of Work package %{id} by %{watcher_changer}."
   text_work_packages_destroy_confirmation: "Are you sure you want to delete the selected work package(s)?"
   text_work_packages_ref_in_commit_messages: "Vertailemalla ja korjaus toimia paketit sitoutua viestejä"
   text_journal_added: "%{label} %{value} lisätty"
@@ -2429,6 +2542,17 @@ fi:
     User limit reached. You cannot activate any more users. Please <a href="%{upgrade_url}">upgrade your plan</a> or block members to allow for additional users.
   warning_user_limit_reached_instructions: >
     You reached your user limit (%{current}/%{max} active users). Please contact sales@openproject.com to upgrade your Enterprise Edition plan and add additional users.
+  0: >
+
+  warning_bar:
+    protocol_mismatch:
+      title: 'Protocol setting mismatch'
+      text_html: >
+        Your application is running with its protocol setting set to <code>%{set_protocol}</code>, but the request is an <code>%{actual_protocol}</code> request. This will result in errors! Go to <a href="%{setting_path}">System settings</a> and change the "Protocol" setting to correct this.
+    hostname_mismatch:
+      title: 'Hostname setting mismatch'
+      text_html: >
+        Your application is running with its host name setting set to <code>%{set_hostname}</code>, but the request is a <code>%{actual_hostname}</code> hostname. This will result in errors! Go to <a href="%{setting_path}">System settings</a> and change the "Host name" setting to correct this.
   menu_item: "Menu item"
   menu_item_setting: "Visibility"
   wiki_menu_item_for: "Menu item for wikipage \"%{title}\""
@@ -2437,6 +2561,7 @@ fi:
     Sinä olet poistat vain tärkeimmät wiki valikosta. Sinun täytyy nyt valita wiki sivu joista tärkein uusi kohde luodaan. Poistaa wiki wiki moduuli voidaan kytkeä pois päältä hankkeen ylläpitäjät.
   wiki_menu_item_delete_not_permitted: Wiki valikosta vain wiki sivu voi olla Poistetaan.
   query_menu_item_for: "Menu item for query \"%{title}\""
+  #TODO: merge with work_packages top level key
   work_package:
     updated_automatically_by_child_changes: |
       _Päivitetty automaattisesti muutoksella joka tapahtui alityöpaketissa %{child}_
@@ -2481,7 +2606,9 @@ fi:
         estimated_hours: "Arvioitu tuntia ei voi asettaa vanhemman toimia paketti."
         invalid_user_assigned_to_work_package: "The chosen user is not allowed to be '%{property}' for this work package."
         start_date: "Start date cannot be set on parent work packages."
-      writing_read_only_attributes: "You must not write a read-only attribute."
+      eprops:
+        invalid_gzip: "is invalid gzip: %{message}"
+        invalid_json: "is invalid json: %{message}"
     resources:
       schema: 'Schema'
   doorkeeper:
@@ -2489,18 +2616,22 @@ fi:
       status: 'Pre-authorization'
     errors:
       messages:
+        #Common error messages
         invalid_request: 'The request is missing a required parameter, includes an unsupported parameter value, or is otherwise malformed.'
-        invalid_redirect_uri: "The requested redirect uri is malformed or doesn't match client redirect URI."
+        invalid_redirect_uri: "The requested redirect URI is malformed or doesn't match client redirect URI."
         unauthorized_client: 'The client is not authorized to perform this request using this method.'
         access_denied: 'The resource owner or authorization server denied the request.'
         invalid_scope: 'The requested scope is invalid, unknown, or malformed.'
         invalid_code_challenge_method: 'The code challenge method must be plain or S256.'
         server_error: 'The authorization server encountered an unexpected condition which prevented it from fulfilling the request.'
         temporarily_unavailable: 'The authorization server is currently unable to handle the request due to a temporary overloading or maintenance of the server.'
+        #Configuration error messages
         credential_flow_not_configured: 'Resource Owner Password Credentials flow failed due to Doorkeeper.configure.resource_owner_from_credentials being unconfigured.'
         resource_owner_authenticator_not_configured: 'Resource Owner find failed due to Doorkeeper.configure.resource_owner_authenticator being unconfigured.'
         admin_authenticator_not_configured: 'Access to admin panel is forbidden due to Doorkeeper.configure.admin_authenticator being unconfigured.'
+        #Access grant errors
         unsupported_response_type: 'The authorization server does not support this response type.'
+        #Access token errors
         invalid_client: 'Client authentication failed due to unknown client, no client authentication included, or unsupported authentication method.'
         invalid_grant: 'The provided authorization grant is invalid, expired, revoked, does not match the redirection URI used in the authorization request, or was issued to another client.'
         unsupported_grant_type: 'The authorization grant type is not supported by the authorization server.'
@@ -2525,6 +2656,7 @@ fi:
         redirect_uri_html: >
           The allowed URLs authorized users can be redirected to. One entry per line. <br/> If you're registering a desktop application, use the following URL.
         confidential: "Check if the application will be used where the client secret can be kept confidential. Native mobile apps and Single Page Apps are assumed non-confidential."
+        scopes: "Check the scopes you want the application to grant access to. If no scope is checked, api_v3 is assumed."
         client_credential_user_id: "Optional user ID to impersonate when clients use this application. Leave empty to allow public access only"
         register_intro: "If you are developing an OAuth API client application for OpenProject, you can register it using this form for all users to use."
         default_scopes: ""
@@ -2539,8 +2671,8 @@ fi:
       wants_to_access_html: >
         This application requests access to your OpenProject account. <br/> <strong>It has requested the following permissions:</strong>
     scopes:
-      api_v3: "Full API access"
-      api_v3_text: "Application will receive full read & write access to the OpenProject API to perform actions on your behalf."
+      api_v3: "Full API v3 access"
+      api_v3_text: "Application will receive full read & write access to the OpenProject API v3 to perform actions on your behalf."
     grants:
       created_date: "Approved on"
       scopes: "Oikeudet"

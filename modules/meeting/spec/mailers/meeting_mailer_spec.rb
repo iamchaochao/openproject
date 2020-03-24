@@ -1,10 +1,18 @@
 #-- copyright
-# OpenProject Meeting Plugin
-#
-# Copyright (C) 2011-2014 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
+#
+# OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+# Copyright (C) 2006-2017 Jean-Philippe Lang
+# Copyright (C) 2010-2013 the ChiliProject Team
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,7 +23,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-# See doc/COPYRIGHT.md for more details.
+# See docs/COPYRIGHT.rdoc for more details.
 #++
 
 require File.dirname(__FILE__) + '/../spec_helper'
@@ -40,7 +48,7 @@ describe MeetingMailer, type: :mailer do
   end
 
   describe 'content_for_review' do
-    let(:mail) { MeetingMailer.content_for_review meeting_agenda, 'agenda', author.mail }
+    let(:mail) { MeetingMailer.content_for_review meeting_agenda, 'agenda', author }
     # this is needed to call module functions from Redmine::I18n
     let(:i18n) do
       class A
@@ -63,6 +71,20 @@ describe MeetingMailer, type: :mailer do
 
     it 'renders the html body' do
       check_meeting_mail_content mail.html_part.body
+    end
+
+    context 'with a recipient with another time zone' do
+      let!(:preference) { FactoryBot.create(:user_preference, user: watcher1, time_zone: 'Asia/Tokyo') }
+      let(:mail) { MeetingMailer.content_for_review meeting_agenda, 'agenda', watcher1 }
+
+      it 'renders the mail with the correcet locale' do
+        expect(mail.text_part.body).to include('Tokyo')
+        expect(mail.text_part.body).to include('GMT+09:00')
+        expect(mail.html_part.body).to include('Tokyo')
+        expect(mail.html_part.body).to include('GMT+09:00')
+        
+        expect(mail.to).to match_array([watcher1.mail])
+      end
     end
   end
 

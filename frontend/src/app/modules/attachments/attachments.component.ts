@@ -1,6 +1,6 @@
 //-- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,38 +23,36 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 //++
 
-import {Component, Input, OnInit, OnDestroy} from '@angular/core';
+import {Component, ElementRef, Input, OnInit} from '@angular/core';
 import {HalResource} from 'core-app/modules/hal/resources/hal-resource';
-import {DynamicBootstrapper} from 'core-app/globals/dynamic-bootstrapper';
-import {ElementRef} from '@angular/core';
 import {HalResourceService} from 'core-app/modules/hal/services/hal-resource.service';
 import {I18nService} from 'core-app/modules/common/i18n/i18n.service';
 import {States} from 'core-components/states.service';
-import {componentDestroyed} from 'ng2-rx-componentdestroyed';
-import {filter, takeUntil} from 'rxjs/operators';
+import {filter} from 'rxjs/operators';
+import {UntilDestroyedMixin} from "core-app/helpers/angular/until-destroyed.mixin";
+
+export const attachmentsSelector = 'attachments';
 
 @Component({
-  selector: 'attachments',
+  selector: attachmentsSelector,
   templateUrl: './attachments.html'
 })
-export class AttachmentsComponent implements OnInit, OnDestroy {
+export class AttachmentsComponent extends UntilDestroyedMixin implements OnInit {
   @Input('resource') public resource:HalResource;
-  @Input() public selfDestroy:boolean = false;
 
   public $element:JQuery;
   public allowUploading:boolean;
   public destroyImmediately:boolean;
   public text:any;
-  public $formElement:JQuery;
-  public initialAttachments:HalResource[];
 
   constructor(protected elementRef:ElementRef,
               protected I18n:I18nService,
               protected states:States,
               protected halResourceService:HalResourceService) {
+    super();
 
     this.text = {
       attachments: this.I18n.t('js.label_attachments'),
@@ -78,37 +76,18 @@ export class AttachmentsComponent implements OnInit, OnDestroy {
       this.destroyImmediately = true;
     }
 
-    this.setupAttachmentDeletionCallback();
     this.setupResourceUpdateListener();
-  }
-
-  public setupAttachmentDeletionCallback() {
-    this.memoizeCurrentAttachments();
-
-    this.$formElement = this.$element.closest('form');
-    this.$formElement.on('submit.attachment-component', () => {
-      this.destroyRemovedAttachments();
-    });
   }
 
   public setupResourceUpdateListener() {
     this.states.forResource(this.resource)!.changes$()
       .pipe(
-        takeUntil(componentDestroyed(this)),
+        this.untilDestroyed(),
         filter(newResource => !!newResource)
       )
       .subscribe((newResource:HalResource) => {
         this.resource = newResource || this.resource;
-
-        if (this.destroyImmediately) {
-          this.destroyRemovedAttachments();
-          this.memoizeCurrentAttachments();
-        }
       });
-  }
-
-  ngOnDestroy() {
-    this.$formElement.off('submit.attachment-component');
   }
 
   // Only show attachment list when allow uploading is set
@@ -116,28 +95,4 @@ export class AttachmentsComponent implements OnInit, OnDestroy {
   public showAttachments() {
     return this.allowUploading || _.get(this.resource, 'attachments.count', 0) > 0;
   }
-
-  private destroyRemovedAttachments() {
-    if (this.selfDestroy) {
-      return;
-    }
-
-    let missingAttachments = _.differenceBy(this.initialAttachments,
-      this.resource.attachments.elements,
-      (attachment:HalResource) => attachment.id);
-
-    if (missingAttachments.length) {
-      missingAttachments.forEach((attachment) => {
-        this
-          .resource
-          .removeAttachment(attachment);
-      });
-    }
-  }
-
-  private memoizeCurrentAttachments() {
-    this.initialAttachments = _.clone(this.resource.attachments.elements);
-  }
 }
-
-DynamicBootstrapper.register({ selector: 'attachments', cls: AttachmentsComponent, embeddable: true });

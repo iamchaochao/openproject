@@ -1,6 +1,6 @@
 //-- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,10 +23,49 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 //++
 
 import {HalResource} from 'core-app/modules/hal/resources/hal-resource';
+import {SchemaResource} from "core-app/modules/hal/resources/schema-resource";
+import {SchemaCacheService} from "core-components/schemas/schema-cache.service";
+import {InjectField} from "core-app/helpers/angular/inject-field.decorator";
 
 export class ProjectResource extends HalResource {
+  @InjectField() private schemaCacheService:SchemaCacheService;
+
+  public get state() {
+    return this.states.projects.get(this.id!) as any;
+  }
+
+  public getEditorTypeFor(fieldName:string):"full"|"constrained" {
+    if (['statusExplanation', 'description'].indexOf(fieldName) !== -1) {
+      return 'full';
+    }
+
+    return 'constrained';
+  }
+
+  /**
+   * Get the schema of the project
+   * ensure that it's loaded
+   *
+   * TODO this is duplicating the WorkPackageResource#schema getter
+   */
+  public get schema():SchemaResource {
+    const state = this.schemaCacheService.state(this as any);
+
+    if (!state.hasValue()) {
+      throw `Accessing schema of ${this.id} without it being loaded.`;
+    }
+
+    return state.value!;
+  }
+
+  /**
+   * Exclude the schema _link from the linkable Resources.
+   */
+  public $linkableKeys():string[] {
+    return _.without(super.$linkableKeys(), 'schema');
+  }
 }

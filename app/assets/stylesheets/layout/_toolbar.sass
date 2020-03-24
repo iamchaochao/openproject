@@ -1,6 +1,6 @@
 //-- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -61,12 +61,19 @@ $nm-color-success-background: #d8fdd1
   &.-with-dropdown .toolbar-item.drop-down
     position: relative
 
+  &.-minimum-title
+    .toolbar-items
+      flex-grow: 1
+
+    .title-container
+      flex-grow: 0
+      flex-basis: auto
+
 // Align title and toolbar with flex
 .toolbar
   display: flex
   flex-wrap: wrap
   align-items: center
-  justify-content: flex-end
 
 // automatically clear the toolbar
 .toolbar:after
@@ -91,6 +98,9 @@ $nm-color-success-background: #d8fdd1
     // hide right margin for e.g., conditional buttons
     &.-no-spacing
       margin-right: 0
+
+    &.-no-grow
+      flex-grow: 0
 
     .button
       width: 100%
@@ -189,11 +199,13 @@ $nm-color-success-background: #d8fdd1
 
 // Allow title container to grow
 .title-container
-  flex-grow: 1
-  flex-basis: auto
+  flex: 1 1
   overflow: hidden
   white-space: nowrap
   margin-bottom: 10px // margin-bottom of toolbar buttons
+
+  &.-no-grow
+    flex-grow: 0
 
   h2
     @include text-shortener
@@ -288,15 +300,6 @@ $nm-color-success-background: #d8fdd1
 
     &.-append
       border-left: none !important
-
-.text
-  cursor: pointer
-  i
-    float: right
-    color: #333333
-    padding-left: 5px
-  &:hover
-    text-decoration: none
 
 .toolbar
   *

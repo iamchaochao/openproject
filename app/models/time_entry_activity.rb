@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,6 +30,9 @@
 
 class TimeEntryActivity < Enumeration
   has_many :time_entries, foreign_key: 'activity_id'
+  has_many :time_entry_activities_projects, foreign_key: 'activity_id', dependent: :delete_all
+
+  validates :parent, absence: true
 
   OptionName = :enumeration_activities
 
@@ -42,20 +45,33 @@ class TimeEntryActivity < Enumeration
   end
 
   def transfer_relations(to)
-    time_entries.update_all("activity_id = #{to.id}")
+    time_entries.update_all(activity_id: to.id)
+  end
+
+  def active_in_project?(project)
+    teap = if time_entry_activities_projects.loaded?
+             detect_project_time_entry_activity_active_state(project)
+           else
+             pluck_project_time_entry_activity_active_state(project)
+           end
+
+    !teap.nil? && teap || teap.nil? && active?
   end
 
   def activated_projects
-    scope = Project.all
+    Project::Scopes::ActivatedTimeActivity.fetch(self)
+  end
 
-    scope = if active?
-              scope
-                .where.not(id: children.select(:project_id))
-            else
-              scope
-                .where('1=0')
-            end
+  private
 
-    scope.or(Project.where(id: children.where(active: true).select(:project_id)))
+  def detect_project_time_entry_activity_active_state(project)
+    time_entry_activities_projects.detect { |t| t.project_id == project.id }&.active?
+  end
+
+  def pluck_project_time_entry_activity_active_state(project)
+    time_entry_activities_projects
+      .where(project_id: project.id)
+      .pluck(:active)
+      .first
   end
 end

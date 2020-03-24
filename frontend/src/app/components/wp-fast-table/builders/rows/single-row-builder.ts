@@ -6,7 +6,7 @@ import {WorkPackageResource} from 'core-app/modules/hal/resources/work-package-r
 import {isRelationColumn, QueryColumn} from '../../../wp-query/query-column';
 import {WorkPackageViewColumnsService} from 'core-app/modules/work_packages/routing/wp-view-base/view-services/wp-view-columns.service';
 import {WorkPackageTable} from '../../wp-fast-table';
-import {CellBuilder, wpCellTdClassName} from '../cell-builder';
+import {CellBuilder, tdClassName} from '../cell-builder';
 import {RelationCellbuilder} from '../relation-cell-builder';
 import {checkedClassName} from '../ui-state-link-builder';
 import {TableActionRenderer} from 'core-components/wp-fast-table/builders/table-action-renderer';
@@ -15,6 +15,7 @@ import {
   internalContextMenuColumn,
   internalSortColumn
 } from "core-components/wp-fast-table/builders/internal-sort-columns";
+import {InjectField} from "core-app/helpers/angular/inject-field.decorator";
 
 // Work package table row entries
 export const tableRowClassName = 'wp-table--row';
@@ -24,9 +25,9 @@ export const commonRowClassName = 'wp--row';
 export class SingleRowBuilder {
 
   // Injections
-  public wpTableSelection = this.injector.get(WorkPackageViewSelectionService);
-  public wpTableColumns = this.injector.get(WorkPackageViewColumnsService);
-  public I18n:I18nService = this.injector.get(I18nService);
+  @InjectField() wpTableSelection:WorkPackageViewSelectionService;
+  @InjectField() wpTableColumns:WorkPackageViewColumnsService;
+  @InjectField() I18n:I18nService;
 
   // Cell builder instance
   protected cellBuilder = new CellBuilder(this.injector);
@@ -141,7 +142,7 @@ export class SingleRowBuilder {
    */
   public refreshRow(workPackage:WorkPackageResource, jRow:JQuery):JQuery {
     // Detach all current edit cells
-    const cells = jRow.find(`.${wpCellTdClassName}`).detach();
+    const cells = jRow.find(`.${tdClassName}`).detach();
 
     // Remember the order of all new edit cells
     const newCells:HTMLElement[] = [];
@@ -175,15 +176,15 @@ export class SingleRowBuilder {
   }
 
   protected buildEmptyRow(workPackage:WorkPackageResource, row:HTMLTableRowElement):[HTMLTableRowElement, boolean] {
-    const changeset = this.workPackageTable.editing.changeset(workPackage.id!);
+    const change = this.workPackageTable.editing.change(workPackage);
     let cells:{ [attribute:string]:JQuery } = {};
 
-    if (changeset && !changeset.empty) {
+    if (change && !change.isEmpty()) {
       // Try to find an old instance of this row
       const oldRow = locateTableRowByIdentifier(this.classIdentifier(workPackage));
 
-      changeset.changedAttributes.forEach((attribute:string) => {
-        cells[attribute] = oldRow.find(`.${wpCellTdClassName}.${attribute}`);
+      change.changedAttributes.forEach((attribute:string) => {
+        cells[attribute] = oldRow.find(`.${tdClassName}.${attribute}`);
       });
     }
 

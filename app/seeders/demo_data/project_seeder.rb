@@ -2,8 +2,8 @@
 
 #-- copyright
 
-# OpenProject is a project management system.
-# Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,12 +26,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-# See doc/COPYRIGHT.rdoc for more details.
+# See docs/COPYRIGHT.rdoc for more details.
 module DemoData
   class ProjectSeeder < Seeder
     # Careful: The seeding recreates the seeded project before it runs, so any changes
     # on the seeded project will be lost.
     def seed_data!
+      puts ' ↳ Updating settings'
+      seed_settings
+
       seed_projects = demo_data_for('projects').keys
 
       seed_projects.each do |key|
@@ -39,6 +42,9 @@ module DemoData
 
         puts '   -Creating/Resetting project'
         project = reset_project key
+
+        puts '   -Setting project status.'
+        set_project_status(project, key)
 
         puts '   -Setting members.'
         set_members(project)
@@ -71,9 +77,6 @@ module DemoData
 
       puts ' ↳ Update form configuration with global queries'
       set_form_configuration
-
-      puts ' ↳ Updating settings'
-      seed_settings
     end
 
     def applicable?
@@ -113,6 +116,19 @@ module DemoData
     def delete_project(key)
       if delete_me = find_project(key)
         delete_me.destroy
+      end
+    end
+
+    def set_project_status(project, key)
+      status_code = project_data_for(key, 'status.code')
+      status_explanation = project_data_for(key, 'status.description')
+
+      if status_code || status_explanation
+        Project::Status.create!(
+          project: project,
+          code: status_code,
+          explanation: status_explanation
+        )
       end
     end
 

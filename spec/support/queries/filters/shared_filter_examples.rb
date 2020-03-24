@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -220,6 +220,7 @@ shared_examples_for 'list_optional query filter' do
     end
   end
 end
+
 shared_examples_for 'list_optional group query filter' do
   include_context 'filter tests'
   describe '#scope' do
@@ -384,7 +385,7 @@ shared_examples_for 'boolean query filter' do |scope: true|
     joins || model.table_name
   end
 
-  let(:valid_values) { [OpenProject::Database::DB_VALUE_TRUE, OpenProject::Database::DB_VALUE_FALSE] }
+  let(:valid_values) { [OpenProject::Database::DB_VALUE_TRUE] }
 
   describe '#allowed_values' do
     it 'is list for a bool' do
@@ -413,9 +414,9 @@ shared_examples_for 'boolean query filter' do |scope: true|
         let(:operator) { '!' }
 
         it 'is the same as handwriting the query' do
-          sql = "(#{expected_table_name}.#{attribute} IS NULL
-                 OR #{expected_table_name}.#{attribute} NOT IN (?))".squish
-          expected = expected_base_scope.where([sql, values])
+          sql = "#{expected_table_name}.#{attribute} IS NULL
+                 OR #{expected_table_name}.#{attribute} IN (?)".squish
+          expected = expected_base_scope.where([sql, [OpenProject::Database::DB_VALUE_FALSE]])
 
           expect(instance.scope.to_sql).to eql expected.to_sql
         end

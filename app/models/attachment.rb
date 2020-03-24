@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -59,8 +59,8 @@ class Attachment < ApplicationRecord
   ##
   # Returns an URL if the attachment is stored in an external (fog) attachment storage
   # or nil otherwise.
-  def external_url
-    url = URI.parse file.download_url(content_disposition: content_disposition) # returns a path if local
+  def external_url(expires_in: nil)
+    url = URI.parse file.download_url(content_disposition: content_disposition, expires_in: expires_in) # returns a path if local
 
     url if url.host
   rescue URI::InvalidURIError
@@ -198,27 +198,25 @@ class Attachment < ApplicationRecord
   end
 
   def extract_fulltext
-    return unless OpenProject::Database.allows_tsv?
+    return unless OpenProject::Database.allows_tsv? && (!container || container.class.attachment_tsv_extracted?)
 
-    job = ExtractFulltextJob.new(id)
-    Delayed::Job.enqueue job, priority: ::ApplicationJob.priority_number(:low)
+    ExtractFulltextJob.perform_later(id)
   end
 
   # Extract the fulltext of any attachments where fulltext is still nil.
-  # This runs inline and not in a asynchronous worker.
+  # This runs inline and not in an asynchronous worker.
   def self.extract_fulltext_where_missing(run_now: true)
     return unless OpenProject::Database.allows_tsv?
 
     Attachment
       .where(fulltext: nil)
+      .where(container_type: tsv_extracted_containers)
       .pluck(:id)
       .each do |id|
-      job = ExtractFulltextJob.new(id)
-
       if run_now
-        job.perform
+        ExtractFulltextJob.perform_now(id)
       else
-        Delayed::Job.enqueue job, priority: ::ApplicationJob.priority_number(:low)
+        ExtractFulltextJob.perform_later(id)
       end
     end
   end
@@ -227,16 +225,29 @@ class Attachment < ApplicationRecord
     return unless OpenProject::Database.allows_tsv?
 
     Attachment.pluck(:id).each do |id|
-      job = ExtractFulltextJob.new(id)
-      job.perform
+      ExtractFulltextJob.perform_now(id)
+    end
+  end
+
+  def self.tsv_extracted_containers
+    Attachment
+      .select(:container_type)
+      .distinct
+      .pluck(:container_type)
+      .compact
+      .select do |container_class|
+      klass = container_class.constantize
+
+      klass.respond_to?(:attachment_tsv_extracted?) && klass.attachment_tsv_extracted?
+    rescue NameError
+      false
     end
   end
 
   private
 
   def schedule_cleanup_uncontainered_job
-    Delayed::Job.enqueue Attachments::CleanupUncontaineredJob.new,
-                         priority: ::ApplicationJob.priority_number(:low)
+    Attachments::CleanupUncontaineredJob.perform_later
   end
 
   def filesize_below_allowed_maximum

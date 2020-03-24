@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -80,7 +80,7 @@ module Pages
     def within_add_widget_modal(row_number, column_number, location)
       area = area_of(row_number, column_number, location)
       area.hover
-      area.find('.grid--widget-add').click
+      area.find('.grid--widget-add', visible: :all).click
 
       within '.op-modal--portal' do
         yield

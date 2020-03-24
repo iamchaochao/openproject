@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -34,23 +34,18 @@ describe SystemUser, type: :model do
   describe '#grant_privileges' do
     before do
       expect(system_user.admin).to be_falsey
-      expect(system_user.status).to eq(User::STATUSES[:locked])
+      expect(system_user.status).to eq(User::STATUSES[:active])
       system_user.grant_privileges
     end
 
     it 'grant admin rights' do
       expect(system_user.admin).to be_truthy
     end
-
-    it 'unlocks the user' do
-      expect(system_user.status).to eq(User::STATUSES[:builtin])
-    end
   end
 
   describe '#remove_privileges' do
     before do
       system_user.admin = true
-      system_user.status = User::STATUSES[:active]
       system_user.save
       system_user.remove_privileges
     end
@@ -58,14 +53,10 @@ describe SystemUser, type: :model do
     it 'removes admin rights' do
       expect(system_user.admin).to be_falsey
     end
-
-    it 'locks the user' do
-      expect(system_user.status).to eq(User::STATUSES[:locked])
-    end
   end
 
   describe '#run_given' do
-    let(:project) { FactoryBot.create(:project_with_types, is_public: false) }
+    let(:project) { FactoryBot.create(:project_with_types, public: false) }
     let(:user) { FactoryBot.build(:user) }
     let(:role) { FactoryBot.create(:role, permissions: [:view_work_packages]) }
     let(:member) {

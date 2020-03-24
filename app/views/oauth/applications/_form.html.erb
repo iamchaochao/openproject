@@ -1,6 +1,6 @@
 <%#-- copyright
-OpenProject is a project management system.
-Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+OpenProject is an open source project management software.
+Copyright (C) 2012-2020 the OpenProject GmbH
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License version 3.
@@ -44,6 +44,26 @@ See docs/COPYRIGHT.rdoc for more details.
       <code><%= ::Doorkeeper.configuration.native_redirect_uri %></code>
     </span>
   </div>
+
+  <% if Doorkeeper.configuration.scopes.all.length > 1 %>
+    <div class="form--field">
+      <label class="form--label">Scopes:</label>
+      <% Doorkeeper.configuration.scopes.each do |scope| %>
+        <div class="form--field-container -vertical">
+          <label class="form--label-with-check-box">
+            <div class="form--check-box-container">
+              <%= styled_check_box_tag 'application[scopes][]', scope, f.object.scopes.include?(scope) %>
+            </div>
+            <%= scope %>
+          </label>
+        </div>
+      <% end %>
+      <span class="form--field-instructions">
+        <%= t('oauth.application.instructions.scopes') %>
+      </span>
+    </div>
+  <% end %>
+
   <div class="form--field">
     <%= f.check_box :confidential %>
     <span class="form--field-instructions">
@@ -58,10 +78,10 @@ See docs/COPYRIGHT.rdoc for more details.
             authorization_code_flow_link: static_link_to(:oauth_authorization_code_flow))  %>
     </p>
 
-    <div class="form--field">
+    <div class="form--field -visible-overflow">
       <label class="form--label"> <%= t('doorkeeper.application.client_credentials_user_id') %>
       </label>
-      <div class="form--field-container -visible-overflow">
+      <div class="form--field-container">
         <div class="form--text-field-container -middle">
           <%= f.hidden_field :client_credentials_user_id,  value: @application.client_credentials_user_id %>
           <user-autocompleter data-allow-empty="true"

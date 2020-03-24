@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -34,8 +34,9 @@ describe Projects::UpdateContract do
     let(:project) do
       FactoryBot.build_stubbed(:project,
                                identifier: project_identifier,
-                               status: project_status,
-                               is_public: project_public).tap do |p|
+                               active: project_active,
+                               public: project_public,
+                               status: project_status).tap do |p|
         # in order to actually have something changed
         p.name = project_name
         p.parent = project_parent

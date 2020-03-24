@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -46,7 +46,6 @@ describe 'OAuth applications management', type: :feature, js: true do
     # Fill invalid redirect_uri
     fill_in 'application_redirect_uri', with: "not a url!"
     click_on 'Create'
-
 
     expect(page).to have_selector('.errorExplanation', text: 'Redirect URI must be an absolute URI.')
     fill_in 'application_redirect_uri', with: "urn:ietf:wg:oauth:2.0:oob\nhttps://localhost/my/callback"

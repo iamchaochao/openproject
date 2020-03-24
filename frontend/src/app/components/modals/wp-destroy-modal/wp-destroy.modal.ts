@@ -1,6 +1,6 @@
 //-- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,12 +23,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 //++
 
 import {WorkPackagesListService} from '../../wp-list/wp-list.service';
 import {States} from '../../states.service';
-import {WorkPackageNotificationService} from '../../wp-edit/wp-notification.service';
+import {HalResourceNotificationService} from "core-app/modules/hal/services/hal-resource-notification.service";
 import {NotificationsService} from "core-app/modules/common/notifications/notifications.service";
 import {OpModalComponent} from "core-components/op-modals/op-modal.component";
 import {ChangeDetectorRef, Component, ElementRef, Inject, OnInit} from "@angular/core";
@@ -40,6 +40,7 @@ import {StateService} from '@uirouter/core';
 import {I18nService} from "core-app/modules/common/i18n/i18n.service";
 import {WorkPackageService} from "core-components/work-packages/work-package.service";
 import {BackRoutingService} from "core-app/modules/common/back-routing/back-routing.service";
+import {WorkPackageNotificationService} from "core-app/modules/work_packages/notifications/work-package-notification.service";
 
 @Component({
   templateUrl: './wp-destroy.modal.html'
@@ -76,8 +77,7 @@ export class WpDestroyModal extends OpModalComponent implements OnInit {
               readonly states:States,
               readonly wpTableFocus:WorkPackageViewFocusService,
               readonly wpListService:WorkPackagesListService,
-              readonly wpNotificationsService:WorkPackageNotificationService,
-              readonly notificationsService:NotificationsService,
+              readonly notificationService:WorkPackageNotificationService,
               readonly backRoutingService:BackRoutingService) {
     super(locals, cdRef, elementRef);
   }
@@ -98,7 +98,7 @@ export class WpDestroyModal extends OpModalComponent implements OnInit {
       this.text.text = this.I18n.t('js.modals.destroy_work_package.text', {
         label: this.workPackageLabel,
         count: this.workPackages.length
-      }),
+      });
 
       this.text.childCount = (wp:WorkPackageResource) => {
         const count = this.children(wp).length;
@@ -143,7 +143,7 @@ export class WpDestroyModal extends OpModalComponent implements OnInit {
          * Otherwise we expect a redirect to where we came from,
          * since the WP in view (split/full) does not exist any more.
          */
-        if (this.$state.current.name !== 'work-packages.list') {
+        if (this.$state.current.name !== 'work-packages.partitioned.list') {
           this.backRoutingService.goBack(true);
         }
       })

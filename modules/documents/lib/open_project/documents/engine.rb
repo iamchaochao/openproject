@@ -1,15 +1,12 @@
 #-- copyright
-# OpenProject Documents Plugin
-#
-# Former OpenProject Core functionality extracted into a plugin.
-#
-# Copyright (C) 2009-2014 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
 #
 # OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
-# Copyright (C) 2006-2013 Jean-Philippe Lang
+# Copyright (C) 2006-2017 Jean-Philippe Lang
 # Copyright (C) 2010-2013 the ChiliProject Team
 #
 # This program is free software; you can redistribute it and/or
@@ -26,7 +23,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-# See doc/COPYRIGHT.rdoc for more details.
+# See docs/COPYRIGHT.rdoc for more details.
 #++
 
 module OpenProject::Documents
@@ -56,7 +53,7 @@ module OpenProject::Documents
       Redmine::Notifiable.all << Redmine::Notifiable.new('document_added')
 
       Redmine::Activity.map do |activity|
-        activity.register :documents, class_name: 'Activity::DocumentActivityProvider', default: false
+        activity.register :documents, class_name: 'Activities::DocumentActivityProvider', default: false
       end
 
       Redmine::Search.register :documents
@@ -94,11 +91,6 @@ module OpenProject::Documents
       require_dependency 'document_category'
       require_dependency 'document_category_custom_field'
 
-      # Have to apply this one by hand and not via op_engine patches method
-      # becauses the op_engine method does not allow for patching something
-      # in the lib/open_project directory. Bummer.
-      require_relative 'patches/text_formatting_patch'
-      require_dependency 'open_project/documents/patches/text_formatting_patch'
       ::OpenProject::Documents::Patches::ColonSeparatorPatch.mixin!
       ::OpenProject::Documents::Patches::HashSeparatorPatch.mixin!
 

@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -32,7 +32,6 @@ class Principal < ApplicationRecord
   # Account statuses
   # Code accessing the keys assumes they are ordered, which they are since Ruby 1.9
   STATUSES = {
-    builtin: 0,
     active: 1,
     registered: 2,
     locked: 3,
@@ -48,7 +47,7 @@ class Principal < ApplicationRecord
   has_many :members, foreign_key: 'user_id', dependent: :destroy
   has_many :memberships, -> {
     includes(:project, :roles)
-      .where(projects: { status: Project::STATUS_ACTIVE })
+      .where(projects: { active: true })
       .order(Arel.sql('projects.name ASC'))
     # haven't been able to produce the order using hashes
   },
@@ -60,7 +59,7 @@ class Principal < ApplicationRecord
   scope :active, -> { where(status: STATUSES[:active]) }
 
   scope :active_or_registered, -> {
-    where(status: [STATUSES[:active], STATUSES[:registered], STATUSES[:invited]])
+    not_builtin.where(status: [STATUSES[:active], STATUSES[:registered], STATUSES[:invited]])
   }
 
   scope :active_or_registered_like, ->(query) { active_or_registered.like(query) }
@@ -73,9 +72,8 @@ class Principal < ApplicationRecord
     where.not(id: Member.of(project).select(:user_id))
   }
 
-  # Active non-anonymous principals scope
   scope :not_builtin, -> {
-    where("#{Principal.table_name}.status <> #{STATUSES[:builtin]}")
+    where.not(type: [SystemUser.name, AnonymousUser.name, DeletedUser.name])
   }
 
   scope :like, ->(q) {
@@ -135,6 +133,11 @@ class Principal < ApplicationRecord
 
   def active_or_registered?
     [STATUSES[:active], STATUSES[:registered], STATUSES[:invited]].include?(status)
+  end
+
+  # Helper method to identify internal users
+  def builtin?
+    false
   end
 
   ##

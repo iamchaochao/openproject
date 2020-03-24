@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -60,9 +60,9 @@ describe 'API v3 Projects schema resource', type: :request, content_type: :json 
         .at_path '_type'
     end
 
-    #it 'does not embed' do
-    #  expect(subject.body)
-    #    .not_to have_json_path('page/_links/allowedValues')
-    #end
+    it 'does not embed' do
+      expect(subject.body)
+        .not_to have_json_path('parent/_links/allowedValues')
+    end
   end
 end

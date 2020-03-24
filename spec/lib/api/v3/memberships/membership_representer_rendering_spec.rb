@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -33,7 +33,7 @@ describe ::API::V3::Memberships::MembershipRepresenter, 'rendering' do
 
   let(:member) do
     FactoryBot.build_stubbed(:member,
-                             member_roles: [member_role1, member_role2, marked_member_role],
+                             member_roles: [member_role1, member_role2, member_role2, marked_member_role],
                              principal: principal,
                              project: project,
                              created_on: Time.current)
@@ -154,6 +154,7 @@ describe ::API::V3::Memberships::MembershipRepresenter, 'rendering' do
       it_behaves_like 'has a link collection' do
         let(:link) { 'roles' }
         # excludes member_roles marked for destruction
+        # and duplicates
         let(:hrefs) do
           [
             {

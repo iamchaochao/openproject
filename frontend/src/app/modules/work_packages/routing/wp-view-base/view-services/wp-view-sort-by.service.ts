@@ -1,6 +1,6 @@
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 
 import {States} from 'core-components/states.service';
@@ -37,6 +37,7 @@ import {Observable} from 'rxjs';
 import {QuerySortByResource} from 'core-app/modules/hal/resources/query-sort-by-resource';
 import {PathHelperService} from "core-app/modules/common/path-helper/path-helper.service";
 import {QueryColumn} from "core-components/wp-query/query-column";
+import {WorkPackagesListService} from "core-components/wp-list/wp-list.service";
 
 @Injectable()
 export class WorkPackageViewSortByService extends WorkPackageQueryStateService<QuerySortByResource[]> {
@@ -120,11 +121,21 @@ export class WorkPackageViewSortByService extends WorkPackageQueryStateService<Q
     return this.isManuallySorted(this.current);
   }
 
-  public switchToManualSorting() {
+  public switchToManualSorting(query:QueryResource):boolean {
     let manualSortObject =  this.manualSortObject;
     if (manualSortObject && !this.isManualSortingMode) {
-      this.update([manualSortObject]);
+
+      if (query && query.persisted) {
+        // Save the query if it is persisted
+        query.sortBy = [manualSortObject];
+        return true;
+      } else {
+        // Query cannot be saved, just update the props for now
+        this.update([manualSortObject]);
+      }
     }
+
+    return false;
   }
 
   public get current():QuerySortByResource[] {

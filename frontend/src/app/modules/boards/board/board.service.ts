@@ -17,7 +17,7 @@ export interface CreateBoardParams {
   attribute?:string;
 }
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class BoardService {
 
   private loadAllPromise:Promise<Board[]>|undefined;
@@ -25,7 +25,7 @@ export class BoardService {
   private text = {
     unnamed_board: this.I18n.t('js.boards.label_unnamed_board'),
     action_board: (attr:string) => this.I18n.t('js.boards.board_type.action_by_attribute',
-      { attribute: attr}),
+      { attribute: attr }),
     unnamed_list: this.I18n.t('js.boards.label_unnamed_list'),
   };
 
@@ -74,6 +74,7 @@ export class BoardService {
     this.reorderWidgets(board);
     return this.boardDm.save(board)
       .then(board => {
+        board.sortWidgets();
         this.boardCache.update(board);
         return board;
       });

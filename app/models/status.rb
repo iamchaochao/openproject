@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -40,9 +40,11 @@ class Status < ApplicationRecord
 
   before_destroy :delete_workflows
 
-  validates_presence_of :name
-  validates_uniqueness_of :name
-  validates_length_of :name, maximum: 30
+  validates :name,
+            presence: true,
+            uniqueness: { case_sensitive: false },
+            length: { maximum: 30 }
+
   validates_inclusion_of :default_done_ratio, in: 0..100, allow_nil: true
 
   after_save :unmark_old_default_value, if: :is_default?
@@ -71,28 +73,6 @@ class Status < ApplicationRecord
     end
 
     WorkPackage.use_status_for_done_ratio?
-  end
-
-  # Returns an array of all statuses the given role can switch to
-  def new_statuses_allowed_to(roles, type, author = false, assignee = false)
-    self.class.new_statuses_allowed(self, roles, type, author, assignee)
-  end
-
-  def self.new_statuses_allowed(status, roles, type, author = false, assignee = false)
-    if roles.present? && type.present?
-      status_id = status.try(:id) || 0
-
-      workflows = Workflow
-                  .from_status(status_id,
-                               type.id,
-                               roles.map(&:id),
-                               author,
-                               assignee)
-
-      Status.where(id: workflows.select(:new_status_id))
-    else
-      Status.where('1 = 0')
-    end
   end
 
   def self.order_by_position

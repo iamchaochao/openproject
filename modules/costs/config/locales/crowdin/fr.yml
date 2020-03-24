@@ -1,11 +1,33 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
+#---
 fr:
   activerecord:
     attributes:
       cost_entry:
-        work_package: "Lot de Travaux"
+        work_package: "Lot de travaux"
         overridden_costs: "Coûts outrepassés"
         spent: "Consommé"
-        spent_on: "Date"
+        spent_on: "date"
       cost_object:
         author: "Auteur"
         available: "Disponible"
@@ -68,7 +90,7 @@ fr:
   button_log_costs: "Consigner coûts unitaires"
   button_log_time: "Consigner temps"
   caption_booked_on_project: "Réservé pour le projet"
-  caption_default: "Défaut"
+  caption_default: "défaut"
   caption_default_rate_history_for: "Historique des tarifs par défaut pour %{user}"
   caption_labor: "Main d'œuvre"
   caption_labor_costs: "Coûts de main d'œuvre réels"
@@ -82,9 +104,6 @@ fr:
   caption_set_rate: "Définir le tarif actuel"
   caption_show_locked: "Afficher les types verrouillés"
   cost_objects_title: "Budgets"
-  label_cost_type_plural: "Types de coûts"
-  currency_delimiter: " "
-  currency_separator: ","
   description_date_for_new_rate: "Date pour le nouveau tarif"
   events:
     cost_object: "Budget modifié"
@@ -102,6 +121,7 @@ fr:
   label_cost_plural: "Coûts"
   label_cost_report: "Rapport de coût"
   label_cost_type_specific: "Budget #%{id}: %{name}"
+  label_cost_type_plural: "Types de coûts"
   label_costs_per_page: "Coûts par page"
   label_currency: "Devise"
   label_currency_format: "Format de devise"

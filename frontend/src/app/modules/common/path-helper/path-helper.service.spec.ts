@@ -1,6 +1,6 @@
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,13 +23,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 
 import {PathHelperService} from './path-helper.service';
 
 describe('PathHelper', function() {
   var PathHelper:PathHelperService = new PathHelperService();
+
+  function encodeParams(object:any) {
+    return new URLSearchParams(object).toString();
+  }
 
   describe('apiV3', function() {
     var projectIdentifier = 'majora';
@@ -42,18 +46,39 @@ describe('PathHelper', function() {
       var projectId = '1';
       var term = 'Maria';
 
+      let params = {
+        filters: '[{"status":{"operator":"!","values":["3"]}},{"member":{"operator":"=","values":["1"]}},{"type":{"operator":"=","values":["User","Group"]}},{"id":{"operator":"!","values":["me"]}},{"name":{"operator":"~","values":["Maria"]}}]',
+        sortBy: '[["name","asc"]]',
+        offset: '1',
+        pageSize: '10'
+      };
+
       expect(
         PathHelper.api.v3.principals(projectId, term)
-      ).toEqual('/api/v3/principals?filters=' +  encodeURI('[{"status":{"operator":"!","values":["0","3"]}},{"member":{"operator":"=","values":["1"]}},{"type":{"operator":"=","values":["User","Group"]}},{"id":{"operator":"!","values":["me"]}},{"name":{"operator":"~","values":["Maria"]}}]&sortBy=[["name","asc"]]&offset=1&pageSize=10'));
+      ).toEqual('/api/v3/principals?' +  encodeParams(params));
     });
 
     it('should provide a path to work package query on subject or ID ', function() {
+      let params = {
+        filters: '[{"subjectOrId":{"operator":"**","values":["bogus"]}}]',
+        sortBy: '[["updatedAt","desc"]]',
+        offset: '1',
+        pageSize: '10'
+      };
+
       expect(
         PathHelper.api.v3.wpBySubjectOrId("bogus")
-      ).toEqual('/api/v3/work_packages?filters=' +  encodeURI('[{"subjectOrId":{"operator":"**","values":["bogus"]}}]&sortBy=[["updatedAt","desc"]]&offset=1&pageSize=10'));
+      ).toEqual('/api/v3/work_packages?' +  encodeParams(params));
+
+      params = {
+        filters: '[{"id":{"operator":"=","values":["1234"]}}]',
+        sortBy: '[["updatedAt","desc"]]',
+        offset: '1',
+        pageSize: '10'
+      };
       expect(
         PathHelper.api.v3.wpBySubjectOrId("1234", true)
-      ).toEqual('/api/v3/work_packages?filters=' +  encodeURI('[{"id":{"operator":"=","values":["1234"]}}]&sortBy=[["updatedAt","desc"]]&offset=1&pageSize=10'));
+      ).toEqual('/api/v3/work_packages?' +  encodeParams(params));
     });
   });
 });

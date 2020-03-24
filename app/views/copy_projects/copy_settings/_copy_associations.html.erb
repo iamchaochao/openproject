@@ -1,6 +1,6 @@
 <%#-- copyright
-OpenProject is a project management system.
-Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+OpenProject is an open source project management software.
+Copyright (C) 2012-2020 the OpenProject GmbH
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License version 3.
@@ -34,7 +34,7 @@ See docs/COPYRIGHT.rdoc for more details.
              locals: { name: "queries", checked: true, label: l(:label_query_plural),
                           count: project.queries.count } %>
   <%= render partial: "copy_projects/copy_settings/block_checkbox",
-             locals: { name: "boards", checked: false, label: l(:label_forum_plural),
+             locals: { name: "forums", checked: false, label: l(:label_forum_plural),
                           count: project.forums.count } %>
   <%= render partial: "copy_projects/copy_settings/block_checkbox",
              locals: { name: "members", checked: true, label: l(:label_member_plural),

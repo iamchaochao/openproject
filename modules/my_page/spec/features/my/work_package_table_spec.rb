@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -75,16 +75,18 @@ describe 'Arbitrary WorkPackage query table widget on my page', type: :feature, 
 
   context 'with the permission to save queries' do
     it 'can add the widget and see the work packages of the filtered for types' do
-      sleep(0.1)
+      sleep(0.5)
 
       my_page.add_widget(1, 2, :column, "Work packages table")
 
-      sleep(0.1)
+      # Actually there are two success messages displayed currently. One for the grid getting updated and one
+      # for the query assigned to the new widget being created. A user will not notice it but the automated
+      # browser can get confused. Therefore we wait.
+      sleep(1)
+
+      my_page.expect_and_dismiss_notification message: I18n.t('js.notice_successful_update')
 
       filter_area = Components::Grids::GridArea.new('.grid--area.-widgeted:nth-of-type(3)')
-
-      sleep(0.1)
-
       filter_area.expect_to_span(1, 2, 2, 3)
 
       # At the beginning, the default query is displayed
@@ -106,8 +108,6 @@ describe 'Arbitrary WorkPackage query table widget on my page', type: :feature, 
       modal.switch_to('Columns')
       columns.assume_opened
       columns.remove 'Subject'
-
-      my_page.expect_and_dismiss_notification message: I18n.t('js.notice_successful_update')
 
       expect(filter_area.area)
         .to have_selector('.id', text: type_work_package.id)

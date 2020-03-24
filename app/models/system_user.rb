@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -42,6 +42,8 @@ class SystemUser < User
   # Overrides a few properties
   def logged?; false end
 
+  def builtin?; true end
+
   def name(*_args); 'System' end
 
   def mail; nil end
@@ -54,12 +56,10 @@ class SystemUser < User
 
   def grant_privileges
     self.admin = true
-    self.status = STATUSES[:builtin]
   end
 
   def remove_privileges
     self.admin = false
-    self.status = STATUSES[:locked]
   end
 
   def run_given(&_block)
@@ -69,7 +69,7 @@ class SystemUser < User
       User.current = self
 
       begin
-        yield
+        yield self
       ensure
         remove_privileges
         User.current = old_user

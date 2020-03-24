@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,7 +28,9 @@
 #++
 
 class DeliverWorkPackageNotificationJob < DeliverNotificationJob
-  def initialize(journal_id, recipient_id, author_id)
+  queue_with_priority :notification
+
+  def perform(journal_id, recipient_id, author_id)
     @journal_id = journal_id
     super(recipient_id, author_id)
   end
@@ -36,7 +38,7 @@ class DeliverWorkPackageNotificationJob < DeliverNotificationJob
   def render_mail(recipient:, sender:)
     return nil unless raw_journal # abort, assuming that the underlying WP was deleted
 
-    journal = find_aggregated_journal
+    journal = Journal::AggregatedJournal.with_version(raw_journal)
 
     # The caller should have ensured that the journal can't outdate anymore
     # before queuing a notification
@@ -53,11 +55,6 @@ class DeliverWorkPackageNotificationJob < DeliverNotificationJob
 
   def raw_journal
     @raw_journal ||= Journal.find_by(id: @journal_id)
-  end
-
-  def find_aggregated_journal
-    wp_journals = Journal::AggregatedJournal.aggregated_journals(journable: work_package)
-    wp_journals.detect { |journal| journal.version == raw_journal.version }
   end
 
   def work_package

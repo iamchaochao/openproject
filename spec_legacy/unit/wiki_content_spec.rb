@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,7 +26,7 @@
 #
 # See docs/COPYRIGHT.rdoc for more details.
 #++
-require 'legacy_spec_helper'
+require_relative '../legacy_spec_helper'
 
 describe WikiContent, type: :model do
   fixtures :all
@@ -52,16 +52,6 @@ describe WikiContent, type: :model do
     assert_equal content.text, content.versions.last.data.text
   end
 
-  it 'should create should send email notification' do
-    Setting.notified_events = ['wiki_content_added']
-
-    page = WikiPage.new(wiki: @wiki, title: 'A new page')
-    page.content = WikiContent.new(text: 'Content text', author: User.find(1), comments: 'My comment')
-    assert page.save
-
-    assert_equal 2, ActionMailer::Base.deliveries.size
-  end
-
   it 'should update' do
     content = @page.content
     version_count = content.version
@@ -70,16 +60,6 @@ describe WikiContent, type: :model do
     content.reload
     assert_equal version_count + 1, content.version
     assert_equal version_count + 1, content.versions.length
-  end
-
-  it 'should update should send email notification' do
-    Setting.notified_events = ['wiki_content_updated']
-
-    content = @page.content
-    content.text = 'My new content'
-    assert content.save
-
-    assert_equal 2, ActionMailer::Base.deliveries.size
   end
 
   it 'should fetch history' do

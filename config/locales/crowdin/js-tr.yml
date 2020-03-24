@@ -1,3 +1,24 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
 tr:
   js:
     ajax:
@@ -59,6 +80,7 @@ tr:
         inline: 'Satır içi vurgula:'
         entire_card_by: 'Kartın tamamı'
       remove_from_list: 'Kartı listeden çıkar'
+    caption_rate_history: "Hız tarihi"
     clipboard:
       browser_error: "Tarayıcınız panoya kopyalamayı desteklemiyor. Metni lütfen elle kopyalayınız."
       copied_successful: "Panoya başarıyla kopyalandı!"
@@ -150,6 +172,9 @@ tr:
       cannot_save_changes_with_message: "Değişikliklerinizin kaydedilememesine sebep olan hata: %{error}"
       query_saving: "Görünüm kaydedilemedi."
       embedded_table_loading: "Gömülü görünüm yüklenemedi: %{message}"
+    enumeration_activities: "Etkinlikler (zaman izleme)"
+    enumeration_doc_categories: "Belge kategorileri"
+    enumeration_work_package_priorities: "İş paketi öncelikleri"
     filter:
       description:
         text_open_filter: "Bu filtreyi 'ALT' ve ok tuşları ile açın."
@@ -171,16 +196,28 @@ tr:
     general_text_yes: "evet"
     general_text_No: "Hayır"
     general_text_Yes: "Evet"
+    global_roles: Küresel rolleri
+    hal:
+      error:
+        update_conflict_refresh: "Kaynağı yenilemek ve en yeni sürüme güncellemek için burayı tıklayın."
+        edit_prohibited: "%{attribute} düzenlenmesi bu kaynak için engellendi. Bu özellik ya ilişkilerden (örneğin çocuklar) elde edilir ya da başka türlü yapılandırılamaz.\n"
+        format:
+          date: "%{attribute} geçerli tarih değil - YYYY-AA-GG formatında girilmeli."
+        general: "Bir hata oluştu."
     homescreen:
       blocks:
         new_features:
           text_new_features: "Yeni özellikler ve ürün güncellemeleri hakkında bilgi edinin."
-          current_new_feature_html: "OpenProject, Çevik proje yönetimi için yeni bir <b> Pano görünümü </b> içerir. </br> Bu yeni özelliği mevcut projeleriniz için etkinleştirmek için lütfen aşağıdaki adımları uygulayın: <ul> <li> Modül Panolarını mevcut projelerin ayarları dahilinde etkinleştirin. </li> <li> Panolarınızı bir projede yapılandırın. </li> <li> Rolleri ve izinleri doğrula </li> </ul>"
-          image_alt_text: "Yönetim Kurulu teaser image"
-          learn_about: "Çevik Kurullar hakkında daha fazla bilgi edinin"
+          learn_about: "Yeni özellikler hakkında daha fazla bilgi edinin"
+          standard:
+            learn_about_link: https://www.openproject.org/openproject-10-4
+            current_new_feature_html: >
+              Sürüm çeşitli yeni özellikler ve geliştirmeler içeriyor: <br><br> <ul> <li>Default <b> Açık veya karanlık bir tema (premium özellik) seçmek için varsayılan <b> tasarım şablonları </li> <li>New <b> Sayfam </i> için çubuk grafikte harcanan zamanı göstermek üzere yeni <b> zaman izleme widget'ı </b>. </li> <li> <b> Maliyet raporları için XLS dışa aktarma </b> ve iş paketlerinin PDF dışa aktarımında biçimlendirilmiş metin. </li> <li><b> Geliştirilmiş tasarım ve kullanılabilirlik </b>, yani proje ayarları ve yönetimindeki sekmeler ve daha fazlası. </li> </ul>
+          bim:
+            learn_about_link: https://www.openproject.org/openproject-bim-10-4
+            current_new_feature_html: >
+              OpenProject, proje yönetim uygulamanıza <b> 3B modelleri entegre etmek için </b> yeni bir IFC modülü içerir </b> ve ayrı pahalı yazılım veya lisanslar kurmadan ekibinizle bu dosyalarla işbirliği içinde çalışmak. <br> <br> <ul> <li> <b> Bina modellerinin IFC dosyalarını </b> OpenProject uygulamanıza aktarın. </li> <li> <b> 3D modelleri açın ve bina modellerini görselleştirin </ b > tarayıcınızda. </li> <li> Ekibi ayrı bir pahalı yazılım yüklemeden doğrudan OpenProject ile kolayca <b> birden fazla IFC dosyası üzerinde çalışın </b>. </li> </ul>
     label_activate: "Etkinleştir"
-    label_activity_no: "Etkinlik giriş numarası %{activityNo}"
-    label_activity_with_comment_no: "Etkinlik giriş numarası %{activityNo}. Kullanıcı yorumu var."
     label_add_column_after: "Sonrasına sütun ekle"
     label_add_column_before: "Öncesine sütun ekle"
     label_add_columns: "Sütunlar ekle"
@@ -197,6 +234,7 @@ tr:
     label_and: "ve"
     label_ascending: "Azalan"
     label_author: "Yazar: %{user}"
+    label_avatar: "Avatar"
     label_between: "arasında"
     label_board: "Pano"
     label_board_locked: "Kilitlendi"
@@ -210,6 +248,8 @@ tr:
     label_deactivate: "Etkisizleştir"
     label_descending: "Azalan"
     label_description: "Açıklama"
+    label_details: "Detaylar"
+    label_display: "Göster"
     label_cancel_comment: "Yorumu iptal et"
     label_closed_work_packages: "kapalı"
     label_collapse: "Daralt"
@@ -230,22 +270,29 @@ tr:
     label_export: "Dışarı aktar"
     label_filename: "Dosya"
     label_filesize: "Boyutu"
+    label_general: "Genel"
     label_greater_or_equal: ">="
     label_group: 'Grup'
     label_group_by: "Grupla"
+    label_group_plural: "Gruplar"
     label_hide_attributes: "Daha az göster"
     label_hide_column: "Sütunu gizle"
     label_hide_project_menu: "Proje menüsünü daralt"
     label_in: "şurada"
     label_in_less_than: "daha azdır"
     label_in_more_than: "daha fazla"
+    label_incoming_emails: "Gelen e-postalar"
+    label_information_plural: "Bilgi"
     label_import: "İçeri Aktar"
     label_latest_activity: "En son etkinlik"
     label_last_updated_on: "Son güncelleme"
     label_less_or_equal: "<="
     label_less_than_ago: "bir haftadan kısa bir süre önce"
     label_loading: "Yükleniyor..."
+    label_mail_notification: "E-posta bildirimleri"
     label_me: "ben"
+    label_meeting_agenda: "Ajanda"
+    label_meeting_minutes: "Dakika"
     label_menu_collapse: "çöküş"
     label_menu_expand: "genişletmek"
     label_more_than_ago: "günler önce"
@@ -254,6 +301,7 @@ tr:
     label_no_data: "Görüntülenecek veri yok"
     label_no_due_date: "bitiş tarihi yok"
     label_no_start_date: "başlangıç tarihi yok"
+    label_no_value: "Değer yok"
     label_none: "hiçbiri"
     label_not_contains: "içermiyor"
     label_not_equals: "değildir"
@@ -265,12 +313,16 @@ tr:
     label_previous: "Önceki"
     label_per_page: "Sayfa başına:"
     label_please_wait: "Lütfen bekleyin"
+    label_project_plural: "Projeler"
     label_visibility_settings: "Görünürlük ayarları"
     label_quote_comment: "Yorumu alıntıla"
+    label_recent: "son günlerdeki"
     label_reset: "Sıfırla"
     label_remove_column: "Sütunu kaldır"
     label_remove_columns: "Seçili sütunları sil"
     label_remove_row: "Satırı kaldır"
+    label_report: "Rapor"
+    label_repository_plural: "Depolar"
     label_save_as: "Farklı Kaydet"
     label_select_watcher: "Takipçi seç..."
     label_selected_filter_list: "Seçilen filtreler"
@@ -281,6 +333,7 @@ tr:
     label_sort_higher: "Yukarı taşı"
     label_sort_lower: "Aşağı taşı"
     label_sorting: "Sıralama"
+    label_spent_time: "Harcanan zaman"
     label_star_query: "avantajlı"
     label_press_enter_to_save: "Kaydetmek için enter tuşuna basın."
     label_public_query: "Herkese Açık"
@@ -289,7 +342,9 @@ tr:
     label_subject: "Konu"
     label_this_week: "bu hafta"
     label_today: "bugün"
+    label_time_entry_plural: "Harcanan zaman"
     label_up: "Yukarı"
+    label_user_plural: "Kullanıcılar"
     label_activity_show_only_comments: "Sadece yorumların olduğu etkinlikleri göster"
     label_activity_show_all: "Tüm etkinlikleri göster"
     label_total_progress: "Toplam ilerleme %{percent}%"
@@ -331,6 +386,7 @@ tr:
     label_wait: "Lütfen Yapılandırmanın tamamlanmasını bekleyin..."
     label_upload_counter: "%{done} / %{count} dosya yüklendi"
     label_validation_error: "İş paketi aşağıdaki hatalar nedeniyle kaydedilemedi:"
+    label_version_plural: "Sürümler"
     label_view_has_changed: "Bu görünüm kaydedilmemiş değişikliklere sahip. Onları kaydetmek için tıklayın."
     help_texts:
       show_modal: 'Metin giriş öznitelik yardımını göster'
@@ -397,23 +453,22 @@ tr:
         upgrade_to_ee_text: "Vay canına! Eğer bu özelliğe ihtiyaç duyuyorsanız süper bir profesyonelsiniz! Açık Kaynak kodu desteklemeyi düşünüyorseniz bizim geliştiricilerimize katkı sağlamak için Enterprise sürüm müşterimiz olur musunuz?"
         more_information: "Daha fazla bilgi"
         nevermind: "Boşver"
-        filter_types:
-          parent: "çocuğu olmak"
-          precedes: "önceki"
-          follows: "takip etmek"
-          relates: "ile ilgili"
-          duplicates: "çoğaltmak"
-          duplicated: "tarafından çoğaltılır"
-          blocks: "engelleme"
-          blocked: "bağlı"
-          partof: "parçası olmak"
-          includes: "dahil olmak üzere"
-          requires: "gerektiren"
-          required: "tarafından gerekli"
+      edit:
+        form_configuration: "Form Yapılandırması"
+        projects: "Projeler"
+        settings: "Ayarlar"
     time_entry:
+      project: 'Proje'
+      work_package: 'İş paketi'
+      work_package_required: 'Önce bir iş paketi seçilmesini gerektirir.'
       activity: 'Etkinlik'
       comment: 'Yorum'
+      duration: 'Süre'
+      spent_on: 'Tarih'
       hours: 'Saat'
+      label: 'Zaman girişi'
+    two_factor_authentication:
+      label_two_factor_authentication: 'İki faktörlü kimlik doğrulama'
     watchers:
       label_loading: takipçiler yükleniyor...
       label_error_loading: Takipçileri yüklerken bir hata oluştu
@@ -473,12 +528,14 @@ tr:
     field_value_enter_prompt: "'%{field}' için bir değer girin"
     select2:
       input_too_short:
+        zero: "Lütfen daha fazla karakter girin"
         one: "Lütfen bir karakter daha girin"
         other: "Lütfen {{count}} karakter daha girin"
       load_more: "Daha fazla sonuç yükleniyor ..."
       no_matches: "Eşleşme bulunamadı"
       searching: "Aranıyor ..."
       selection_too_big:
+        zero: "Hiçbir öğeyi seçemezsiniz"
         one: "Yalnızca bir öğe seçebilirsiniz"
         other: "Sadece {{limit}} tane seçebilirsiniz"
     project_menu_details: "Detaylar"
@@ -586,12 +643,6 @@ tr:
       description_enter_text: "Metin girin"
       description_options_hide: "Seçenekleri gizle"
       description_options_show: "Seçenekleri göster"
-      error:
-        update_conflict_refresh: "İş paketini yenilemek ve en yeni sürüme güncellemek için buraya tıklayın."
-        edit_prohibited: "%{attribute} düzenleme bu iş paketi için bloke durumda. Ya bu öznitelik ilişkileri (ör, alt paket) ile tanımlanabilir ya da yapılandırılamaz."
-        format:
-          date: "%{attribute} geçerli tarih değil - YYYY-AA-GG formatında girilmeli."
-        general: "Bir hata oluştu."
       edit_attribute: "%{attribute} - Düzenle"
       key_value: "%{key}: %{value}"
       label_enable_multi_select: "Çoklu seçimi etkinleştir"
@@ -606,7 +657,6 @@ tr:
       message_view_spent_time: "Bu iş paketi için harcanan zamanı göster"
       message_work_package_read_only: "İş paketi bu durum içinde kilitli. Durumu haricinde başka bir özelliği değiştirilemez."
       message_work_package_status_blocked: "İş paketi durumu, kapalı durum ve kapalı sürüm tahsis edildiğinden dolayı yazılamaz."
-      no_value: "Değer yok"
       placeholder_filter_by_text: "Konu, açıklama, yorumlar, ..."
       inline_create:
         title: 'Listeden yeni bir iş paketi eklemek için buraya tıklayınız'
@@ -631,8 +681,7 @@ tr:
       no_results:
         title: Görüntülecek bir iş paketi bulunmuyor.
         description: Ya hiç iş paketi oluşturulmamış, ya da tüm iş paketeri filtrelenmiş.
-      limited_results: >
-        %{total} toplam iş paketi var, ancak manuel sıralama modunda sadece %{count} gösterilebilir. Lütfen sonuçları filtreleyerek azaltın.
+      limited_results: Manuel sıralama modunda sadece %{count} iş paketi gösterilebilir. Lütfen sonuçları filtreleyerek azaltın.
       property_groups:
         details: "Detaylar"
         people: "Kişiler"
@@ -674,7 +723,7 @@ tr:
         label_content: "Menüyü geçerek içeriği görmek için tıklayın"
       placeholders:
         default: "-"
-        description: "Açıklama girmek için tıklayınız..."
+        formattable: "%{name}: Düzenlemek için tıklayın ..."
       query:
         column_names: "Sütunlar"
         group_by: "Sonuçları grupla"
@@ -739,8 +788,7 @@ tr:
           relation_columns: 'İş paketleri listesindeki ilişkileri görmek ister misiniz?'
           check_out_link: 'Enterprise sürüme bakın.'
         relation_filters:
-          first_part: "Tüm iş paketleri görüntüle"
-          second_part: "geçerli iş paketi"
+          filter_work_packages_by_relation_type: 'İş paketlerini ilişki türüne göre filtreleme'
       tabs:
         overview: Genel Bakış
         activity: Etkinlik
@@ -826,6 +874,7 @@ tr:
         one: "bir alt iş paketi"
         other: "%{count} alt iş paketi"
       hour:
+        zero: "0 s"
         one: "%{count} 1 saat"
         other: "%{count} 1 saat"
     zen_mode:

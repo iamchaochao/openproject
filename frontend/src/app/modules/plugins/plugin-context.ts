@@ -16,7 +16,7 @@ import {HalResource} from "core-app/modules/hal/resources/hal-resource";
 import {WorkPackageCacheService} from "core-components/work-packages/work-package-cache.service";
 import {DisplayFieldService} from "core-app/modules/fields/display/display-field.service";
 import {EditFieldService} from "core-app/modules/fields/edit/edit-field.service";
-import {WorkPackageNotificationService} from "core-components/wp-edit/wp-notification.service";
+import {HalResourceNotificationService} from "core-app/modules/hal/services/hal-resource-notification.service";
 import {OpenProjectFileUploadService} from "core-components/api/op-file-upload/op-file-upload.service";
 import {EditorMacrosService} from "core-components/modals/editor/editor-macros.service";
 import {HTMLSanitizeService} from "../common/html-sanitize/html-sanitize.service";
@@ -25,6 +25,7 @@ import {DynamicBootstrapper} from "core-app/globals/dynamic-bootstrapper";
 import {States} from 'core-components/states.service';
 import {CKEditorPreviewService} from "core-app/modules/common/ckeditor/ckeditor-preview.service";
 import {ExternalRelationQueryConfigurationService} from "core-components/wp-table/external-configuration/external-relation-query-configuration.service";
+import {InjectField} from "core-app/helpers/angular/inject-field.decorator";
 
 /**
  * Plugin context bridge for plugins outside the CLI compiler context
@@ -47,7 +48,6 @@ export class OpenProjectPluginContext {
     hooks: this.injector.get<HookService>(HookService),
     i18n: this.injector.get<I18nService>(I18nService),
     notifications: this.injector.get<NotificationsService>(NotificationsService),
-    wpNotifications: this.injector.get<WorkPackageNotificationService>(WorkPackageNotificationService),
     opModalService: this.injector.get<OpModalService>(OpModalService),
     opFileUpload: this.injector.get<OpenProjectFileUploadService>(OpenProjectFileUploadService),
     helpTextDm: this.injector.get<HelpTextDmService>(HelpTextDmService),
@@ -77,7 +77,7 @@ export class OpenProjectPluginContext {
   public readonly hooks:{ [hook:string]:(callback:Function) => void } = {};
 
   // Angular zone reference
-  public readonly zone:NgZone = this.injector.get(NgZone);
+  @InjectField() public readonly zone:NgZone;
 
   // Angular2 global injector reference
   constructor(public readonly injector:Injector) {

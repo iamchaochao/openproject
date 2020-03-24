@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -45,7 +45,7 @@ describe 'API v3 Revisions resource', type: :request do
     FactoryBot.create(:repository_subversion, project: project)
   }
   let(:project) {
-    FactoryBot.create(:project, identifier: 'test_project', is_public: false)
+    FactoryBot.create(:project, identifier: 'test_project', public: false)
   }
   let(:role) {
     FactoryBot.create(:role,

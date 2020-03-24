@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -33,11 +33,9 @@ require 'rake'
 class RakeJob < ApplicationJob
   attr_reader :task_name
 
-  def initialize(task_name)
+  def perform(task_name)
     @task_name = task_name
-  end
 
-  def perform
     Rails.logger.info { "Invoking Rake task #{task_name}." }
     invoke
   end

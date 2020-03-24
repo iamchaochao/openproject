@@ -1,6 +1,6 @@
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,28 +23,34 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 
-import {Inject, Injectable, Injector} from '@angular/core';
-import {HalResource} from 'core-app/modules/hal/resources/hal-resource';
+import {Injectable, Injector} from '@angular/core';
 import {WorkPackageCacheService} from '../work-packages/work-package-cache.service';
 import {Observable, Subject} from 'rxjs';
-import {WorkPackageChangeset} from '../wp-edit-form/work-package-changeset';
 import {WorkPackageResource} from 'core-app/modules/hal/resources/work-package-resource';
 import {HalResourceService} from 'core-app/modules/hal/services/hal-resource.service';
-import {IWorkPackageCreateService} from "core-components/wp-new/wp-create.service.interface";
 import {HookService} from 'core-app/modules/plugins/hook-service';
 import {WorkPackageFilterValues} from "core-components/wp-edit-form/work-package-filter-values";
-import {IWorkPackageEditingServiceToken} from "core-components/wp-edit-form/work-package-editing.service.interface";
-import {WorkPackageEditingService} from "core-components/wp-edit-form/work-package-editing-service";
+
+import {
+  HalResourceEditingService,
+  ResourceChangesetCommit
+} from "core-app/modules/fields/edit/services/hal-resource-editing.service";
+import {WorkPackageChangeset} from "core-components/wp-edit/work-package-changeset";
+import {filter} from "rxjs/operators";
 import {IsolatedQuerySpace} from "core-app/modules/work_packages/query-space/isolated-query-space";
 import {WorkPackageDmService} from "core-app/modules/hal/dm-services/work-package-dm.service";
 import {FormResource} from "core-app/modules/hal/resources/form-resource";
-import {WorkPackageEventsService} from "core-app/modules/work_packages/events/work-package-events.service";
+import {HalEventsService} from "core-app/modules/hal/services/hal-events.service";
+import {AuthorisationService} from "core-app/modules/common/model-auth/model-auth.service";
+import {UntilDestroyedMixin} from "core-app/helpers/angular/until-destroyed.mixin";
+
+export const newWorkPackageHref = '/api/v3/work_packages/new';
 
 @Injectable()
-export class WorkPackageCreateService implements IWorkPackageCreateService {
+export class WorkPackageCreateService extends UntilDestroyedMixin {
   protected form:Promise<FormResource>|undefined;
 
   // Allow callbacks to happen on newly created work packages
@@ -54,15 +60,37 @@ export class WorkPackageCreateService implements IWorkPackageCreateService {
               protected hooks:HookService,
               protected wpCacheService:WorkPackageCacheService,
               protected halResourceService:HalResourceService,
-              @Inject(IWorkPackageEditingServiceToken) protected readonly wpEditing:WorkPackageEditingService,
-              protected readonly querySpace:IsolatedQuerySpace,
+              protected querySpace:IsolatedQuerySpace,
+              protected authorisationService:AuthorisationService,
+              protected halEditing:HalResourceEditingService,
               protected workPackageDmService:WorkPackageDmService,
-              protected readonly wpEvents:WorkPackageEventsService) {
+              protected halEvents:HalEventsService) {
+    super();
+
+    this.halEditing
+      .comittedChanges
+      .pipe(
+        this.untilDestroyed(),
+        filter(commit => commit.resource._type === 'WorkPackage' && commit.wasNew)
+      )
+      .subscribe((commit:ResourceChangesetCommit<WorkPackageResource>) => {
+        this.newWorkPackageCreated(commit.resource);
+      });
+
+    this.halEditing
+      .changes$(newWorkPackageHref)
+      .pipe(
+        this.untilDestroyed(),
+        filter(changeset => !changeset)
+      )
+      .subscribe(() => {
+        this.reset();
+      });
   }
 
-  public newWorkPackageCreated(wp:WorkPackageResource) {
-    this.form = undefined;
-    this.wpEvents.push({ type: 'created', id: wp.id! });
+  protected newWorkPackageCreated(wp:WorkPackageResource) {
+    this.halEvents.push(wp, { eventType: 'created' });
+    this.reset();
     this.newWorkPackageCreatedSubject.next(wp);
   }
 
@@ -82,20 +110,20 @@ export class WorkPackageCreateService implements IWorkPackageCreateService {
     });
   }
 
-  public fromCreateForm(form:FormResource) {
+  public fromCreateForm(form:FormResource):WorkPackageChangeset {
     let wp = this.halResourceService.createHalResourceOfType<WorkPackageResource>('WorkPackage', form.payload.$plain());
     wp.initializeNewResource(form);
 
-    const changeset = new WorkPackageChangeset(this.injector, wp, form);
+    const change = this.halEditing.edit<WorkPackageResource, WorkPackageChangeset>(wp, form);
 
     // Call work package initialization hook
-    this.hooks.call('workPackageNewInitialization', changeset);
+    this.hooks.call('workPackageNewInitialization', change);
 
-    return changeset;
+    return change;
   }
 
   public copyWorkPackage(copyFrom:WorkPackageChangeset) {
-    let request = copyFrom.resource.$source;
+    let request = copyFrom.pristineResource.$source;
 
     // Ideally we would make an empty request before to get the create schema (cannot use the update schema of the source changeset)
     // to get all the writable attributes and only send those.
@@ -117,7 +145,7 @@ export class WorkPackageCreateService implements IWorkPackageCreateService {
 
     wp.initializeNewResource(form);
 
-    return new WorkPackageChangeset(this.injector, wp, form);
+    return this.halEditing.edit(wp, form);
   }
 
 
@@ -130,44 +158,49 @@ export class WorkPackageCreateService implements IWorkPackageCreateService {
   }
 
   public cancelCreation() {
-    this.wpEditing.stopEditing('new');
-    this.wpCacheService.clearSome('new');
-    this.form = undefined;
+    this.halEditing.stopEditing({ href: newWorkPackageHref });
+    this.reset();
   }
 
   public changesetUpdates$() {
     return this
-      .wpEditing
-      .state('new')
+      .halEditing
+      .state(newWorkPackageHref)
       .values$();
   }
 
   public createOrContinueWorkPackage(projectIdentifier:string|null|undefined, type?:number) {
-    let changesetPromise = this.continueExistingEdit(type);
+    let changePromise = this.continueExistingEdit(type);
 
-    if (!changesetPromise) {
-      changesetPromise = this.createNewWithDefaults(projectIdentifier, type);
+    if (!changePromise) {
+      changePromise = this.createNewWithDefaults(projectIdentifier, type);
     }
 
-    return changesetPromise.then((changeset) => {
-      this.wpEditing.updateValue('new', changeset);
-      this.wpCacheService.updateWorkPackage(changeset.resource);
+    return changePromise.then((change:WorkPackageChangeset) => {
+      this.authorisationService.initModelAuth('work_package', change.pristineResource);
+      this.halEditing.updateValue(newWorkPackageHref, change);
+      this.wpCacheService.updateWorkPackage(change.pristineResource);
 
-      return changeset;
+      return change;
     });
   }
 
-  protected continueExistingEdit(type?:number) {
-    const changeset = this.wpEditing.state('new').value;
-    if (changeset !== undefined) {
-      const changeType = changeset.resource.type;
+  protected reset() {
+    this.wpCacheService.clearSome('new');
+    this.form = undefined;
+  }
 
-      const hasChanges = !changeset.empty;
+  protected continueExistingEdit(type?:number) {
+    const change = this.halEditing.state(newWorkPackageHref).value as WorkPackageChangeset;
+    if (change !== undefined) {
+      const changeType = change.projectedResource.type;
+
+      const hasChanges = !change.isEmpty();
       const typeEmpty = !changeType && !type;
       const typeMatches = type && changeType && changeType.idFromLink === type.toString();
 
       if (hasChanges && (typeEmpty || typeMatches)) {
-        return Promise.resolve(changeset);
+        return Promise.resolve(change);
       }
     }
 
@@ -175,16 +208,16 @@ export class WorkPackageCreateService implements IWorkPackageCreateService {
   }
 
   protected createNewWithDefaults(projectIdentifier:string|null|undefined, type?:number) {
-    let changesetPromise = null;
+    let changePromise = null;
 
     if (type) {
-      changesetPromise = this.createNewTypedWorkPackage(projectIdentifier, type);
+      changePromise = this.createNewTypedWorkPackage(projectIdentifier, type);
     } else {
-      changesetPromise = this.createNewWorkPackage(projectIdentifier);
+      changePromise = this.createNewWorkPackage(projectIdentifier);
     }
 
-    return changesetPromise.then((changeset:WorkPackageChangeset) => {
-      if (!changeset) {
+    return changePromise.then((change:WorkPackageChangeset) => {
+      if (!change) {
         throw 'No new work package was created';
       }
 
@@ -194,9 +227,9 @@ export class WorkPackageCreateService implements IWorkPackageCreateService {
         except = ['type'];
       }
 
-      this.applyDefaults(changeset, changeset.resource, except);
+      this.applyDefaults(change, change.projectedResource, except);
 
-      return changeset;
+      return change;
     });
   }
 
@@ -207,13 +240,13 @@ export class WorkPackageCreateService implements IWorkPackageCreateService {
    * @param wp
    * @param except
    */
-  private applyDefaults(changeset:WorkPackageChangeset, wp:WorkPackageResource, except:string[]) {
+  private applyDefaults(change:WorkPackageChangeset, wp:WorkPackageResource, except:string[]) {
     // Not using WorkPackageViewFiltersService here as the embedded table does not load the form
     // which will result in that service having empty current filters.
     let query = this.querySpace.query.value;
 
     if (query) {
-      const filter = new WorkPackageFilterValues(this.injector, changeset, query.filters, except);
+      const filter = new WorkPackageFilterValues(this.injector, change, query.filters, except);
       filter.applyDefaultsFromFilters();
     }
   }

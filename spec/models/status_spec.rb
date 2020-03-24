@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,62 +30,6 @@ require 'spec_helper'
 
 describe Status, type: :model do
   let(:stubbed_status) { FactoryBot.build_stubbed(:status) }
-
-  describe '.new_statuses_allowed' do
-    let(:role) { FactoryBot.create(:role) }
-    let(:type) { FactoryBot.create(:type) }
-    let(:statuses) { (1..4).map { |_i| FactoryBot.create(:status) } }
-    let(:status) { statuses[0] }
-    let(:workflow_a) do
-      FactoryBot.create(:workflow, role_id: role.id,
-                                    type_id: type.id,
-                                    old_status_id: statuses[0].id,
-                                    new_status_id: statuses[1].id,
-                                    author: false,
-                                    assignee: false)
-    end
-    let(:workflow_b) do
-      FactoryBot.create(:workflow, role_id: role.id,
-                                    type_id: type.id,
-                                    old_status_id: statuses[0].id,
-                                    new_status_id: statuses[2].id,
-                                    author: true,
-                                    assignee: false)
-    end
-    let(:workflow_c) do
-      FactoryBot.create(:workflow, role_id: role.id,
-                                    type_id: type.id,
-                                    old_status_id: statuses[0].id,
-                                    new_status_id: statuses[3].id,
-                                    author: false,
-                                    assignee: true)
-    end
-    let(:workflows) { [workflow_a, workflow_b, workflow_c] }
-
-    before do
-      workflows
-    end
-
-    it 'should respect workflows w/o author and w/o assignee' do
-      expect(Status.new_statuses_allowed(status, [role], type, false, false))
-        .to match_array([statuses[1]])
-    end
-
-    it 'should respect workflows w/ author and w/o assignee' do
-      expect(Status.new_statuses_allowed(status, [role], type, true, false))
-        .to match_array([statuses[1], statuses[2]])
-    end
-
-    it 'should respect workflows w/o author and w/ assignee' do
-      expect(Status.new_statuses_allowed(status, [role], type, false, true))
-        .to match_array([statuses[1], statuses[3]])
-    end
-
-    it 'should respect workflows w/ author and w/ assignee' do
-      expect(Status.new_statuses_allowed(status, [role], type, true, true))
-        .to match_array([statuses[1], statuses[2], statuses[3]])
-    end
-  end
 
   describe 'default status' do
     context 'when default exists' do
@@ -127,6 +71,30 @@ describe Status, type: :model do
 
       expect(stubbed_status.cache_key)
         .not_to eql old_cache_key
+    end
+  end
+
+  context '.update_done_ratios' do
+    let(:status) { FactoryBot.create(:status, default_done_ratio: 50) }
+    let(:work_package) { FactoryBot.create(:work_package, status: status) }
+
+    context 'with Setting.work_package_done_ratio using the field', with_settings: { work_package_done_ratio: 'field' } do
+      it 'changes nothing' do
+        done_ratio_before = work_package.done_ratio
+        Status.update_work_package_done_ratios
+
+        expect(work_package.reload.done_ratio)
+          .to eql done_ratio_before
+      end
+    end
+
+    context 'with Setting.work_package_done_ratio using the status', with_settings: { work_package_done_ratio: 'status' } do
+      it "should update all of the issue's done_ratios to match their Issue Status" do
+        Status.update_work_package_done_ratios
+
+        expect(work_package.reload.done_ratio)
+          .to eql status.default_done_ratio
+      end
     end
   end
 end

@@ -1,3 +1,24 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
 hr:
   no_results_title_text: Trenutno nema zapisa za prikaz.
   activities:
@@ -7,21 +28,40 @@ hr:
     plugins:
       no_results_title_text: Nema dostupnih dodataka.
     custom_styles:
+      color_theme: "Color theme"
+      color_theme_custom: "(Custom)"
+      colors:
+        alternative-color: "Alternative"
+        content-link-color: "Link font"
+        primary-color: "Primary"
+        primary-color-dark: "Primary (dark)"
+        header-bg-color: "Header background"
+        header-item-bg-hover-color: "Header background on hover"
+        header-item-font-color: "Header font"
+        header-item-font-hover-color: "Header font on hover"
+        header-border-bottom-color: "Header border"
+        main-menu-bg-color: "Main menu background"
+        main-menu-bg-selected-background: "Main menu when selected"
+        main-menu-bg-hover-background: "Main menu on hover"
+        main-menu-font-color: "Main menu font"
+        main-menu-selected-font-color: "Main menu font when selected"
+        main-menu-hover-font-color: "Main menu font on hover"
+        main-menu-border-color: "Main menu border"
       custom_colors: "Prilagođavanje boje"
       customize: "Prilagodite instalaciju OpenProject s vlastitim logotipom. Napomena: Ovaj logo će biti dostupan javnosti."
       enterprise_notice: "Kao posebno \"Hvala!\" za njihov financijski doprinos za razvoj OpenProject, ova malena funkcija dostupna je samo za Enterprise Edition pretplatnike."
       manage_colors: "Uređivanje boja odaberite Opcije"
       instructions:
-        alternative_color: "Strong accent color, typically used for most the important button on a screen."
-        content_link_color: "Font color of most of the links."
-        primary_color: "Glavna boja."
-        primary_color_dark: "Obično tamnije verzije glavne boje za efekat lebdenja."
-        header_bg_color: "Background color of the header."
-        header_item_bg_hover_color: "Background color of clickable header items when hovered with the mouse."
-        header_item_font_color: "Font color of clickable header items."
-        header_item_font_hover_color: "Font color of clickable header items when hovered with the mouse."
-        header_border_bottom_color: "Thin line under the header. Leave this field empty if you don't want any line."
-        main_menu_bg_color: "Left side menu's background color."
+        alternative-color: "Strong accent color, typically used for the most important button on a screen."
+        content-link-color: "Font color of most of the links."
+        primary-color: "Glavna boja."
+        primary-color-dark: "Obično tamnije verzije glavne boje za efekat lebdenja."
+        header-item-bg-hover-color: "Background color of clickable header items when hovered with the mouse."
+        header-item-font-color: "Font color of clickable header items."
+        header-item-font-hover-color: "Font color of clickable header items when hovered with the mouse."
+        header-border-bottom-color: "Thin line under the header. Leave this field empty if you don't want any line."
+        main-menu-bg-color: "Left side menu's background color."
+      theme_warning: Changing the theme will overwrite you custom style. The design will then be lost. Are you sure you want to continue?
     enterprise:
       upgrade_to_ee: "Nadogradnja na izdanje Enterprise"
       add_token: "Upload an Enterprise Edition support token"
@@ -45,7 +85,39 @@ hr:
       no_results_content_title: Trenutno ne postoji mehanizam provjere autentičnosti.
       no_results_content_text: Dodaj novi mod provjere autentičnosti
   ldap_auth_sources:
+    technical_warning_html: |
+      This LDAP form requires technical knowledge of your LDAP / Active Directory setup.
+      <br/>
+      <a href="https://www.openproject.org/help/administration/manage-ldap-authentication/">Please visit our documentation for detailed instructions</a>.
+    attribute_texts:
+      name: Arbitrary name of the LDAP connection
+      host: LDAP host name or IP address
+      login_map: The attribute key in LDAP that is used to identify the unique user login. Usually, this will be `uid` or `samAccountName`.
+      generic_map: The attribute key in LDAP that is mapped to the OpenProject `%{attribute}` attribute
+      admin_map_html: "Optional: The attribute key in LDAP that <strong>if present</strong> marks the OpenProject user an admin. Leave empty when in doubt."
+      system_user_dn_html: |
+        Enter the DN of the system user used for read-only access.
+        <br/>
+        Example: uid=openproject,ou=system,dc=example,dc=com
+      system_user_password: Enter the bind password of the system user
+      base_dn: |
+        Enter the Base DN of the subtree in LDAP you want OpenProject to look for users and groups.
+        OpenProject will filter for provided usernames in this subtree only.
+        Example: ou=users,dc=example,dc=com
+      onthefly_register: |
+        If you check this box, OpenProject will automatically create new users from their LDAP entries
+        when they first authenticate with OpenProject.
+        Leave this unchecked to only allow existing accounts in OpenProject to authenticate through LDAP!
     connection_encryption: 'Connection encryption'
+    system_account: 'System account'
+    system_account_legend: |
+      OpenProject requires read-only access through a system account to lookup users and groups in your LDAP tree.
+      Please specify the bind credentials for that system user in the following section.
+    ldap_details: 'LDAP details'
+    user_settings: 'Attribute mapping'
+    user_settings_legend: |
+      The following fields are related to how users are created in OpenProject from LDAP entries and
+      what LDAP attributes are used to define the attributes of an OpenProject user (attribute mapping).
     tls_mode:
       plain: 'none'
       simple_tls: 'simple_tls'
@@ -280,7 +352,7 @@ hr:
       changeset:
         repository: "Repozitorij"
       comment:
-        commented: "Komentirano"
+        commented: "Komentirano" #an object that this comment belongs to
       custom_action:
         actions: "Actions"
       custom_field:
@@ -328,6 +400,13 @@ hr:
         types: "Tipovi"
         versions: "Verzije"
         work_packages: "Radni paketi"
+      project/status:
+        code: 'Status'
+        explanation: 'Status description'
+        codes:
+          on_track: 'On track'
+          at_risk: 'At risk'
+          off_track: 'Off track'
       query:
         column_names: "Stupci"
         relations_to_type_column: "Relations to %{type}"
@@ -419,6 +498,8 @@ hr:
         confirmation: "ne odgovara %{attribute}."
         could_not_be_copied: "ne može biti (u potpunosti) kopirano."
         does_not_exist: "ne postoji."
+        error_unauthorized: "may not be accessed."
+        error_readonly: "was attempted to be written but is not writable."
         empty: "ne može biti prazan unos."
         even: "mora biti izjednačeno."
         exclusion: "je rezerviran."
@@ -482,6 +563,8 @@ hr:
               invalid_values: "Vrijednost nije valjana."
               id_filter_required: "An 'id' filter is required."
         project:
+          archived_ancestor: 'The project has an archived ancestor.'
+          foreign_wps_reference_version: 'Work packages in non descendant projects reference versions of the project or its descendants.'
           attributes:
             types:
               in_use_by_work_packages: "još uvijek u uporabi od strane radnih paketa: %{types}"
@@ -515,6 +598,10 @@ hr:
         role:
           permissions:
             dependency_missing: "need to also include '%{dependency}' as '%{permission}' is selected."
+        time_entry:
+          attributes:
+            hours:
+              day_limit: "is too high as a maximum of 24 hours can be logged per date."
         work_package:
           is_not_a_valid_target_for_time_entries: "Radni paket #%{id} nije nadređen za ponovno dodjeljivanje vremena."
           attributes:
@@ -613,6 +700,7 @@ hr:
   activity:
     created: "Kreirano: %{title}"
     updated: "Ažurirano: %{title}"
+  #common attributes of all models
   attributes:
     active: "Aktivno"
     assigned_to: "Opunomoćeno"
@@ -645,6 +733,7 @@ hr:
     is_default: "Zadane vrijednost"
     is_for_all: "Za sve projekte"
     is_public: "Javno"
+    #kept for backwards compatibility
     issue: "Radni paket"
     lastname: "Prezime"
     login: "Username"
@@ -653,6 +742,7 @@ hr:
     password: "Lozinka"
     priority: "Prioritet"
     project: "Projekt"
+    public: "Javno"
     responsible: "Accountable"
     role: "Role"
     roles: "Role"
@@ -664,6 +754,7 @@ hr:
     type: "Tip"
     updated_at: "Ažurirano"
     updated_on: "Ažurirano"
+    uploader: "Uploader"
     user: "Korisnik"
     version: "Verzija"
     work_package: "Radni paket"
@@ -788,9 +879,13 @@ hr:
       - "Petak"
       - "Subota"
     formats:
+      #Use the strftime parameters for formats.
+      #When no format has been given, it uses default.
+      #You can provide other formats here if you like!
       default: "%m/%d/%Y"
       long: "%B %d, %Y"
       short: "%b %d"
+    #Don't forget the nil at the beginning; there's no such thing as a 0th month
     month_names:
       - null
       - "Siječanj"
@@ -805,6 +900,7 @@ hr:
       - "Listopad"
       - "Studeni"
       - "Prosinac"
+    #Used in date_select and datime_select.
     order:
       - :godina
       - :mjesec
@@ -946,6 +1042,7 @@ hr:
   description_sub_work_package: "Podređeni radni paket aktualnog radnog paketa"
   description_toc_toggle: "Pokaži/Sakrij tablicu sadržaja"
   description_wiki_subpages_reassign: "Odaberite novu nadređenu stranicu"
+  #Text direction: Left-to-Right (ltr) or Right-to-Left (rtl)
   direction: ltr
   ee:
     upsale:
@@ -954,13 +1051,12 @@ hr:
         add_groups: "Add new attribute groups"
         rename_groups: "Rename attributes groups"
       project_filters:
-        description_html: "Upgrade to %{link} to filter and sort on custom fields"
-  enumeration_activities: "Aktivnosti (vremensko praćenje)"
+        description_html: "Filtering and sorting on custom fields is an enterprise edition feature."
+  enumeration_activities: "Time tracking activities"
   enumeration_work_package_priorities: "Prioriteti radnog paketa"
-  enumeration_system_activity: "Aktivnost sustava"
   enumeration_reported_project_statuses: "Priopćeni statusi projekta"
   error_auth_source_sso_failed: "Single Sign-On (SSO) for user '%{value}' failed"
-  error_can_not_archive_project: "This project cannot be archived: There is at least one work package assigned to a version defined in this project."
+  error_can_not_archive_project: "This project cannot be archived: %{errors}"
   error_can_not_delete_entry: "Unable to delete entry"
   error_can_not_delete_custom_field: "Nije moguće izbrisati prilagođeno polje"
   error_can_not_delete_type: "Ovaj tip sadrži radni paket i ne može biti izbrisan."
@@ -969,6 +1065,7 @@ hr:
   error_can_not_remove_role: "Ova rola se koristi i ne može biti izbrisana."
   error_can_not_reopen_work_package_on_closed_version: "Dodijeljeni radni paket zaključenoj verziji ne može biti ponovno otvoren"
   error_can_not_find_all_resources: "Could not find all related resources to this request."
+  error_can_not_unarchive_project: "This project cannot be unarchived: %{errors}"
   error_check_user_and_role: "Molim Vas odaberite korisnika i rolu."
   error_code: "Error %{code}"
   error_cookie_missing: 'The OpenProject cookie is missing. Please ensure that cookies are enabled, as this application will not properly function without.'
@@ -1026,6 +1123,8 @@ hr:
       pdf_with_descriptions: "PDF s opisima"
       pdf_with_descriptions_and_attachments: "PDF with descriptions and attachments"
       pdf_with_attachments: "PDF s privicima"
+    image:
+      omitted: "Image not exported."
   extraction:
     available:
       pdftotext: "Pdftotext available (optional)"
@@ -1073,6 +1172,8 @@ hr:
       blog: "OpenProject blog"
       forums: "Forum Zajednice"
       newsletter: "Security alerts / Newsletter"
+  journals:
+    changes_retracted: "The changes where retracted."
   links:
     configuration_guide: 'Vodič za konfiguraciju'
   instructions_after_registration: "Nakon uspješne aktivacije, kliknite %{signin} za prijavu u sustav."
@@ -1606,18 +1707,22 @@ hr:
   label_workflow_plural: "Tijek rada"
   label_workflow_summary: "Sažetak"
   label_x_closed_work_packages_abbr:
+    zero: "0 closed"
     one: "1 zaključen"
     few: "%{count} zatvorenih"
     other: "%{count} zatvorenih"
   label_x_comments:
+    zero: "no comments"
     one: "1 komentar"
     few: "%{count} komentara"
     other: "%{count} komentara"
   label_x_open_work_packages_abbr:
+    zero: "0 open"
     one: "1 započet"
     few: "%{count} započeta"
     other: "%{count} započeta"
   label_x_projects:
+    zero: "no projects"
     one: "1 projekt"
     few: "%{count} projekta"
     other: "%{count} projekta"
@@ -1679,12 +1784,14 @@ hr:
   mail_body_lost_password: "Da bi ste promijenili lozinku, molimo vas odaberite sljedeću poveznicu:"
   mail_body_register: "Da bi ste aktivirali vaš korisnički račun, molim vas odaberite sljedeću poveznicu:"
   mail_body_reminder: "%{count} radni paket(i) koji je dodijeljeni vama, ima krajnji rok u sljedećih %{days} dana:"
+  mail_body_group_reminder: "%{count} work package(s) that are assigned to group \"%{group}\" are due in the next %{days} days:"
   mail_body_wiki_content_added: "'%{id}' wiki stranicu je dodao korisnik %{author}."
   mail_body_wiki_content_updated: "'%{id}' wiki stranicu je ažurirao korisnik %{author}."
   mail_subject_account_activation_request: "%{value} zahtjev za aktivacijom korisničkog računa"
   mail_subject_lost_password: "Vaša %{value} lozinka"
   mail_subject_register: "Vaša %{value} aktivacija korisničkog računa"
   mail_subject_reminder: "%{count} radni paket(i) koji ima krajnji rok u sljedećih %{days} dana"
+  mail_subject_group_reminder: "For group \"%{group}\" %{count} work package(s) due in the next %{days} days"
   mail_subject_wiki_content_added: "'%{id}' wiki stranica je dodana"
   mail_subject_wiki_content_updated: "'%{id}' wiki stranica je ažurirana"
   mail_user_activation_limit_reached:
@@ -1694,8 +1801,8 @@ hr:
       The user cannot activate their account since the user limit has been reached.
     steps:
       label: "To allow the user to sign in you can either: "
-      a: "Upgrade your payment plan ([here](upgrade_url))"
-      b: "Lock or delete an existing user ([here](users_url))"
+      a: "Upgrade your payment plan ([here](upgrade_url))" #here turned into a link
+      b: "Lock or delete an existing user ([here](users_url))" #here turned into a link
   more_actions: "Više funkcija"
   noscript_description: "Morate omogućiti korištenje JavaScripta da bi ste mogli korisiti OpenProject!"
   noscript_heading: "JavaScript onemogućen"
@@ -1762,6 +1869,7 @@ hr:
   notice_project_cannot_update_custom_fields: "You cannot update the project's available custom fields. The project is invalid: %{errors}"
   notice_attachment_migration_wiki_page: >
     This page was generated automatically during the update of OpenProject. It contains all attachments previously associated with the %{container_type} "%{container_name}".
+  #Default format for numbers
   number:
     format:
       delimiter: ""
@@ -1868,6 +1976,7 @@ hr:
       title: Promjeni identifikator projekta
     archive:
       are_you_sure: "Are you sure you want to archive the project '%{name}'?"
+      archived: "Archived"
   project_module_activity: "Aktivnost"
   project_module_forums: "Forumi"
   project_module_calendar: "Kalendar"
@@ -1879,6 +1988,8 @@ hr:
   project_module_wiki: "Wiki"
   query:
     attribute_and_direction: "%{attribute} (%{direction})"
+  #possible query parameters (e.g. issue queries),
+  #which are not attributes of an AR-Model.
   query_fields:
     active_or_archived: "Aktivno ili arhivirano"
     assigned_to_role: "Rola opunomoćenog korisnika"
@@ -2122,6 +2233,7 @@ hr:
   status_invited: pozvani
   status_locked: zaključano
   status_registered: registriran
+  #Used in array.to_sentence.
   support:
     array:
       sentence_connector: "i"
@@ -2157,7 +2269,7 @@ hr:
   text_destroy_with_associated: "There are additional objects assossociated with the work package(s) that are to be deleted. Those objects are of the following types:"
   text_destroy_what_to_do: "Što želite uraditi?"
   text_diff_truncated: "... This diff was truncated because it exceeds the maximum size that can be displayed."
-  text_email_delivery_not_configured: "Email delivery is not configured, and notifications are disabled.\nConfigure your SMTP server in config/configuration.yml and restart the application to enable them."
+  text_email_delivery_not_configured: "Email delivery is not configured, and notifications are disabled.\nConfigure your SMTP server to enable them."
   text_enumeration_category_reassign_to: "Reassign them to this value:"
   text_enumeration_destroy_question: "%{count} objects are assigned to this value."
   text_file_repository_writable: "Attachments directory writable"
@@ -2170,7 +2282,8 @@ hr:
   text_work_package_category_destroy_question: "Some work packages (%{count}) are assigned to this category. What do you want to do?"
   text_work_package_category_reassign_to: "Reassign work packages to this category"
   text_work_package_updated: "Radni paket%{id} je ažurirao %{author}."
-  text_work_package_watcher_added: "Dodani ste kao nadglednik radnom paketu %{id} od strane %{watcher_setter}."
+  text_work_package_watcher_added: "You have been added as a watcher to Work package %{id} by %{watcher_changer}."
+  text_work_package_watcher_removed: "You have been removed from watchers of Work package %{id} by %{watcher_changer}."
   text_work_packages_destroy_confirmation: "Are you sure you want to delete the selected work package(s)?"
   text_work_packages_ref_in_commit_messages: "Referencing and fixing work packages in commit messages"
   text_journal_added: "%{label}%{value} dodana"
@@ -2452,6 +2565,17 @@ hr:
     User limit reached. You cannot activate any more users. Please <a href="%{upgrade_url}">upgrade your plan</a> or block members to allow for additional users.
   warning_user_limit_reached_instructions: >
     You reached your user limit (%{current}/%{max} active users). Please contact sales@openproject.com to upgrade your Enterprise Edition plan and add additional users.
+  0: >
+
+  warning_bar:
+    protocol_mismatch:
+      title: 'Protocol setting mismatch'
+      text_html: >
+        Your application is running with its protocol setting set to <code>%{set_protocol}</code>, but the request is an <code>%{actual_protocol}</code> request. This will result in errors! Go to <a href="%{setting_path}">System settings</a> and change the "Protocol" setting to correct this.
+    hostname_mismatch:
+      title: 'Hostname setting mismatch'
+      text_html: >
+        Your application is running with its host name setting set to <code>%{set_hostname}</code>, but the request is a <code>%{actual_hostname}</code> hostname. This will result in errors! Go to <a href="%{setting_path}">System settings</a> and change the "Host name" setting to correct this.
   menu_item: "Stavka izbornika"
   menu_item_setting: "Vidljivost"
   wiki_menu_item_for: "Stavka izbornika za wiki stranicu \"%{title}\""
@@ -2460,6 +2584,7 @@ hr:
     Izbrisati će te samo glavnu stavku wiki izbornika. U sljdećem koraku morate izabrati wiki stranicu za koju će se generirati nova stavka. Za brisanje wiki stranice, wiki modul mora biti deaktiviran od strane administratora projekta.
   wiki_menu_item_delete_not_permitted: Wiki stavka izbornika jedine wiki stranice ne može biti izbrisana.
   query_menu_item_for: "Stavka izbornika za upit \"%{title}\""
+  #TODO: merge with work_packages top level key
   work_package:
     updated_automatically_by_child_changes: |
       _Ažuriraj automatski tako da promijenite vrijednosti zajedno s podređenim radnim paketom %{child}_
@@ -2504,7 +2629,9 @@ hr:
         estimated_hours: "Predviđeni sati ne mogu biti postavljeni na nadređeni radni paket."
         invalid_user_assigned_to_work_package: "Izabranom korisniku nije dopušteno da bude '%{property}' za ovaj radni paket."
         start_date: "Datum početka ne može biti postavljen na nadređenim radnim paketima."
-      writing_read_only_attributes: "Nije dopušteno zapisivanje kod atributa kod kojeg je dopušteno samo čitanje."
+      eprops:
+        invalid_gzip: "is invalid gzip: %{message}"
+        invalid_json: "is invalid json: %{message}"
     resources:
       schema: 'Shema'
   doorkeeper:
@@ -2512,18 +2639,22 @@ hr:
       status: 'Pre-authorization'
     errors:
       messages:
+        #Common error messages
         invalid_request: 'The request is missing a required parameter, includes an unsupported parameter value, or is otherwise malformed.'
-        invalid_redirect_uri: "The requested redirect uri is malformed or doesn't match client redirect URI."
+        invalid_redirect_uri: "The requested redirect URI is malformed or doesn't match client redirect URI."
         unauthorized_client: 'The client is not authorized to perform this request using this method.'
         access_denied: 'The resource owner or authorization server denied the request.'
         invalid_scope: 'The requested scope is invalid, unknown, or malformed.'
         invalid_code_challenge_method: 'The code challenge method must be plain or S256.'
         server_error: 'The authorization server encountered an unexpected condition which prevented it from fulfilling the request.'
         temporarily_unavailable: 'The authorization server is currently unable to handle the request due to a temporary overloading or maintenance of the server.'
+        #Configuration error messages
         credential_flow_not_configured: 'Resource Owner Password Credentials flow failed due to Doorkeeper.configure.resource_owner_from_credentials being unconfigured.'
         resource_owner_authenticator_not_configured: 'Resource Owner find failed due to Doorkeeper.configure.resource_owner_authenticator being unconfigured.'
         admin_authenticator_not_configured: 'Access to admin panel is forbidden due to Doorkeeper.configure.admin_authenticator being unconfigured.'
+        #Access grant errors
         unsupported_response_type: 'The authorization server does not support this response type.'
+        #Access token errors
         invalid_client: 'Client authentication failed due to unknown client, no client authentication included, or unsupported authentication method.'
         invalid_grant: 'The provided authorization grant is invalid, expired, revoked, does not match the redirection URI used in the authorization request, or was issued to another client.'
         unsupported_grant_type: 'The authorization grant type is not supported by the authorization server.'
@@ -2548,6 +2679,7 @@ hr:
         redirect_uri_html: >
           The allowed URLs authorized users can be redirected to. One entry per line. <br/> If you're registering a desktop application, use the following URL.
         confidential: "Check if the application will be used where the client secret can be kept confidential. Native mobile apps and Single Page Apps are assumed non-confidential."
+        scopes: "Check the scopes you want the application to grant access to. If no scope is checked, api_v3 is assumed."
         client_credential_user_id: "Optional user ID to impersonate when clients use this application. Leave empty to allow public access only"
         register_intro: "If you are developing an OAuth API client application for OpenProject, you can register it using this form for all users to use."
         default_scopes: ""
@@ -2562,8 +2694,8 @@ hr:
       wants_to_access_html: >
         This application requests access to your OpenProject account. <br/> <strong>It has requested the following permissions:</strong>
     scopes:
-      api_v3: "Full API access"
-      api_v3_text: "Application will receive full read & write access to the OpenProject API to perform actions on your behalf."
+      api_v3: "Full API v3 access"
+      api_v3_text: "Application will receive full read & write access to the OpenProject API v3 to perform actions on your behalf."
     grants:
       created_date: "Approved on"
       scopes: "Dozvole"

@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -34,20 +34,6 @@ describe Redmine::I18n do
 
   before do
     @hook_module = Redmine::Hook
-  end
-
-  it 'should date format default' do
-    set_language_if_valid 'en'
-    today = Date.today
-    Setting.date_format = ''
-    assert_equal I18n.l(today), format_date(today)
-  end
-
-  it 'should date format' do
-    set_language_if_valid 'en'
-    today = Date.today
-    Setting.date_format = '%d %m %Y'
-    assert_equal today.strftime('%d %m %Y'), format_date(today)
   end
 
   it 'should date and time for each language' do

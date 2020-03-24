@@ -1,60 +1,132 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
 da:
   no_results_title_text: Der er i øjeblikket ikke noget at vise.
   activities:
     index:
-      no_results_title_text: There has not been any activity for the project within this time frame.
+      no_results_title_text: Der har ikke været nogen aktivitet for projektet i tidsperioden.
   admin:
     plugins:
       no_results_title_text: Der er i øjeblikket ingen plugins installeret.
     custom_styles:
+      color_theme: "Color theme"
+      color_theme_custom: "(Custom)"
+      colors:
+        alternative-color: "Alternative"
+        content-link-color: "Link font"
+        primary-color: "Primary"
+        primary-color-dark: "Primary (dark)"
+        header-bg-color: "Header background"
+        header-item-bg-hover-color: "Header background on hover"
+        header-item-font-color: "Header font"
+        header-item-font-hover-color: "Header font on hover"
+        header-border-bottom-color: "Header border"
+        main-menu-bg-color: "Main menu background"
+        main-menu-bg-selected-background: "Main menu when selected"
+        main-menu-bg-hover-background: "Main menu on hover"
+        main-menu-font-color: "Main menu font"
+        main-menu-selected-font-color: "Main menu font when selected"
+        main-menu-hover-font-color: "Main menu font on hover"
+        main-menu-border-color: "Main menu border"
       custom_colors: "Brugerdefinerede farver"
       customize: "Tilpas din OpenProject installation med dit eget logo. Bemærk: Dette logo vil være offentligt tilgængeligt."
-      enterprise_notice: "As a special 'Thank you!' for their financial contribution to develop OpenProject, this tiny feature is only available for Enterprise Edition support subscribers."
-      manage_colors: "Edit color select options"
+      enterprise_notice: "Som tak for finansiel støtte til udviklingen af OpenProject, denne lille funktion er kun tilgængelig for Enterprise Edition support abonnenter."
+      manage_colors: "Redigér egenskaber for farvevalg"
       instructions:
-        alternative_color: "Strong accent color, typically used for most the important button on a screen."
-        content_link_color: "Font color of most of the links."
-        primary_color: "Main color."
-        primary_color_dark: "Typically a darker version of the main color used for hover effects."
-        header_bg_color: "Background color of the header."
-        header_item_bg_hover_color: "Background color of clickable header items when hovered with the mouse."
-        header_item_font_color: "Font color of clickable header items."
-        header_item_font_hover_color: "Font color of clickable header items when hovered with the mouse."
-        header_border_bottom_color: "Thin line under the header. Leave this field empty if you don't want any line."
-        main_menu_bg_color: "Left side menu's background color."
+        alternative-color: "Strong accent color, typically used for the most important button on a screen."
+        content-link-color: "Tekst-farve på de fleste links."
+        primary-color: "Hovedfarve."
+        primary-color-dark: "Typisk en mørkere version af hovedfarven, brugt til hover effekter."
+        header-item-bg-hover-color: "Baggrundsfarve på knapper i headeren, når musen føres over."
+        header-item-font-color: "Tekst-farve på knapper i headeren."
+        header-item-font-hover-color: "Tekst-farve på knapper i headeren, når musen føres over."
+        header-border-bottom-color: "Tynd linje under headeren. Efterlad dette felt tomt hvis du ikke ønsker en linje."
+        main-menu-bg-color: "Baggrundsfarve på venstre sidemenu."
+      theme_warning: Changing the theme will overwrite you custom style. The design will then be lost. Are you sure you want to continue?
     enterprise:
       upgrade_to_ee: "Opgradér til Enterprise Edition"
-      add_token: "Upload an Enterprise Edition support token"
-      replace_token: "Replace your current support token"
+      add_token: "Upload en Enterprise Edition support-token"
+      replace_token: "Erstat din nuværende support-token"
       order: "Bestil Enterprise Edition"
-      paste: "Paste your Enterprise Edition support token"
-      required_for_feature: "This feature is only available with an active Enterprise Edition support token."
+      paste: "Indsæt din Enterprise Edition support-token"
+      required_for_feature: "Denne funktion er kun tilgængelig med en aktiv Enterprise Edition support-token."
       enterprise_link: "For yderliger information, klik her."
   announcements:
     show_until: Vis indtil
-    is_active: currently displayed
-    is_inactive: currently not displayed
+    is_active: vises i øjeblikket
+    is_inactive: vises ikke i øjeblikket
   attribute_help_texts:
     text_overview: 'In this view, you can create custom help texts for attributes view. When defined, these texts can be shown by clicking the help icon next to its belonging attribute.'
     label_plural: 'Attribute help texts'
-    show_preview: 'Preview text'
-    add_new: 'Add help text'
-    edit: "Edit help text for %{attribute_caption}"
+    show_preview: 'Forhåndsvis tekst'
+    add_new: 'Tilføj hjælpetekst'
+    edit: "Redigér hjælpetekst til %{attribute_caption}"
   auth_sources:
     index:
       no_results_content_title: Der er i øjeblikket ingen godkendelse.
       no_results_content_text: Opret en ny godkendelse
   ldap_auth_sources:
-    connection_encryption: 'Connection encryption'
+    technical_warning_html: |
+      This LDAP form requires technical knowledge of your LDAP / Active Directory setup.
+      <br/>
+      <a href="https://www.openproject.org/help/administration/manage-ldap-authentication/">Please visit our documentation for detailed instructions</a>.
+    attribute_texts:
+      name: Arbitrary name of the LDAP connection
+      host: LDAP host name or IP address
+      login_map: The attribute key in LDAP that is used to identify the unique user login. Usually, this will be `uid` or `samAccountName`.
+      generic_map: The attribute key in LDAP that is mapped to the OpenProject `%{attribute}` attribute
+      admin_map_html: "Optional: The attribute key in LDAP that <strong>if present</strong> marks the OpenProject user an admin. Leave empty when in doubt."
+      system_user_dn_html: |
+        Enter the DN of the system user used for read-only access.
+        <br/>
+        Example: uid=openproject,ou=system,dc=example,dc=com
+      system_user_password: Enter the bind password of the system user
+      base_dn: |
+        Enter the Base DN of the subtree in LDAP you want OpenProject to look for users and groups.
+        OpenProject will filter for provided usernames in this subtree only.
+        Example: ou=users,dc=example,dc=com
+      onthefly_register: |
+        If you check this box, OpenProject will automatically create new users from their LDAP entries
+        when they first authenticate with OpenProject.
+        Leave this unchecked to only allow existing accounts in OpenProject to authenticate through LDAP!
+    connection_encryption: 'Forbindelseskryptering'
+    system_account: 'System account'
+    system_account_legend: |
+      OpenProject requires read-only access through a system account to lookup users and groups in your LDAP tree.
+      Please specify the bind credentials for that system user in the following section.
+    ldap_details: 'LDAP details'
+    user_settings: 'Attribute mapping'
+    user_settings_legend: |
+      The following fields are related to how users are created in OpenProject from LDAP entries and
+      what LDAP attributes are used to define the attributes of an OpenProject user (attribute mapping).
     tls_mode:
       plain: 'ingen'
       simple_tls: 'simple_tls'
       start_tls: 'start_tls'
-      plain_description: "Plain unencrypted connection, no TLS negotiation."
-      simple_tls_description: "Implicit TLS encryption, but no certificate validation. Use with caution and implicit trust of the LDAP connection."
-      start_tls_description: "Explicit TLS encryption with full validation. Use for LDAP over TLS/SSL."
+      plain_description: "Almindelig ikke-krypteret forbindelse, ingen TLS-forhandling."
+      simple_tls_description: "Implicit TLS-kryptering, men ingen certifikatvalidering. Brug med forsigtighed og implicit tillid til LDAP-forbindelsen."
+      start_tls_description: "Eksplicit TLS-kryptering med fuld validering. Brug til LDAP over TLS / SSL."
       section_more_info_link_html: >
-        This section concerns the connection security of this LDAP authentication source. For more information, visit <a href="%{link}">the Net::LDAP documentation</a>.
+        Dette afsnit vedrører forbindelsessikkerheden for denne LDAP-godkendelseskilde. For mere information kan du besøge <a href="%{link}">Net::LDAP dokumentationen</a>.
   forums:
     show:
       no_results_title_text: There are currently no posts for the forum.
@@ -62,15 +134,15 @@ da:
     index:
       no_results_title_text: Der er i øjeblikket ingen farver.
       no_results_content_text: Opret en ny farve
-    label_no_color: 'No color'
+    label_no_color: 'Ingen farve'
   custom_actions:
     actions:
-      name: 'Actions'
-      add: 'Add action'
+      name: 'Handlinger'
+      add: 'Tilføj handling'
       assigned_to:
-        executing_user_value: '(Assign to executing user)'
-    conditions: 'Conditions'
-    plural: 'Custom actions'
+        executing_user_value: '(Tildel til den udførende bruger)'
+    conditions: 'Betingelser'
+    plural: 'Brugerdefinerede handlinger'
     new: 'New custom action'
     edit: 'Edit custom action %{name}'
     execute: 'Execute %{name}'
@@ -279,9 +351,9 @@ da:
       changeset:
         repository: "Projektarkiv"
       comment:
-        commented: "Kommenterede"
+        commented: "Kommenterede" #an object that this comment belongs to
       custom_action:
-        actions: "Actions"
+        actions: "Handlinger"
       custom_field:
         default_value: "Forhåndsvalgt værdi"
         editable: "Redigerbar"
@@ -327,6 +399,13 @@ da:
         types: "Typer"
         versions: "Versioner"
         work_packages: "Arbejdspakker"
+      project/status:
+        code: 'Status'
+        explanation: 'Statusbeskrivelse'
+        codes:
+          on_track: 'På sporet'
+          at_risk: 'I fare'
+          off_track: 'Af sporet'
       query:
         column_names: "Kolonner"
         relations_to_type_column: "Relations to %{type}"
@@ -418,6 +497,8 @@ da:
         confirmation: "matcher ikke %{attribute}."
         could_not_be_copied: "kunne ikke (fuldt ud) kopieres."
         does_not_exist: "findes ikke."
+        error_unauthorized: "kan muligvis ikke tilgås."
+        error_readonly: "was attempted to be written but is not writable."
         empty: "må ikke være tomt."
         even: "skal være lige."
         exclusion: "er reserveret."
@@ -481,6 +562,8 @@ da:
               invalid_values: "A value is invalid."
               id_filter_required: "An 'id' filter is required."
         project:
+          archived_ancestor: 'Projektet har en arkiveret forfader.'
+          foreign_wps_reference_version: 'Arbejdspakker i ikke-efterkommerprojekter refererer til versioner af projektet eller dets efterkommere.'
           attributes:
             types:
               in_use_by_work_packages: "still in use by work packages: %{types}"
@@ -514,6 +597,10 @@ da:
         role:
           permissions:
             dependency_missing: "need to also include '%{dependency}' as '%{permission}' is selected."
+        time_entry:
+          attributes:
+            hours:
+              day_limit: "is too high as a maximum of 24 hours can be logged per date."
         work_package:
           is_not_a_valid_target_for_time_entries: "Arbejdspakke # %{id} er ikke et gyldig mål for tildeling af tider."
           attributes:
@@ -609,6 +696,7 @@ da:
   activity:
     created: "Oprettet: %{title}"
     updated: "Opdateret: %{title}"
+  #common attributes of all models
   attributes:
     active: "Aktiv"
     assigned_to: "Tildelt"
@@ -641,6 +729,7 @@ da:
     is_default: "Forhåndsvalgt værdi"
     is_for_all: "For alle projekter"
     is_public: "Offentlig"
+    #kept for backwards compatibility
     issue: "Arbejdspakke"
     lastname: "Efternavn"
     login: "Username"
@@ -649,6 +738,7 @@ da:
     password: "Adgangskode"
     priority: "Prioritet"
     project: "Prjoekt"
+    public: "Offentlig"
     responsible: "Accountable"
     role: "Rolle"
     roles: "Rollee"
@@ -660,6 +750,7 @@ da:
     type: "Type"
     updated_at: "Opdateret den"
     updated_on: "Opdateret den"
+    uploader: "Uploader"
     user: "Bruger"
     version: "Version"
     work_package: "Arbejdspakke"
@@ -697,7 +788,7 @@ da:
   button_generate: "Generér"
   button_list: "Liste"
   button_lock: "Lås"
-  button_log_time: "Registrér tid"
+  button_log_time: "Tidsregistrering"
   button_login: "Log ind"
   button_move: "Flyt"
   button_move_and_follow: "Flyt og følg"
@@ -784,9 +875,13 @@ da:
       - "Fredag"
       - "Lørdag"
     formats:
+      #Use the strftime parameters for formats.
+      #When no format has been given, it uses default.
+      #You can provide other formats here if you like!
       default: "%d/%m/%Y"
       long: "%B %d %Y"
       short: "%b %d"
+    #Don't forget the nil at the beginning; there's no such thing as a 0th month
     month_names:
       - null
       - "Januar"
@@ -801,6 +896,7 @@ da:
       - "Oktober"
       - "November"
       - "December"
+    #Used in date_select and datime_select.
     order:
       - ':år'
       - ':måned'
@@ -930,6 +1026,7 @@ da:
   description_sub_work_package: "Underordnet arbejdspakke til denne"
   description_toc_toggle: "Vis/Skjul indholdsfortegnelse"
   description_wiki_subpages_reassign: "Vælg ny overordnet side"
+  #Text direction: Left-to-Right (ltr) or Right-to-Left (rtl)
   direction: Fra venstre mod højre
   ee:
     upsale:
@@ -938,13 +1035,12 @@ da:
         add_groups: "Add new attribute groups"
         rename_groups: "Rename attributes groups"
       project_filters:
-        description_html: "Upgrade to %{link} to filter and sort on custom fields"
-  enumeration_activities: "Aktiviteter (styring af tid)"
+        description_html: "Filtering and sorting on custom fields is an enterprise edition feature."
+  enumeration_activities: "Time tracking activities"
   enumeration_work_package_priorities: "Prioritering af arbejdspakker"
-  enumeration_system_activity: "Systemaktivitet"
   enumeration_reported_project_statuses: "Rapporteret projektstatus"
   error_auth_source_sso_failed: "Single Sign-On (SSO) for user '%{value}' failed"
-  error_can_not_archive_project: "This project cannot be archived: There is at least one work package assigned to a version defined in this project."
+  error_can_not_archive_project: "Dette projekt kan ikke arkiveres: %{errors}"
   error_can_not_delete_entry: "Unable to delete entry"
   error_can_not_delete_custom_field: "Kan ikke slette det selvvalgte felt"
   error_can_not_delete_type: "Denne type indeholder arbejdspakker og kan ikke slettes."
@@ -953,6 +1049,7 @@ da:
   error_can_not_remove_role: "Denne rolle er i brug og kan ikke slettes."
   error_can_not_reopen_work_package_on_closed_version: "En arbejdspakke der er knyttet til en lukket version kan ikke åbnes igen"
   error_can_not_find_all_resources: "Could not find all related resources to this request."
+  error_can_not_unarchive_project: "Dette projekt kan ikke fjernes fra arkivering: %{errors}"
   error_check_user_and_role: "Vælg venligst en bruger og en rolle."
   error_code: "Error %{code}"
   error_cookie_missing: 'The OpenProject cookie is missing. Please ensure that cookies are enabled, as this application will not properly function without.'
@@ -1010,6 +1107,8 @@ da:
       pdf_with_descriptions: "PDF med beskrivelse"
       pdf_with_descriptions_and_attachments: "PDF with descriptions and attachments"
       pdf_with_attachments: "PDF with attachments"
+    image:
+      omitted: "Image not exported."
   extraction:
     available:
       pdftotext: "Pdftotext available (optional)"
@@ -1057,6 +1156,8 @@ da:
       blog: "OpenProject blog"
       forums: "Community forum"
       newsletter: "Security alerts / Newsletter"
+  journals:
+    changes_retracted: "The changes where retracted."
   links:
     configuration_guide: 'Configuration guide'
   instructions_after_registration: "Du kan logge ind så snart din konto er blevet aktiveret ved at klikke %{signin}."
@@ -1214,7 +1315,7 @@ da:
   label_duplicated_by: "duplikeret gennem"
   label_duplicate: "duplicate"
   label_duplicates: "dubletter"
-  label_edit: "Redigér"
+  label_edit: "Rediger"
   label_enable_multi_select: "Vælg multivalg"
   label_enabled_project_custom_fields: 'Aktiverede brugerdefinerede felter'
   label_enabled_project_modules: 'Aktiverede moduler'
@@ -1590,15 +1691,19 @@ da:
   label_workflow_plural: "Arbejdsprocesser"
   label_workflow_summary: "Opsummering"
   label_x_closed_work_packages_abbr:
+    zero: "0 closed"
     one: "1 lukket"
     other: "%{count} lukkede"
   label_x_comments:
+    zero: "no comments"
     one: "1 kommetar"
     other: "%{count} kommetarer"
   label_x_open_work_packages_abbr:
+    zero: "0 open"
     one: "1 åbne"
     other: "%{count} åbne"
   label_x_projects:
+    zero: "no projects"
     one: "%{count} projekter"
     other: "%{count} projekter"
   label_year: "År"
@@ -1652,19 +1757,21 @@ da:
       link_name: 'Ny arbejdspakke'
       link_name_type: 'New %{type_name}'
   mail:
-    actions: 'Actions'
+    actions: 'Handlinger'
   mail_body_account_activation_request: "En ny bruger ( %{value}) har registreret sig. Kontoen afventer din godkendelse:"
   mail_body_account_information: "Din kontoinformation"
   mail_body_account_information_external: "Du kan bruge din %{value} konto til at logge ind."
   mail_body_lost_password: "Klik på dette link for at ændre din adgangskode:"
   mail_body_register: "Klik på dette link for at aktivere din konto:"
   mail_body_reminder: "%{count} arbejdspakke(r), der er tilknyttet dig, udløber indenfor de næste %{days} dage:"
+  mail_body_group_reminder: "%{count} arbejdspakke(r) som er tildelt \"%{group}\" har deadline indenfor %{days} dage:"
   mail_body_wiki_content_added: "Wiki-siden '%{id}' er blevet tilføjet af %{author}."
   mail_body_wiki_content_updated: "Wiki-siden '%{id}' er blevet opdateret af %{author}."
   mail_subject_account_activation_request: "%{value} anmodninger om kontoaktivering"
   mail_subject_lost_password: "Din %{value} adgangskode"
   mail_subject_register: "Din %{value} kontoaktivering"
   mail_subject_reminder: "%{count} arbejdspakke(r) har deadline i de næste %{days} dage"
+  mail_subject_group_reminder: "Gruppen \"%{group}\" har %{count} arbejdspakke(r) med deadline indenfor %{days} dage"
   mail_subject_wiki_content_added: "'%{id}' wikisider er blevet tilføjet"
   mail_subject_wiki_content_updated: "'%{id}' wikiside er blevet opdateret"
   mail_user_activation_limit_reached:
@@ -1674,8 +1781,8 @@ da:
       The user cannot activate their account since the user limit has been reached.
     steps:
       label: "To allow the user to sign in you can either: "
-      a: "Upgrade your payment plan ([here](upgrade_url))"
-      b: "Lock or delete an existing user ([here](users_url))"
+      a: "Upgrade your payment plan ([here](upgrade_url))" #here turned into a link
+      b: "Lock or delete an existing user ([here](users_url))" #here turned into a link
   more_actions: "Flere funktioner"
   noscript_description: "Du skal aktivere JavaScript for at bruge OpenProject!"
   noscript_heading: "JavaScript deaktiveret"
@@ -1742,6 +1849,7 @@ da:
   notice_project_cannot_update_custom_fields: "You cannot update the project's available custom fields. The project is invalid: %{errors}"
   notice_attachment_migration_wiki_page: >
     This page was generated automatically during the update of OpenProject. It contains all attachments previously associated with the %{container_type} "%{container_name}".
+  #Default format for numbers
   number:
     format:
       delimiter: ""
@@ -1847,6 +1955,7 @@ da:
       title: Change the project's identifier
     archive:
       are_you_sure: "Are you sure you want to archive the project '%{name}'?"
+      archived: "Archived"
   project_module_activity: "Aktivivtet"
   project_module_forums: "Fora"
   project_module_calendar: "Kalender"
@@ -1858,6 +1967,8 @@ da:
   project_module_wiki: "Wiki"
   query:
     attribute_and_direction: "%{attribute} (%{direction})"
+  #possible query parameters (e.g. issue queries),
+  #which are not attributes of an AR-Model.
   query_fields:
     active_or_archived: "Active or archived"
     assigned_to_role: "Tildeltes rolle"
@@ -2099,6 +2210,7 @@ da:
   status_invited: inviteret
   status_locked: Spærret
   status_registered: registreret
+  #Used in array.to_sentence.
   support:
     array:
       sentence_connector: "og"
@@ -2134,7 +2246,7 @@ da:
   text_destroy_with_associated: "Der er yderligere objekter tilknyttet arbejdspakken/-kerne som skal slettes. Disse er af følgende art:"
   text_destroy_what_to_do: "Hvad vil du lave?"
   text_diff_truncated: "... Denne afvigelse blev undertrykt da den overstiger den længde, der kan vises."
-  text_email_delivery_not_configured: "Email levering er ikke indstillet og påmindelser er inaktive.\nOpsæt din SMTP-server i config/configuration.yml og genstart appen for at aktivere dette."
+  text_email_delivery_not_configured: "Email delivery is not configured, and notifications are disabled.\nConfigure your SMTP server to enable them."
   text_enumeration_category_reassign_to: "Genindsæt dem med denne værdi:"
   text_enumeration_destroy_question: "%{count} objekter er tilknyttet denne værdi."
   text_file_repository_writable: "Arkiv for vedhæftninger er skrivbart"
@@ -2147,7 +2259,8 @@ da:
   text_work_package_category_destroy_question: "Nogle arbejdspakker (%{count}) er tilknyttet til denne kategori. Hvad vil du gøre?"
   text_work_package_category_reassign_to: "Gentilknyt arbejdspakker til denne kategori"
   text_work_package_updated: "Arbejdspakke %{id} er blevet opdateret af %{author}."
-  text_work_package_watcher_added: "Du er blevet tilføjet som en iagttager for arbejdspakke %{id} af %{watcher_setter}."
+  text_work_package_watcher_added: "You have been added as a watcher to Work package %{id} by %{watcher_changer}."
+  text_work_package_watcher_removed: "You have been removed from watchers of Work package %{id} by %{watcher_changer}."
   text_work_packages_destroy_confirmation: "Er du sikker på, du vil slette de/den valgte arbejdspakke(r)?"
   text_work_packages_ref_in_commit_messages: "Arbejdspakker håndteres i tilknyttede meddelelser"
   text_journal_added: "%{label} %{value} tilføjet"
@@ -2427,6 +2540,17 @@ da:
     User limit reached. You cannot activate any more users. Please <a href="%{upgrade_url}">upgrade your plan</a> or block members to allow for additional users.
   warning_user_limit_reached_instructions: >
     You reached your user limit (%{current}/%{max} active users). Please contact sales@openproject.com to upgrade your Enterprise Edition plan and add additional users.
+  0: >
+
+  warning_bar:
+    protocol_mismatch:
+      title: 'Protocol setting mismatch'
+      text_html: >
+        Your application is running with its protocol setting set to <code>%{set_protocol}</code>, but the request is an <code>%{actual_protocol}</code> request. This will result in errors! Go to <a href="%{setting_path}">System settings</a> and change the "Protocol" setting to correct this.
+    hostname_mismatch:
+      title: 'Hostname setting mismatch'
+      text_html: >
+        Your application is running with its host name setting set to <code>%{set_hostname}</code>, but the request is a <code>%{actual_hostname}</code> hostname. This will result in errors! Go to <a href="%{setting_path}">System settings</a> and change the "Host name" setting to correct this.
   menu_item: "Menupunkt"
   menu_item_setting: "Synlighed"
   wiki_menu_item_for: "Menupunkt for wikipage \"%{title}\""
@@ -2435,6 +2559,7 @@ da:
     Du er ved at slette det eneste overordnede punkt på wiki-menuen. Du skal nu vælge en wiki-side, udfra hvilken der kan dannes et nyt hovedpunkt. Hvis du vil slette wikien helt kan wiki-modulet deaktiveres af projektadministratorer.
   wiki_menu_item_delete_not_permitted: Menupunktet til den eneste wiki-side kan ikke slettes.
   query_menu_item_for: "Menupunkt for forespørgsel \"%{title}\""
+  #TODO: merge with work_packages top level key
   work_package:
     updated_automatically_by_child_changes: |
       _Updateret automatisk ved at ændre værdier i underordnet arbejdspakke %{child} _
@@ -2479,7 +2604,9 @@ da:
         estimated_hours: "Det skønnede timetal kan ikke angives på overordnede arbejdspakker."
         invalid_user_assigned_to_work_package: "Den valgte bruger er ikke tilladt at være '%{property}' for denne arbejdspakke."
         start_date: "Startdato kan ikke angives for overordnede arbejdspakker."
-      writing_read_only_attributes: "Du må ikke skrive til en skrivebeskyttet attribut."
+      eprops:
+        invalid_gzip: "is invalid gzip: %{message}"
+        invalid_json: "is invalid json: %{message}"
     resources:
       schema: 'Skema'
   doorkeeper:
@@ -2487,18 +2614,22 @@ da:
       status: 'Pre-authorization'
     errors:
       messages:
+        #Common error messages
         invalid_request: 'The request is missing a required parameter, includes an unsupported parameter value, or is otherwise malformed.'
-        invalid_redirect_uri: "The requested redirect uri is malformed or doesn't match client redirect URI."
+        invalid_redirect_uri: "Den anmodede omdirigerings-URI er misformet eller stemmer ikke overens med klient-omdirigerings-URI."
         unauthorized_client: 'The client is not authorized to perform this request using this method.'
         access_denied: 'The resource owner or authorization server denied the request.'
         invalid_scope: 'The requested scope is invalid, unknown, or malformed.'
         invalid_code_challenge_method: 'The code challenge method must be plain or S256.'
         server_error: 'The authorization server encountered an unexpected condition which prevented it from fulfilling the request.'
         temporarily_unavailable: 'The authorization server is currently unable to handle the request due to a temporary overloading or maintenance of the server.'
+        #Configuration error messages
         credential_flow_not_configured: 'Resource Owner Password Credentials flow failed due to Doorkeeper.configure.resource_owner_from_credentials being unconfigured.'
         resource_owner_authenticator_not_configured: 'Resource Owner find failed due to Doorkeeper.configure.resource_owner_authenticator being unconfigured.'
         admin_authenticator_not_configured: 'Access to admin panel is forbidden due to Doorkeeper.configure.admin_authenticator being unconfigured.'
+        #Access grant errors
         unsupported_response_type: 'The authorization server does not support this response type.'
+        #Access token errors
         invalid_client: 'Client authentication failed due to unknown client, no client authentication included, or unsupported authentication method.'
         invalid_grant: 'The provided authorization grant is invalid, expired, revoked, does not match the redirection URI used in the authorization request, or was issued to another client.'
         unsupported_grant_type: 'The authorization grant type is not supported by the authorization server.'
@@ -2523,6 +2654,7 @@ da:
         redirect_uri_html: >
           The allowed URLs authorized users can be redirected to. One entry per line. <br/> If you're registering a desktop application, use the following URL.
         confidential: "Check if the application will be used where the client secret can be kept confidential. Native mobile apps and Single Page Apps are assumed non-confidential."
+        scopes: "Check the scopes you want the application to grant access to. If no scope is checked, api_v3 is assumed."
         client_credential_user_id: "Optional user ID to impersonate when clients use this application. Leave empty to allow public access only"
         register_intro: "If you are developing an OAuth API client application for OpenProject, you can register it using this form for all users to use."
         default_scopes: ""
@@ -2537,8 +2669,8 @@ da:
       wants_to_access_html: >
         This application requests access to your OpenProject account. <br/> <strong>It has requested the following permissions:</strong>
     scopes:
-      api_v3: "Full API access"
-      api_v3_text: "Application will receive full read & write access to the OpenProject API to perform actions on your behalf."
+      api_v3: "Full API v3 access"
+      api_v3_text: "Application will receive full read & write access to the OpenProject API v3 to perform actions on your behalf."
     grants:
       created_date: "Approved on"
       scopes: "Tilladelser"

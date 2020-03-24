@@ -1,6 +1,6 @@
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 
 import {APP_INITIALIZER, NgModule} from '@angular/core';
@@ -41,15 +41,19 @@ import {SelectEditFieldComponent} from "core-app/modules/fields/edit/field-types
 import {FormattableEditFieldComponent} from "core-app/modules/fields/edit/field-types/formattable-edit-field.component";
 import {TextEditFieldComponent} from "core-app/modules/fields/edit/field-types/text-edit-field.component";
 import {OpenprojectCommonModule} from "core-app/modules/common/openproject-common.module";
-import {WorkPackageEditingPortalService} from "core-app/modules/fields/edit/editing-portal/wp-editing-portal-service";
 import {EditFormPortalComponent} from "core-app/modules/fields/edit/editing-portal/edit-form-portal.component";
 import {EditFieldControlsComponent,} from "core-app/modules/fields/edit/field-controls/edit-field-controls.component";
 import {OpenprojectAccessibilityModule} from "core-app/modules/a11y/openproject-a11y.module";
-import {WorkPackageEditFieldComponent} from "core-app/modules/fields/edit/field-types/work-package-edit-field.component";
 import {OpenprojectEditorModule} from 'core-app/modules/editor/openproject-editor.module';
 import {UserFieldPortalComponent} from "core-app/modules/fields/display/display-portal/display-user-field-portal/user-field-portal.component";
-import {UserFieldPortalService} from "core-app/modules/fields/display/display-portal/display-user-field-portal/user-field-portal-service";
 import {SelectAutocompleterRegisterService} from "core-app/modules/fields/edit/field-types/select-autocompleter-register.service";
+import {EditFormComponent} from "core-app/modules/fields/edit/edit-form/edit-form.component";
+import {WorkPackageEditFieldComponent} from "core-app/modules/fields/edit/field-types/work-package-edit-field.component";
+import {EditableAttributeFieldComponent} from "core-app/modules/fields/edit/field/editable-attribute-field.component";
+import {ProjectStatusEditFieldComponent} from "core-app/modules/fields/edit/field-types/project-status-edit-field.component";
+import {PortalCleanupService} from "core-app/modules/fields/display/display-portal/portal-cleanup.service";
+import {PlainFormattableEditFieldComponent} from "core-app/modules/fields/edit/field-types/plain-formattable-edit-field.component";
+import {TimeEntryWorkPackageEditFieldComponent} from "core-app/modules/fields/edit/field-types/te-work-package-edit-field.component";
 
 @NgModule({
   imports: [
@@ -61,15 +65,23 @@ import {SelectAutocompleterRegisterService} from "core-app/modules/fields/edit/f
     EditFieldControlsComponent,
     EditFormPortalComponent,
     UserFieldPortalComponent,
+    EditFormComponent,
+    EditableAttributeFieldComponent,
   ],
   providers: [
-    WorkPackageEditingPortalService,
-    UserFieldPortalService,
-    DisplayFieldService,
-    EditFieldService,
-    SelectAutocompleterRegisterService,
-    { provide: APP_INITIALIZER, useFactory: initializeCoreEditFields, deps: [EditFieldService, SelectAutocompleterRegisterService], multi: true },
-    { provide: APP_INITIALIZER, useFactory: initializeCoreDisplayFields, deps: [DisplayFieldService], multi: true },
+    PortalCleanupService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeCoreEditFields,
+      deps: [EditFieldService, SelectAutocompleterRegisterService],
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeCoreDisplayFields,
+      deps: [DisplayFieldService],
+      multi: true
+    },
   ],
   declarations: [
     EditFormPortalComponent,
@@ -80,26 +92,18 @@ import {SelectAutocompleterRegisterService} from "core-app/modules/fields/edit/f
     FloatEditFieldComponent,
     IntegerEditFieldComponent,
     FormattableEditFieldComponent,
+    PlainFormattableEditFieldComponent,
     MultiSelectEditFieldComponent,
     SelectEditFieldComponent,
     TextEditFieldComponent,
     EditFieldControlsComponent,
     WorkPackageEditFieldComponent,
-  ],
-  entryComponents: [
-    EditFormPortalComponent,
-    UserFieldPortalComponent,
-    BooleanEditFieldComponent,
-    DateEditFieldComponent,
-    DurationEditFieldComponent,
-    FloatEditFieldComponent,
-    IntegerEditFieldComponent,
-    FormattableEditFieldComponent,
-    MultiSelectEditFieldComponent,
-    SelectEditFieldComponent,
-    TextEditFieldComponent,
-    WorkPackageEditFieldComponent,
+    TimeEntryWorkPackageEditFieldComponent,
+    EditFormComponent,
+    EditableAttributeFieldComponent,
+    ProjectStatusEditFieldComponent,
   ]
 })
-export class OpenprojectFieldsModule { }
+export class OpenprojectFieldsModule {
+}
 

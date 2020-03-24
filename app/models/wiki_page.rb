@@ -1,7 +1,8 @@
 #-- encoding: UTF-8
+
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,8 +27,6 @@
 #
 # See docs/COPYRIGHT.rdoc for more details.
 #++
-
-require 'diff'
 
 class WikiPage < ApplicationRecord
   belongs_to :wiki, touch: true
@@ -155,13 +154,13 @@ class WikiPage < ApplicationRecord
     content_to = content.versions.find_by(version: version_to)
     content_from = content.versions.find_by(version: version_from)
 
-    (content_to && content_from) ? WikiDiff.new(content_to, content_from) : nil
+    (content_to && content_from) ? Wikis::Diff.new(content_to, content_from) : nil
   end
 
   def annotate(version = nil)
     version = version ? version.to_i : content.version
     c = content.versions.find_by(version: version)
-    c ? WikiAnnotate.new(c) : nil
+    c ? Wikis::Annotate.new(c) : nil
   end
 
   def text
@@ -255,55 +254,5 @@ class WikiPage < ApplicationRecord
 
   def validate_same_project
     errors.add(:parent_title, :not_same_project) if parent && (parent.wiki_id != wiki_id)
-  end
-end
-
-class WikiDiff < Redmine::Helpers::Diff
-  attr_reader :content_to, :content_from
-
-  def initialize(content_to, content_from)
-    @content_to = content_to
-    @content_from = content_from
-    super(content_to.data.text, content_from.data.text)
-  end
-end
-
-class WikiAnnotate
-  attr_reader :lines, :content
-
-  def initialize(content)
-    @content = content
-    current = content
-    current_lines = current.data.text.split(/\r?\n/)
-    @lines = current_lines.map { |t| [nil, nil, t] }
-    positions = []
-    current_lines.size.times do |i| positions << i end
-    while current.previous
-      d = current.previous.data.text.split(/\r?\n/).diff(current.data.text.split(/\r?\n/)).diffs.flatten
-      d.each_slice(3) do |s|
-        sign = s[0]
-        line = s[1]
-        if sign == '+' && positions[line] && positions[line] != -1
-          if @lines[positions[line]][0].nil?
-            @lines[positions[line]][0] = current.version
-            @lines[positions[line]][1] = current.data.author
-          end
-        end
-      end
-      d.each_slice(3) do |s|
-        sign = s[0]
-        line = s[1]
-        if sign == '-'
-          positions.insert(line, -1)
-        else
-          positions[line] = nil
-        end
-      end
-      positions.compact!
-      # Stop if every line is annotated
-      break unless @lines.detect { |line| line[0].nil? }
-      current = current.previous
-    end
-    @lines.each { |line| line[0] ||= current.version }
   end
 end

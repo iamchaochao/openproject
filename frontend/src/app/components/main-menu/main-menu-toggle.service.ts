@@ -1,6 +1,6 @@
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 
 import {Injectable} from '@angular/core';
@@ -32,15 +32,17 @@ import {I18nService} from "core-app/modules/common/i18n/i18n.service";
 import {CurrentProjectService} from "core-components/projects/current-project.service";
 import {DeviceService} from "app/modules/common/browser/device.service";
 import {Injector} from "@angular/core";
+import {InjectField} from "core-app/helpers/angular/inject-field.decorator";
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class MainMenuToggleService {
   public toggleTitle:string;
 
   private elementWidth:number;
   private readonly localStorageKey:string = 'openProject-mainMenuWidth';
   private readonly defaultWidth:number = 230;
-  private readonly currentProject:CurrentProjectService = this.injector.get(CurrentProjectService);
+
+  @InjectField() currentProject:CurrentProjectService;
 
   private global = (window as any);
   private htmlNode = document.getElementsByTagName('html')[0];
@@ -59,12 +61,12 @@ export class MainMenuToggleService {
   private resizeSubscription$:Subscription;
 
   constructor(protected I18n:I18nService,
-              protected injector:Injector,
+              public injector:Injector,
               readonly deviceService:DeviceService) {
   }
 
   public initializeMenu():void {
-    if (!this.mainMenu) return;
+    if (!this.mainMenu) { return; }
 
     this.elementWidth = parseInt(window.OpenProject.guardedLocalStorage(this.localStorageKey) as string);
 
@@ -75,7 +77,7 @@ export class MainMenuToggleService {
     }
 
     let currentProject:CurrentProjectService = this.injector.get(CurrentProjectService);
-    if (jQuery(document.body).hasClass('controller-my') && this.elementWidth == 0 || currentProject.id === null) {
+    if (jQuery(document.body).hasClass('controller-my') && this.elementWidth === 0 || currentProject.id === null) {
       this.saveWidth(this.defaultWidth);
     }
 
@@ -86,7 +88,7 @@ export class MainMenuToggleService {
   }
 
   // click on arrow or hamburger icon
-  public toggleNavigation(event?:JQuery.TriggeredEvent) : void {
+  public toggleNavigation(event?:JQuery.TriggeredEvent):void {
     if (event) {
       event.stopPropagation();
       event.preventDefault();
@@ -95,38 +97,33 @@ export class MainMenuToggleService {
     if (!this.showNavigation) { // sidebar is hidden -> show menu
       if (this.deviceService.isMobile) { // mobile version
         this.setWidth(window.innerWidth);
-        // On mobile the main menu shall close whenever you click outside the menu.
-        this.setupAutocloseMainMenu();
       } else { // desktop version
-        this.saveWidth(this.defaultWidth);
+        this.saveWidth(parseInt(window.OpenProject.guardedLocalStorage(this.localStorageKey) as string));
       }
     } else { // sidebar is expanded -> close menu
       this.closeMenu();
     }
 
-    this.addRemoveClassHidden();
+    this.toggleClassHidden();
     this.setToggleTitle();
     // Set focus on first visible main menu item.
     // This needs to be called after AngularJS has rendered the menu, which happens some when after(!) we leave this
     // method here. So we need to set the focus after a timeout.
-    setTimeout(function() {
+    setTimeout(function () {
       jQuery('#main-menu [class*="-menu-item"]:visible').first().focus();
     }, 500);
   }
 
   public closeMenu():void {
-    if (this.deviceService.isMobile) {
-      this.saveWidth(0);
-    } else {
-      this.setWidth(0);
-    }
+    this.setWidth(0);
     this.hideElements.addClass('hidden-navigation');
+    jQuery('.wp-query-menu--search-input').blur();
   }
 
   public closeWhenOnMobile():void {
     if (this.deviceService.isMobile) {
-      this.closeMenu()
-    };
+      this.closeMenu();
+    }
   }
 
   private setToggleTitle():void {
@@ -138,7 +135,7 @@ export class MainMenuToggleService {
     this.titleData.next(this.toggleTitle);
   }
 
-  private addRemoveClassHidden():void {
+  private toggleClassHidden():void {
     this.hideElements.toggleClass('hidden-navigation', !this.showNavigation);
   }
 
@@ -146,7 +143,7 @@ export class MainMenuToggleService {
     // Leave a minimum amount of space for space fot the content
     let maxMenuWidth = window.innerWidth - 520;
 
-    if (width != undefined && width > maxMenuWidth) {
+    if (width !== undefined && width > maxMenuWidth) {
       width = maxMenuWidth;
     }
 
@@ -169,31 +166,8 @@ export class MainMenuToggleService {
     this.ensureContentVisibility();
 
     this.global.showNavigation = this.showNavigation;
-    this.addRemoveClassHidden();
+    this.toggleClassHidden();
     this.htmlNode.style.setProperty("--main-menu-width", this.elementWidth + 'px');
-  }
-
-  private setupAutocloseMainMenu():void {
-    let that = this;
-    jQuery('#main-menu').off('focusout.main_menu');
-    jQuery('#main-menu').on('focusout.main_menu', function (event) {
-      let originalEvent = event.originalEvent as FocusEvent;
-      // Check that main menu is not closed and that the `focusout` event is not a click on an element
-      // that tries to close the menu anyways.
-      if (!that.showNavigation || document.getElementById('main-menu-toggle') ===  originalEvent.relatedTarget) {
-        return;
-      }
-      else {
-        // There might be a time gap between `focusout` and the focussing of the activeElement, thus we need a timeout.
-        setTimeout(function() {
-          if (!jQuery.contains(document.getElementById('main-menu')!, document.activeElement!) &&
-              (document.getElementById('main-menu-toggle') !== document.activeElement)) {
-            // activeElement is outside of main menu.
-            that.closeMenu();
-          }
-        }, 0);
-      }
-    });
   }
 
   private snapBack():void {
@@ -214,6 +188,6 @@ export class MainMenuToggleService {
   }
 
   private get isGlobalPage():boolean {
-    return this.currentProject.id? false : true;
+    return this.currentProject.id ? false : true;
   }
 }

@@ -1,3 +1,25 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
+#---
 ru:
   activerecord:
     attributes:
@@ -59,7 +81,7 @@ ru:
     costs: "Расходы"
     current_rate: "Текущий тариф"
     hours: "Часы"
-    units: "Количество"
+    units: "Модули"
     valid_from: "Действует с"
   button_add_budget_item: "Добавить запланированные расходы"
   button_add_cost_object: "Добавить бюджет"
@@ -70,7 +92,7 @@ ru:
   button_log_costs: "Журналировать расходы на единицу"
   button_log_time: "Журналировать время"
   caption_booked_on_project: "Заказано на проект"
-  caption_default: "По умолчанию"
+  caption_default: "по умолчанию"
   caption_default_rate_history_for: "История тарифов по умолчанию для %{user}"
   caption_labor: "Трудовые"
   caption_labor_costs: "Фактические трудозатраты"
@@ -84,9 +106,6 @@ ru:
   caption_set_rate: "Установить текущий тариф"
   caption_show_locked: "Показывать Заблокированные типы"
   cost_objects_title: "Бюджеты"
-  label_cost_type_plural: "Типы затрат"
-  currency_delimiter: ","
-  currency_separator: "."
   description_date_for_new_rate: "Дата для нового тарифа"
   events:
     cost_object: "Бюджет изменен"
@@ -104,6 +123,7 @@ ru:
   label_cost_plural: "Расходы"
   label_cost_report: "Отчет по расходам"
   label_cost_type_specific: "Бюджет #%{id}: %{name}"
+  label_cost_type_plural: "Типы затрат"
   label_costs_per_page: "Расходов на странице"
   label_currency: "Валюта"
   label_currency_format: "Формат валюты"
@@ -140,7 +160,7 @@ ru:
   label_valid_from: "Действует с"
   label_variable_cost_object: "Бюджет на основе переменного тарифа"
   label_view_all_cost_objects: "Отобразить все бюджеты"
-  label_yes: "Да"
+  label_yes: "да"
   notice_cost_object_conflict: "Пакет работ должен быть из того же проекта."
   notice_no_cost_objects_available: "Нет доступных бюджетов."
   notice_something_wrong: "Произошла ошибка. Пожалуйста, попробуйте снова."
@@ -172,4 +192,4 @@ ru:
   text_warning_hidden_elements: "Некоторые записи были исключены из агрегирования."
   week: "неделя"
   js:
-    text_are_you_sure: "Уверены?"
+    text_are_you_sure: "Вы уверены?"

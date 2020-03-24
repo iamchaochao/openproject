@@ -1,15 +1,29 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2014 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
+#
+# OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+# Copyright (C) 2006-2017 Jean-Philippe Lang
+# Copyright (C) 2010-2013 the ChiliProject Team
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-# See doc/COPYRIGHT.md for more details.
+# See docs/COPYRIGHT.rdoc for more details.
 #++
 
 module OpenProject
@@ -36,6 +50,7 @@ module OpenProject
     # Returns the newly created hook
     def self.register_hook(name, &callback)
       raise "A hook named '#{name}' is already registered!" if find(name)
+
       Rails.logger.warn "hook registered"
       hook = Hook.new(name, &callback)
       @@registered_hooks << hook
@@ -47,11 +62,12 @@ module OpenProject
     def self.unregister_hook(name)
       hook = find(name)
       raise "A hook named '#{name}' was not registered!" unless find(name)
+
       @@registered_hooks.delete hook
     end
 
     def self.find(name)
-      @@registered_hooks.find {|h| h.name == name}
+      @@registered_hooks.find { |h| h.name == name }
     end
   end
 end

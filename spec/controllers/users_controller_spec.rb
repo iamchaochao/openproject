@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -197,6 +197,7 @@ describe UsersController, type: :controller do
       end
 
       it 'sends another activation email' do
+        perform_enqueued_jobs
         mail = ActionMailer::Base.deliveries.first.body.parts.first.body.to_s
         token = Token::Invitation.find_by user_id: invited_user.id
 
@@ -408,6 +409,7 @@ describe UsersController, type: :controller do
       end
 
       it 'should send an email to the correct user in the correct language' do
+        perform_enqueued_jobs
         mail = ActionMailer::Base.deliveries.last
         refute_nil mail
         assert_equal [registered_user.mail], mail.to

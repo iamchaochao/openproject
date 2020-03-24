@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -43,28 +43,20 @@ describe WorkPackages::SetAttributesService, type: :model do
     wp.type = FactoryBot.build_stubbed(:type)
     wp.send(:clear_changes_information)
 
-    allow(wp)
-      .to receive(:valid?)
-      .and_return(work_package_valid)
-
     wp
   end
   let(:new_work_package) do
-    wp = WorkPackage.new
-
-    allow(wp)
-      .to receive(:valid?)
-      .and_return(work_package_valid)
-
-    wp
+    WorkPackage.new
   end
+  let(:statuses) { [] }
   let(:contract_class) { WorkPackages::UpdateContract }
   let(:mock_contract) do
     double(contract_class,
            new: mock_contract_instance)
   end
   let(:mock_contract_instance) do
-    mock = mock_model(contract_class)
+    mock = mock_model(contract_class,
+                      assignable_statuses: statuses)
     allow(mock)
       .to receive(:validate)
       .and_return contract_valid
@@ -72,7 +64,6 @@ describe WorkPackages::SetAttributesService, type: :model do
     mock
   end
   let(:contract_valid) { true }
-  let(:work_package_valid) { true }
   let(:instance) do
     described_class.new(user: user,
                         model: work_package,
@@ -125,26 +116,6 @@ describe WorkPackages::SetAttributesService, type: :model do
           expect(subject.errors).to eql mock_contract_instance.errors
         end
       end
-
-      context 'when the work package is invalid' do
-        let(:work_package_valid) { false }
-
-        it 'is unsuccessful' do
-          expect(subject.success?).to be_falsey
-        end
-
-        it 'leaves the value unchanged' do
-          subject
-
-          expect(work_package.changed?).to be_truthy
-        end
-
-        it "exposes the work_packages's errors" do
-          subject
-
-          expect(subject.errors).to eql work_package.errors
-        end
-      end
     end
 
     context 'update subject before calling the service' do
@@ -171,10 +142,6 @@ describe WorkPackages::SetAttributesService, type: :model do
       let(:new_statuses) { [other_status, default_status] }
 
       before do
-        allow(work_package)
-          .to receive(:new_statuses_allowed_to)
-          .with(user, true)
-          .and_return(new_statuses)
         allow(Status)
           .to receive(:default)
           .and_return(default_status)
@@ -255,7 +222,7 @@ describe WorkPackages::SetAttributesService, type: :model do
           it 'notes the author to be system changed' do
             subject
 
-            expect(work_package.changed_by_system)
+            expect(instance.changed_by_system)
               .to include('author_id')
           end
         end
@@ -318,7 +285,6 @@ describe WorkPackages::SetAttributesService, type: :model do
         let(:call_attributes) { attributes }
         let(:attributes) { { start_date: Date.today - 5.days } }
         let(:contract_valid) { true }
-        let(:work_package_valid) { true }
         subject { instance.call(call_attributes) }
 
         it 'is successful' do
@@ -482,10 +448,6 @@ describe WorkPackages::SetAttributesService, type: :model do
       end
 
       before do
-        allow(work_package)
-          .to receive(:new_statuses_allowed_to)
-          .with(user, true)
-          .and_return(new_statuses)
         allow(new_project)
           .to receive(:shared_versions)
           .and_return(new_versions)
@@ -561,7 +523,7 @@ describe WorkPackages::SetAttributesService, type: :model do
             it 'adds change to system changes' do
               subject
 
-              expect(work_package.changed_by_system)
+              expect(instance.changed_by_system)
                 .to include('category_id')
             end
           end
@@ -590,7 +552,7 @@ describe WorkPackages::SetAttributesService, type: :model do
             it 'adds change to system changes' do
               subject
 
-              expect(work_package.changed_by_system)
+              expect(instance.changed_by_system)
                 .to include('type_id')
             end
           end
@@ -608,7 +570,7 @@ describe WorkPackages::SetAttributesService, type: :model do
             it 'adds change to system changes' do
               subject
 
-              expect(work_package.changed_by_system)
+              expect(instance.changed_by_system)
                 .to include('type_id')
             end
           end
@@ -626,7 +588,7 @@ describe WorkPackages::SetAttributesService, type: :model do
             it 'does not set the change to system changes' do
               subject
 
-              expect(work_package.changed_by_system)
+              expect(instance.changed_by_system)
                 .not_to include('type_id')
             end
           end

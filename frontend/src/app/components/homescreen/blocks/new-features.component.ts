@@ -1,6 +1,6 @@
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,16 +23,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 
-import {Component, Injector} from '@angular/core';
+import {Component} from '@angular/core';
 import {DynamicBootstrapper} from "core-app/globals/dynamic-bootstrapper";
 import {I18nService} from "core-app/modules/common/i18n/i18n.service";
-import {boardTeaserWebsiteURL} from "core-app/modules/boards/board-constants.const";
-import {OpModalService} from "core-components/op-modals/op-modal.service";
-import {BoardVideoTeaserModalComponent} from "core-app/modules/boards/board/board-video-teaser-modal/board-video-teaser-modal.component";
 import {DomSanitizer} from "@angular/platform-browser";
+
+export const homescreenNewFeaturesBlockSelector = 'homescreen-new-features-block';
 
 @Component({
   template: `
@@ -41,14 +40,14 @@ import {DomSanitizer} from "@angular/platform-browser";
     </p>
 
     <div class="widget-box--description">
-      <p [innerHtml]="text.currentNewFeatureHtml"></p>
+      <p [innerHtml]="currentNewFeatureHtml"></p>
 
-      <a class="widget-box--teaser-image" (click)="showBoardTeaserVideo()"></a>
+      <a class="widget-box--teaser-image"></a>
     </div>
 
-    <a [href]="boardTeaserWebsiteUrl()" target="_blank">{{ text.learnAbout }}</a>
+    <a [href]="teaserWebsiteUrl" target="_blank">{{ text.learnAbout }}</a>
   `,
-  selector: 'homescreen-new-features-block',
+  selector: homescreenNewFeaturesBlockSelector,
   styleUrls: ['./new-features.component.sass'],
 })
 
@@ -56,33 +55,39 @@ import {DomSanitizer} from "@angular/platform-browser";
  * Component for the homescreen block to promote new features.
  * When updating this for the next release, be sure to cleanup stuff is not needed any more:
  * Locals (js-en.yml), Styles (new-features.component.sass), HTML (above), TS (below)
- * Further cleanup additional stuff (and update this list): The boardVideoTeaserModal, the image shown as modalLink
  */
 export class HomescreenNewFeaturesBlockComponent {
+  public isStandardEdition:boolean;
+
   public text = {
     newFeatures: this.i18n.t('js.label_new_features'),
     descriptionNewFeatures: this.i18n.t('js.homescreen.blocks.new_features.text_new_features'),
-    currentNewFeatureHtml: this.i18n.t('js.homescreen.blocks.new_features.current_new_feature_html'),
     learnAbout: this.i18n.t('js.homescreen.blocks.new_features.learn_about'),
-    imageAltText: this.i18n.t('js.homescreen.blocks.new_features.image_alt_text'),
   };
 
-  constructor(readonly i18n:I18nService,
-              readonly opModalService:OpModalService,
-              readonly injector:Injector,
-              readonly domSanitizer:DomSanitizer) {
+  constructor(
+    readonly i18n:I18nService,
+    readonly domSanitizer:DomSanitizer
+  ) {
+    this.isStandardEdition = window.OpenProject.isStandardEdition;
   }
 
-  public showBoardTeaserVideo() {
-    this.opModalService.show(
-      BoardVideoTeaserModalComponent,
-      this.injector
-    );
+  public get teaserWebsiteUrl() {
+    let url = this.translated('learn_about_link');
+    return this.domSanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
-  public boardTeaserWebsiteUrl() {
-    return this.domSanitizer.bypassSecurityTrustResourceUrl(boardTeaserWebsiteURL);
+  public get currentNewFeatureHtml():string {
+    return this.translated('current_new_feature_html');
+  }
+
+  private translated(key:string):string {
+    return this.i18n.t(this.i18nBase + this.i18nPrefix + '.' + key);
+  }
+
+  private i18nBase:string = 'js.homescreen.blocks.new_features.';
+
+  private get i18nPrefix():string {
+    return this.isStandardEdition ? "standard" : "bim";
   }
 }
-
-DynamicBootstrapper.register({ selector: 'homescreen-new-features-block', cls: HomescreenNewFeaturesBlockComponent  });

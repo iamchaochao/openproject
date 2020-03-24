@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -41,22 +41,6 @@ describe OpenProject::Database do
     allow(OpenProject::Database).to receive(:adapter_name).and_return 'PostgresQL'
 
     expect(OpenProject::Database.name).to equal(:postgresql)
-  end
-
-  it 'should be able to parse semantic versions' do
-    version = OpenProject::Database.semantic_version '5.7.0'
-    version2 = OpenProject::Database.semantic_version '5.5.60-0+deb8u1'
-
-    expect(version2.major).to eq 5
-    expect(version2 < version).to be_truthy
-
-    version3 = OpenProject::Database.semantic_version '10.1.26-MariaDB-0+deb9u1'
-    expect(version3.major).to eq 10
-
-    version4 = OpenProject::Database.semantic_version '5.7.23-0ubuntu0.16.04.1'
-    expect(version4.major).to eq 5
-    # Cuts the build if its invalid semver
-    expect(version4.build).to be_nil
   end
 
   it 'should be able to use the helper methods' do

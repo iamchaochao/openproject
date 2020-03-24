@@ -1,10 +1,18 @@
 #-- copyright
-# OpenProject Meeting Plugin
-#
-# Copyright (C) 2011-2014 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
+#
+# OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+# Copyright (C) 2006-2017 Jean-Philippe Lang
+# Copyright (C) 2010-2013 the ChiliProject Team
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,7 +23,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-# See doc/COPYRIGHT.md for more details.
+# See docs/COPYRIGHT.rdoc for more details.
 #++
 
 require 'open_project/plugins'
@@ -59,7 +67,7 @@ module OpenProject::Meeting
       end
 
       Redmine::Activity.map do |activity|
-        activity.register :meetings, class_name: 'Activity::MeetingActivityProvider', default: false
+        activity.register :meetings, class_name: 'Activities::MeetingActivityProvider', default: false
       end
     end
 
@@ -82,7 +90,7 @@ module OpenProject::Meeting
     end
 
     initializer 'meeting.register_latest_project_activity' do
-      Project.register_latest_project_activity on: ::Meeting,
+      Project.register_latest_project_activity on: 'Meeting',
                                                attribute: :updated_at
     end
 

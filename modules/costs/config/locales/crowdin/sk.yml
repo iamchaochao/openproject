@@ -1,3 +1,25 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
+#---
 sk:
   activerecord:
     attributes:
@@ -11,7 +33,7 @@ sk:
         available: "Dostupný"
         budget: "Plánovaný"
         budget_ratio: "Použité (pomer)"
-        created_on: "Vytvorený na"
+        created_on: "Vytvorené"
         description: "Popis"
         fixed_date: "Stanovený dátum"
         spent: "Minuté"
@@ -58,7 +80,7 @@ sk:
     cost_type: "Typ nákladu"
     costs: "Náklady"
     current_rate: "Aktuálna sadzba"
-    hours: "Hodiny"
+    hours: "Hodín"
     units: "Jednotky"
     valid_from: "Platný od"
   button_add_budget_item: "Pridať plánované náklady"
@@ -70,7 +92,7 @@ sk:
   button_log_costs: "Zaúčtovať jednotkové náklady"
   button_log_time: "Zaprotokoluj čas"
   caption_booked_on_project: "Rezervované na projekte"
-  caption_default: "Predvolené"
+  caption_default: "Predvolený"
   caption_default_rate_history_for: "História predvolenej sadzby pre %{user}"
   caption_labor: "Práca"
   caption_labor_costs: "Aktuálne mzdové náklady"
@@ -84,9 +106,6 @@ sk:
   caption_set_rate: "Nastaviť aktuálnu sadzbu"
   caption_show_locked: "Zobraziť zablokované typy"
   cost_objects_title: "Rozpočty"
-  label_cost_type_plural: "Typy nákladov"
-  currency_delimiter: ","
-  currency_separator: "."
   description_date_for_new_rate: "Dátum novej sadzby"
   events:
     cost_object: "Rozpočet bol upravený"
@@ -104,6 +123,7 @@ sk:
   label_cost_plural: "Náklady"
   label_cost_report: "Výkaz nákladov"
   label_cost_type_specific: "Rozpočet #%{id}: %{name}"
+  label_cost_type_plural: "Typy nákladov"
   label_costs_per_page: "Náklady na stranu"
   label_currency: "Mena"
   label_currency_format: "Formát meny"
@@ -135,7 +155,7 @@ sk:
   label_rate_plural: "Sadzby"
   label_status_finished: "Dokončené"
   label_units: "Nákladové jednotky"
-  label_user: "Užívateľ"
+  label_user: "Užívateľ(ka)"
   label_until: "do"
   label_valid_from: "Platný od"
   label_variable_cost_object: "Rozpočet založený na variabilnej sadzbe"

@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -54,7 +54,7 @@ module API
 
           post &::API::V3::Utilities::Endpoints::Create.new(model: ::Grids::Grid).mount
 
-          mount CreateFormAPI
+          mount ::API::V3::Grids::CreateFormAPI
           mount ::API::V3::Grids::Schemas::GridSchemaAPI
 
           route_param :id, type: Integer, desc: 'Grid ID' do
@@ -105,7 +105,7 @@ module API
                                                             .mount
               delete &::API::V3::Utilities::Endpoints::Delete.new(model: ::Grids::Grid).mount
 
-              mount UpdateFormAPI
+              mount ::API::V3::Grids::UpdateFormAPI
             end
           end
         end

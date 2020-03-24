@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -51,4 +51,29 @@ module OpenProject
       end
     end
   end
+end
+
+require "reform/form/active_model/validations"
+
+Reform::Form.class_eval do
+  include Reform::Form::ActiveModel::Validations
+end
+
+Reform::Contract.class_eval do
+  include Reform::Form::ActiveModel::Validations
+end
+
+Reform::Form::ActiveModel::Validations::Validator.class_eval do
+  ##
+  # use activerecord as the base scope instead of 'activemodel' to be compatible
+  # to the messages we have already stored
+  def self.i18n_scope
+    :activerecord
+  end
+end
+
+require 'reform/contract'
+
+class Reform::Form::ActiveModel::Errors
+  prepend OpenProject::Patches::Reform
 end

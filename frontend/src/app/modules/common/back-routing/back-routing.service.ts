@@ -1,6 +1,6 @@
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,12 +23,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 
 import {Injectable, Injector} from '@angular/core';
 import {StateService, Transition} from "@uirouter/core";
 import {KeepTabService} from "core-components/wp-single-view-tabs/keep-tab/keep-tab.service";
+import {InjectField} from "core-app/helpers/angular/inject-field.decorator";
 
 interface BackRouteOptions {
   name:string;
@@ -36,22 +37,27 @@ interface BackRouteOptions {
   parent:string;
 }
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class BackRoutingService {
-  private _backRoute:BackRouteOptions;
-  private $state:StateService = this.injector.get(StateService);
-  private keepTab:KeepTabService = this.injector.get(KeepTabService);
+  @InjectField() private $state:StateService;
+  @InjectField() private keepTab:KeepTabService;
 
-  constructor(protected injector:Injector) {
+  private _backRoute:BackRouteOptions;
+
+  constructor(readonly injector:Injector) {
   }
 
   public goBack(preferListOverSplit:boolean = false) {
-    if (!this.backRoute) {
-      this.$state.go('work-packages.list', this.$state.params);
+    // Default: back to list
+    // When coming from a deep link or a create form
+    const baseRoute = this.$state.current.data.baseRoute || 'work-packages.partitioned.list';
+
+    if (!this.backRoute || this.backRoute.name.includes('new')) {
+      this.$state.go(baseRoute, this.$state.params);
     } else {
       if (this.keepTab.isDetailsState(this.backRoute.parent)) {
-        if(preferListOverSplit) {
-          this.$state.go('work-packages.list', this.$state.params);
+        if (preferListOverSplit) {
+          this.$state.go(baseRoute, this.$state.params);
         } else {
           this.$state.go(this.keepTab.currentDetailsState, this.$state.params);
         }
@@ -59,6 +65,11 @@ export class BackRoutingService {
         this.$state.go(this.backRoute.name, this.backRoute.params);
       }
     }
+  }
+
+  public goToBaseState() {
+    const baseRoute = this.$state.current.data.baseRoute || 'work-packages.partitioned.list';
+    this.$state.go(baseRoute, this.$state.params);
   }
 
   public sync(transition:Transition) {

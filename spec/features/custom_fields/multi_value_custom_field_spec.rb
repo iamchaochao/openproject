@@ -147,7 +147,7 @@ describe "multi select custom values", clear_cache: true, js: true do
 
         # Open split view
         split_view = wp_table.open_split_view work_package
-        field = WorkPackageMultiSelectField.new(split_view.container, "customField#{custom_field.id}")
+        field = SelectField.new(split_view.container, "customField#{custom_field.id}")
 
         field.activate!
         field.unset_value "ham", true
@@ -202,16 +202,16 @@ describe "multi select custom values", clear_cache: true, js: true do
         work_package2
 
         login_as(user)
-
-        wp_table.visit_query query
-        wp_table.expect_work_package_listed(work_package)
-        wp_table.expect_work_package_listed(work_package2)
       end
 
       describe 'sorting by the multi select field' do
         let(:multi_value) { true }
 
         it 'sorts as expected asc and desc' do
+          wp_table.visit_query query
+          wp_table.expect_work_package_listed(work_package)
+          wp_table.expect_work_package_listed(work_package2)
+
           expect(wp1_field.display_element).to have_text('ham')
           expect(wp1_field.display_element).to have_text('pineapple')
           expect(wp2_field.display_element).to have_text('ham')
@@ -233,6 +233,10 @@ describe "multi select custom values", clear_cache: true, js: true do
         let(:work_package_options) { %w[mushrooms] } # position 4
 
         it 'sorts as expected asc and desc' do
+          wp_table.visit_query query
+          wp_table.expect_work_package_listed(work_package)
+          wp_table.expect_work_package_listed(work_package2)
+
           expect(wp2_field.display_element).to have_text('onions')
           expect(wp1_field.display_element).to have_text('mushrooms')
 

@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -40,18 +40,34 @@ describe 'Manual sorting of WP table', type: :feature, js: true do
     FactoryBot.create(:work_package, subject: 'WP1', project: project, type: type_task, created_at: Time.now)
   end
   let(:work_package_2) do
-    FactoryBot.create(:work_package, subject: 'WP2', project: project, parent: work_package_1, type: type_task, created_at: Time.now - 1.minutes)
+    FactoryBot.create(:work_package,
+                      subject: 'WP2',
+                      project: project,
+                      parent: work_package_1,
+                      type: type_task,
+                      created_at: Time.now - 1.minutes)
   end
   let(:work_package_3) do
-    FactoryBot.create(:work_package, subject: 'WP3', project: project, parent: work_package_2, type: type_bug, created_at: Time.now - 2.minutes)
+    FactoryBot.create(:work_package,
+                      subject: 'WP3',
+                      project: project,
+                      parent: work_package_2,
+                      type: type_bug,
+                      created_at: Time.now - 2.minutes)
   end
   let(:work_package_4) do
-    FactoryBot.create(:work_package, subject: 'WP4', project: project, parent: work_package_3, type: type_bug, created_at: Time.now - 3.minutes)
+    FactoryBot.create(:work_package,
+                      subject: 'WP4',
+                      project: project,
+                      parent: work_package_3,
+                      type: type_bug,
+                      created_at: Time.now - 3.minutes)
   end
 
   let(:sort_by) { ::Components::WorkPackages::SortBy.new }
   let(:hierarchies) { ::Components::WorkPackages::Hierarchies.new }
   let(:dialog) { ::Components::ConfirmationDialog.new }
+  let(:pagination) { ::Components::TablePagination.new }
 
   def expect_query_order(query, expected)
     retry_block do
@@ -100,9 +116,12 @@ describe 'Manual sorting of WP table', type: :feature, js: true do
         raise "Query was not yet saved." unless query.name == 'My sorted query'
       end
 
-
       # Expect sorted 1 and 2, the rest is not positioned
       expect_query_order(query, [work_package_1, work_package_4].map(&:id))
+
+      # Pagination information is shown but no per page options
+      pagination.expect_range(1, 4, 4)
+      pagination.expect_no_per_page_options
     end
 
     it 'can drag an element into a hierarchy' do
@@ -118,7 +137,7 @@ describe 'Manual sorting of WP table', type: :feature, js: true do
       hierarchies.expect_leaf_at(work_package_3, work_package_4)
     end
 
-    it 'can drag an element out of the hierarchy' do
+    it 'can drag an element completely out of the hierarchy' do
       # Move up the hierarchy
       wp_table.drag_and_drop_work_package from: 3, to: 0
       loading_indicator_saveguard
@@ -135,6 +154,47 @@ describe 'Manual sorting of WP table', type: :feature, js: true do
       hierarchies.expect_hierarchy_at(work_package_1, work_package_2)
       hierarchies.expect_leaf_at(work_package_3, work_package_4)
       wp_page.expect_no_parent
+    end
+
+    context 'drag an element partly out of the hierarchy' do
+      let(:work_package_5) do
+        FactoryBot.create(:work_package, subject: 'WP5', project: project, parent: work_package_1)
+      end
+      let(:work_package_6) do
+        FactoryBot.create(:work_package, subject: 'WP6', project: project, parent: work_package_1)
+      end
+
+      before do
+        work_package_5
+        work_package_6
+        work_package_4.parent = work_package_2
+        work_package_4.save!
+        wp_table.visit!
+
+        # Hierarchy enabled
+        wp_table.expect_work_package_order(work_package_1,
+                                           work_package_2,
+                                           work_package_3,
+                                           work_package_4,
+                                           work_package_5,
+                                           work_package_6)
+        hierarchies.expect_hierarchy_at(work_package_1, work_package_2)
+        hierarchies.expect_leaf_at(work_package_3, work_package_4, work_package_5, work_package_6)
+      end
+
+      it 'move below a sibling of my parent' do
+        wp_table.drag_and_drop_work_package from: 3, to: 5
+
+        loading_indicator_saveguard
+        wp_table.expect_work_package_order(work_package_1,
+                                           work_package_2,
+                                           work_package_3,
+                                           work_package_5,
+                                           work_package_4,
+                                           work_package_6)
+        hierarchies.expect_hierarchy_at(work_package_1, work_package_2)
+        hierarchies.expect_leaf_at(work_package_3, work_package_4, work_package_5, work_package_6)
+      end
     end
   end
 
@@ -228,6 +288,37 @@ describe 'Manual sorting of WP table', type: :feature, js: true do
     end
   end
 
+  describe 'with a saved query that is NOT manually sorted' do
+    let(:query) do
+      FactoryBot.create(:query, user: user, project: project, show_hierarchies: false).tap do |q|
+        q.sort_criteria = [[:id, 'asc']]
+        q.save!
+      end
+    end
+
+    it 'can drag and drop and will save the query' do
+      wp_table.visit_query query
+      wp_table.expect_work_package_order work_package_1, work_package_2, work_package_3, work_package_4
+
+      wp_table.drag_and_drop_work_package from: 1, to: 3
+
+      wp_table.expect_work_package_order work_package_1, work_package_3, work_package_2, work_package_4
+
+      wp_table.expect_and_dismiss_notification message: 'Successful update.'
+
+      retry_block do
+        query.reload
+
+        if query.sort_criteria != [['manual_sorting', 'asc']]
+          raise "Expected sort_criteria to be updated to manual_sorting, was #{query.sort_criteria.inspect}"
+        end
+      end
+
+      pagination.expect_range(1, 4, 4)
+      pagination.expect_no_per_page_options
+    end
+  end
+
   describe 'flat mode' do
     before do
       wp_table.visit!
@@ -268,6 +359,9 @@ describe 'Manual sorting of WP table', type: :feature, js: true do
       query = Query.last
       expect(query.name).to eq 'Manual sorted query'
       expect_query_order(query, [work_package_1.id, work_package_3.id, work_package_2.id])
+
+      pagination.expect_range(1, 4, 4)
+      pagination.expect_no_per_page_options
     end
 
     it 'does not loose the current order when switching to manual sorting' do

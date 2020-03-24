@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -108,7 +108,7 @@ describe 'Create repository', type: :feature, js: true, selenium: true do
       it 'should display a collapsed type' do
         expect(selector).not_to be_nil
         expect(selector[:selected]).to be_falsey
-        expect(selector[:disabled]).to be_falsey
+        expect(selector).not_to be_disabled
 
         content = find("##{vendor}-#{type}", visible: false)
         expect(content).not_to be_nil
@@ -124,7 +124,7 @@ describe 'Create repository', type: :feature, js: true, selenium: true do
         find("input[name='scm_type'][value='#{type}']").set(true)
         content = find("#attributes-group--content-#{type}")
         expect(content).not_to be_nil
-        expect(content[:hidden]).to be_falsey
+        expect(content[:hidden]).to eql 'false'
         content = find("##{vendor}-#{type}", visible: false)
         expect(content).not_to be_nil
         expect(content[:style]).not_to match("display: none")
@@ -132,7 +132,7 @@ describe 'Create repository', type: :feature, js: true, selenium: true do
         find('input[type="radio"][value="managed"]').set(true)
         content = find('#attributes-group--content-managed')
         expect(content).not_to be_nil
-        expect(content[:hidden]).to be_falsey
+        expect(content[:hidden]).to eql 'false'
         content = find("##{vendor}-managed", visible: false)
         expect(content).not_to be_nil
         expect(content[:style]).not_to match("display: none")

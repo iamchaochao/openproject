@@ -1,7 +1,8 @@
 #-- encoding: UTF-8
+
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -24,14 +25,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-# See doc/COPYRIGHT.rdoc for more details.
+# See docs/COPYRIGHT.rdoc for more details.
 
 require 'spec_helper'
 require 'contracts/work_packages/shared_base_contract'
 
 describe WorkPackages::UpdateContract do
   let(:project) do
-    FactoryBot.build_stubbed(:project, is_public: false).tap do |p|
+    FactoryBot.build_stubbed(:project, public: false).tap do |p|
       allow(Project)
         .to receive(:find)
         .with(p.id)
@@ -42,7 +43,6 @@ describe WorkPackages::UpdateContract do
     FactoryBot.build_stubbed(:work_package,
                              project: project,
                              type: type).tap do |wp|
-
       wp_scope = double('wp scope')
 
       allow(WorkPackage)

@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,8 +29,10 @@
 #++
 
 class MyController < ApplicationController
-  include Concerns::PasswordConfirmation
-  include Concerns::UserPasswordChange
+  include PasswordConfirmation
+  include Accounts::UserPasswordChange
+  include ActionView::Helpers::TagHelper
+
   layout 'my'
 
   helper_method :gon
@@ -89,10 +91,10 @@ class MyController < ApplicationController
   # Create a new feeds key
   def generate_rss_key
     if request.post?
-      token = Token::Rss.create!(user: current_user)
+      token = Token::RSS.create!(user: current_user)
       flash[:info] = [
-        t('my.access_token.notice_reset_token', type: 'RSS'),
-        "<strong>#{token.plain_value}</strong>".html_safe,
+        t('my.access_token.notice_reset_token', type: 'RSS').html_safe,
+        content_tag(:strong, token.plain_value),
         t('my.access_token.token_value_warning')
       ]
     end
@@ -106,10 +108,10 @@ class MyController < ApplicationController
   # Create a new API key
   def generate_api_key
     if request.post?
-      token = Token::Api.create!(user: current_user)
+      token = Token::API.create!(user: current_user)
       flash[:info] = [
-        t('my.access_token.notice_reset_token', type: 'API'),
-        "<strong>#{token.plain_value}</strong>".html_safe,
+        t('my.access_token.notice_reset_token', type: 'API').html_safe,
+        content_tag(:strong, token.plain_value),
         t('my.access_token.token_value_warning')
       ]
     end

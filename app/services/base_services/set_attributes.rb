@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2019 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -25,24 +25,19 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-# See doc/COPYRIGHT.rdoc for more details.
+# See docs/COPYRIGHT.rdoc for more details.
 #++
 
 module BaseServices
   class SetAttributes
-    include Concerns::Contracted
+    include Contracted
 
-    def initialize(user:, model:, contract_class:)
+    def initialize(user:, model:, contract_class:, contract_options: {})
       self.user = user
       self.model = model
 
-      # Allow tracking changes caused by a user but done for him by the system.
-      # E.g. fixed_version of a work package might need to be changed as the user changed the project.
-      # This is currently used for permission checks where the changed project is checked but the fixed_version
-      # is not if it is done by the system.
-      model.extend(Mixins::ChangedBySystem)
-
       self.contract_class = contract_class
+      self.contract_options = contract_options
     end
 
     def call(params)
@@ -60,15 +55,15 @@ module BaseServices
     def set_attributes(params)
       model.attributes = params
 
-      set_default_attributes if model.new_record?
+      set_default_attributes(params) if model.new_record?
     end
 
-    def set_default_attributes
+    def set_default_attributes(_params)
       # nothing to do for now but a subclass may
     end
 
     def validate_and_result
-      success, errors = validate(model, user)
+      success, errors = validate(model, user, options: contract_options)
 
       ServiceResult.new(success: success,
                         errors: errors,

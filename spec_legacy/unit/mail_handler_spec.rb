@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -36,55 +36,6 @@ describe MailHandler, type: :model do
 
   before do
     allow(Setting).to receive(:notified_events).and_return(Redmine::Notifiable.all.map(&:name))
-  end
-
-  it 'should add work package' do
-    # This email contains: 'Project: onlinestore'
-    issue = submit_email('ticket_on_given_project.eml', allow_override: 'fixed_version')
-    assert issue.is_a?(WorkPackage)
-    assert !issue.new_record?
-    issue.reload
-    assert_equal Project.find(2), issue.project
-    assert_equal issue.project.types.first, issue.type
-    assert_equal 'New ticket on a given project', issue.subject
-    assert_equal User.find_by_login('jsmith'), issue.author
-    assert_equal Status.find_by(name: 'Resolved'), issue.status
-    assert issue.description.include?('Lorem ipsum dolor sit amet, consectetuer adipiscing elit.')
-    assert_equal '2010-01-01', issue.start_date.to_s
-    assert_equal '2010-12-31', issue.due_date.to_s
-    assert_equal User.find_by_login('jsmith'), issue.assigned_to
-    assert_equal Version.find_by(name: 'alpha'), issue.fixed_version
-    assert_equal 2.5, issue.estimated_hours
-    assert_equal 30, issue.done_ratio
-    assert issue.root?
-    assert issue.leaf?
-    # keywords should be removed from the email body
-    assert !issue.description.match(/^Project:/i)
-    assert !issue.description.match(/^Status:/i)
-    assert !issue.description.match(/^Start Date:/i)
-    # Email notification should be sent
-    mail = ActionMailer::Base.deliveries.last
-    refute_nil mail
-    assert mail.subject.include?('New ticket on a given project')
-  end
-
-  it 'should add work package with default type' do
-    # This email contains: 'Project: onlinestore'
-    issue = submit_email('ticket_on_given_project.eml', issue: { type: 'Support request' })
-    assert issue.is_a?(WorkPackage)
-    assert !issue.new_record?
-    issue.reload
-    assert_equal 'Support request', issue.type.name
-  end
-
-  it 'should add work package with status' do
-    # This email contains: 'Project: onlinestore' and 'Status: Resolved'
-    issue = submit_email('ticket_on_given_project.eml')
-    assert issue.is_a?(WorkPackage)
-    assert !issue.new_record?
-    issue.reload
-    assert_equal Project.find(2), issue.project
-    assert_equal Status.find_by(name: 'Resolved'), issue.status
   end
 
   it 'should add work package with attributes override' do
@@ -230,7 +181,7 @@ describe MailHandler, type: :model do
                              unknown_user: 'accept')
         assert issue.is_a?(WorkPackage)
         assert issue.author.anonymous?
-        assert !issue.project.is_public?
+        assert !issue.project.public?
         assert issue.root?
         assert issue.leaf?
       end
@@ -423,80 +374,6 @@ describe MailHandler, type: :model do
     issue.reload
     assert_equal 'HTML email', issue.subject
     assert_equal 'This is a html-only email.', issue.description
-  end
-
-  context 'truncate emails based on the Setting' do
-    context 'with no setting' do
-      before do
-        Setting.mail_handler_body_delimiters = ''
-      end
-
-      it 'should add the entire email into the issue' do
-        issue = submit_email('ticket_on_given_project.eml')
-        assert_issue_created(issue)
-        assert issue.description.include?('---')
-        assert issue.description.include?('This paragraph is after the delimiter')
-      end
-    end
-
-    context 'with a single string' do
-      before do
-        Setting.mail_handler_body_delimiters = '---'
-      end
-
-      it 'should truncate the email at the delimiter for the issue' do
-        issue = submit_email('ticket_on_given_project.eml')
-        assert_issue_created(issue)
-        assert issue.description.include?('This paragraph is before delimiters')
-        assert issue.description.include?('--- This line starts with a delimiter')
-        assert !issue.description.match(/^---$/)
-        assert !issue.description.include?('This paragraph is after the delimiter')
-      end
-    end
-
-    context 'with a single quoted reply (e.g. reply to a Redmine email notification)' do
-      before do
-        Setting.mail_handler_body_delimiters = '--- Reply above. Do not remove this line. ---'
-      end
-
-      it 'should truncate the email at the delimiter with the quoted reply symbols (>)' do
-        journal = submit_email('issue_update_with_quoted_reply_above.eml')
-        assert journal.is_a?(Journal)
-        assert journal.notes.include?('An update to the issue by the sender.')
-        assert !journal.notes.match(Regexp.escape('--- Reply above. Do not remove this line. ---'))
-        assert !journal.notes.include?('Looks like the JSON api for projects was missed.')
-      end
-    end
-
-    context 'with multiple quoted replies (e.g. reply to a reply of a Redmine email notification)' do
-      before do
-        Setting.mail_handler_body_delimiters = '--- Reply above. Do not remove this line. ---'
-      end
-
-      it 'should truncate the email at the delimiter with the quoted reply symbols (>)' do
-        journal = submit_email('issue_update_with_multiple_quoted_reply_above.eml')
-        assert journal.is_a?(Journal)
-        assert journal.notes.include?('An update to the issue by the sender.')
-        assert !journal.notes.match(Regexp.escape('--- Reply above. Do not remove this line. ---'))
-        assert !journal.notes.include?('Looks like the JSON api for projects was missed.')
-      end
-    end
-
-    context 'with multiple strings' do
-      before do
-        Setting.mail_handler_body_delimiters = "---\nBREAK"
-      end
-
-      it 'should truncate the email at the first delimiter found (BREAK)' do
-        issue = submit_email('ticket_on_given_project.eml')
-        assert_issue_created(issue)
-        assert issue.description.include?('This paragraph is before delimiters')
-        assert !issue.description.include?('BREAK')
-        assert !issue.description.include?('This paragraph is between delimiters')
-        assert !issue.description.match(/^---$/)
-        assert !issue.description.include?('This paragraph is after the delimiter')
-      end
-    end
   end
 
   it 'should email with long subject line' do

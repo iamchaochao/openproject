@@ -9,15 +9,18 @@ import {tableRowClassName} from '../../builders/rows/single-row-builder';
 import {WorkPackageTable} from '../../wp-fast-table';
 import {TableEventHandler} from '../table-handler-registry';
 import {WorkPackageViewSelectionService} from "core-app/modules/work_packages/routing/wp-view-base/view-services/wp-view-selection.service";
+import {displayClassName} from "core-components/wp-edit-form/display-field-renderer";
+import {activeFieldClassName} from "core-app/modules/fields/edit/edit-form/edit-form";
+import {InjectField} from "core-app/helpers/angular/inject-field.decorator";
 
 export class RowClickHandler implements TableEventHandler {
 
   // Injections
-  public $state:StateService = this.injector.get(StateService);
-  public states:States = this.injector.get(States);
-  public keepTab:KeepTabService = this.injector.get(KeepTabService);
-  public wpTableSelection:WorkPackageViewSelectionService = this.injector.get(WorkPackageViewSelectionService);
-  public wpTableFocus:WorkPackageViewFocusService = this.injector.get(WorkPackageViewFocusService);
+  @InjectField() public $state:StateService;
+  @InjectField() public states:States;
+  @InjectField() public keepTab:KeepTabService;
+  @InjectField() public wpTableSelection:WorkPackageViewSelectionService;
+  @InjectField() public wpTableFocus:WorkPackageViewFocusService;
 
   constructor(public readonly injector:Injector,
               table:WorkPackageTable) {
@@ -45,7 +48,7 @@ export class RowClickHandler implements TableEventHandler {
 
     // Shortcut to any clicks within a cell
     // We don't want to handle these.
-    if (target.parents(`.${tdClassName}`).length) {
+    if (target.hasClass(`${displayClassName}`) || target.hasClass(`${activeFieldClassName}`)) {
       debugLog('Skipping click on inner cell');
       return true;
     }

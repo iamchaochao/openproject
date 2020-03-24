@@ -1,6 +1,6 @@
 //-- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 //++
 
 import {HalResource} from 'core-app/modules/hal/resources/hal-resource';
@@ -40,12 +40,16 @@ import {SchemaResource} from 'core-app/modules/hal/resources/schema-resource';
 import {States} from 'core-components/states.service';
 import {WorkPackageCacheService} from 'core-components/work-packages/work-package-cache.service';
 import {SchemaCacheService} from 'core-components/schemas/schema-cache.service';
-import {WorkPackageNotificationService} from 'core-components/wp-edit/wp-notification.service';
+import {HalResourceNotificationService} from "core-app/modules/hal/services/hal-resource-notification.service";
 import {PathHelperService} from 'core-app/modules/common/path-helper/path-helper.service';
 import {NotificationsService} from 'core-app/modules/common/notifications/notifications.service';
 import {Attachable} from 'core-app/modules/hal/resources/mixins/attachable-mixin';
 import {WorkPackageDmService} from "core-app/modules/hal/dm-services/work-package-dm.service";
 import {FormResource} from "core-app/modules/hal/resources/form-resource";
+import {InputState} from "reactivestates";
+import {WorkPackagesActivityService} from "core-components/wp-single-view-tabs/activity-panel/wp-activity.service";
+import {WorkPackageNotificationService} from "core-app/modules/work_packages/notifications/work-package-notification.service";
+import {InjectField} from "core-app/helpers/angular/inject-field.decorator";
 
 export interface WorkPackageResourceEmbedded {
   activities:CollectionResource;
@@ -80,7 +84,7 @@ export interface WorkPackageResourceLinks extends WorkPackageResourceEmbedded {
 
   addChild(child:HalResource):Promise<any>;
 
-  addComment(comment:{ comment:string }, headers?:any):Promise<any>;
+  addComment(comment:unknown, headers?:any):Promise<any>;
 
   addRelation(relation:any):Promise<any>;
 
@@ -121,19 +125,17 @@ export class WorkPackageBaseResource extends HalResource {
   public activities:CollectionResource;
   public attachments:AttachmentCollectionResource;
 
-  public overriddenSchema?:SchemaResource;
-  public __initialized_at:Number;
-
-  readonly I18n:I18nService = this.injector.get(I18nService);
-  readonly states:States = this.injector.get(States);
-  readonly workPackageDmService = this.injector.get(WorkPackageDmService);
-  readonly wpCacheService:WorkPackageCacheService = this.injector.get(WorkPackageCacheService);
-  readonly schemaCacheService:SchemaCacheService = this.injector.get(SchemaCacheService);
-  readonly NotificationsService:NotificationsService = this.injector.get(NotificationsService);
-  readonly wpNotificationsService:WorkPackageNotificationService = this.injector.get(
-    WorkPackageNotificationService);
-  readonly pathHelper:PathHelperService = this.injector.get(PathHelperService);
-  readonly opFileUpload:OpenProjectFileUploadService = this.injector.get(OpenProjectFileUploadService);
+  public overriddenSchema:SchemaResource|undefined = undefined;
+  @InjectField() I18n:I18nService;
+  @InjectField() tates:States;
+  @InjectField() wpActivity:WorkPackagesActivityService;
+  @InjectField() workPackageDmService:WorkPackageDmService;
+  @InjectField() wpCacheService:WorkPackageCacheService;
+  @InjectField() schemaCacheService:SchemaCacheService;
+  @InjectField() NotificationsService:NotificationsService;
+  @InjectField() workPackageNotificationService:WorkPackageNotificationService;
+  @InjectField() pathHelper:PathHelperService;
+  @InjectField() opFileUpload:OpenProjectFileUploadService;
 
   readonly attachmentsBackend = true;
 
@@ -164,13 +166,9 @@ export class WorkPackageBaseResource extends HalResource {
    */
   public subjectWithId(truncateSubject:number = 40):string {
     const id = this.isNew ? '' : ` (#${this.id})`;
-    const subject = _.truncate(this.subject, { length: truncateSubject });
+    const subject = _.truncate(this.subject, {length: truncateSubject});
 
     return `${subject}${id}`;
-  }
-
-  public get isNew():boolean {
-    return this.id === 'new';
   }
 
   public get isMilestone():boolean {
@@ -190,6 +188,18 @@ export class WorkPackageBaseResource extends HalResource {
    */
   public get isEditable() {
     return this.isNew || !!this.$links.update;
+  }
+
+  public previewPath() {
+    if (!this.isNew) {
+      return this.pathHelper.api.v3.work_packages.id(this.id!).path;
+    } else {
+      return super.previewPath();
+    }
+  }
+
+  public getEditorTypeFor(fieldName:string):"full"|"constrained" {
+    return fieldName === 'description' ? 'full' : 'constrained';
   }
 
   /**
@@ -255,22 +265,6 @@ export class WorkPackageBaseResource extends HalResource {
   }
 
   /**
-   * Get updated attachments and activities from the server and inform the cache service
-   * about the update.
-   *
-   * Return a promise that returns the attachments. Reject, if the work package has
-   * no attachments.
-   */
-  public updateAttachments():Promise<HalResource> {
-    return this
-      .updateLinkedResources('activities', 'attachments')
-      .then((resource:any) => {
-        this.wpCacheService.updateWorkPackage(this as any);
-        return resource.attachments;
-      });
-  }
-
-  /**
    * Assign values from the form for a newly created work package resource.
    * @param form
    */
@@ -293,21 +287,10 @@ export class WorkPackageBaseResource extends HalResource {
     };
   }
 
-  /**
-   * Retain the internal tracking identifier from the given other work package.
-   * This is due to us needing to identify a work package beyond its actual ID,
-   * because that changes upon saving.
-   *
-   * @param other
-   */
-  public retainFrom(other:WorkPackageResource) {
-    this.__initialized_at = other.__initialized_at;
-  }
-
   public $initialize(source:any) {
     super.$initialize(source);
 
-    let attachments:any = this.attachments || { $source: {}, elements: [] };
+    let attachments:any = this.attachments || {$source: {}, elements: []};
     this.attachments = new AttachmentCollectionResource(
       this.injector,
       // Attachments MAY be an array if we're building from a form
@@ -344,6 +327,27 @@ export class WorkPackageBaseResource extends HalResource {
     }
 
     return state.value!;
+  }
+
+  /**
+   * Return the associated state to this HAL resource, if any.
+   */
+  public get state():InputState<this> {
+    return this.states.workPackages.get(this.id!) as any;
+  }
+
+  /**
+   * Update the state
+   */
+  public push(newValue:this):void {
+    this.wpActivity.clear(newValue.id!);
+
+    // If there is a parent, its view has to be updated as well
+    if (newValue.parent) {
+      this.wpCacheService.require(newValue.parent.id!, true);
+    }
+
+    this.wpCacheService.updateWorkPackage(newValue as any);
   }
 
   public get hasOverriddenSchema():boolean {

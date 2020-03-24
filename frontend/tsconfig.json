@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "importHelpers": true,
-    "target": "es5",
+    "target": "es2015",
     "module": "esnext",
     "moduleResolution": "node",
     "outDir": "./dist/out-tsc",
@@ -25,7 +25,8 @@
     "skipLibCheck": true,
     "baseUrl": "./src/",
     "typeRoots": [
-      "node_modules/@types"
+      "node_modules/@types",
+      "src/types"
     ],
     "lib": [
       "es2017",

@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -272,11 +272,14 @@ class ApplicationController < ActionController::Base
   def require_login
     unless User.current.logged?
 
-      # Ensure we reset the session to terminate any old session objects
-      reset_session
-
       respond_to do |format|
-        format.any(:html, :atom) { redirect_to main_app.signin_path(back_url: login_back_url) }
+        format.any(:html, :atom) do
+          # Ensure we reset the session to terminate any old session objects
+          # but ONLY for html requests to avoid double-resetting sessions
+          reset_session
+
+          redirect_to main_app.signin_path(back_url: login_back_url)
+        end
 
         auth_header = OpenProject::Authentication::WWWAuthenticate.response_header(request_headers: request.headers)
 
@@ -313,7 +316,7 @@ class ApplicationController < ActionController::Base
     is_authorized = AuthorizationService.new({ controller: ctrl, action: action }, context: context, global: global).call
 
     unless is_authorized
-      if @project && @project.archived?
+      if @project&.archived?
         render_403 message: :notice_not_authorized_archived_project
       else
         deny_access
@@ -447,7 +450,7 @@ class ApplicationController < ActionController::Base
   # on the project.
   def check_project_privacy
     if @project && @project.active?
-      if @project.is_public? || User.current.member_of?(@project) || User.current.admin?
+      if @project.public? || User.current.member_of?(@project) || User.current.admin?
         true
       else
         User.current.logged? ? render_403 : require_login
@@ -520,14 +523,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # Renders a warning flash if obj has unsaved attachments
-  def render_attachment_warning_if_needed(obj)
-    unsaved_attachments = obj.attachments.select(&:new_record?)
-    if unsaved_attachments.any?
-      flash[:warning] = l(:warning_attachments_not_saved, unsaved_attachments.size)
-    end
-  end
-
   # Converts the errors on an ActiveRecord object into a common JSON format
   def object_errors_to_json(object)
     object.errors.map do |attribute, error|
@@ -583,6 +578,12 @@ class ApplicationController < ActionController::Base
     false
   end
   helper_method :show_local_breadcrumb
+
+  def admin_first_level_menu_entry
+    menu_item = admin_menu_item(current_menu_item)
+    menu_item.parent
+  end
+  helper_method :admin_first_level_menu_entry
 
   def check_session_lifetime
     if session_expired?
@@ -649,5 +650,5 @@ class ApplicationController < ActionController::Base
   # http://simonecarletti.com/blog/2011/04/understanding-ruby-and-rails-lazy-load-hooks/
   ActiveSupport.run_load_hooks(:application_controller, self)
 
-  prepend Concerns::AuthSourceSSO
+  prepend AuthSourceSSO
 end

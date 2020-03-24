@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -89,7 +89,7 @@ module API
             api_attribute_name = ::API::Utilities::PropertyNameConverter.from_ar_name(attribute)
             errors.symbols_and_messages_for(attribute).each do |symbol, full_message, _|
               api_errors << if symbol == :error_readonly
-                              ::API::Errors::UnwritableProperty.new(api_attribute_name)
+                              ::API::Errors::UnwritableProperty.new(api_attribute_name, full_message)
                             else
                               ::API::Errors::Validation.new(api_attribute_name, full_message)
                             end

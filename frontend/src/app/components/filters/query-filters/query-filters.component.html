@@ -17,7 +17,8 @@
       </label>
 
       <div class="advanced-filters--filter-value">
-        <wp-filter-by-text-input (filterChanged)="filtersChanged.emit($event)">
+        <wp-filter-by-text-input
+          (deactivateFilter)="deactivateFilter($event)">
         </wp-filter-by-text-input>
       </div>
     </li>
@@ -68,13 +69,12 @@
                    appendTo="body">
         </ng-select>
       </div>
-
-      <enterprise-banner class="advanced-filters--add-filter-info"
-                         *ngIf="eeShowBanners"
-                         [linkMessage]="text.upsale_link"
-                         [textMessage]="text.upsale_for_more"
-                         opReferrer="wp-filter#filters">
-      </enterprise-banner>
     </li>
   </ul>
+  <enterprise-banner class="advanced-filters--add-filter-info"
+                     *ngIf="eeShowBanners"
+                     [linkMessage]="text.upsale_link"
+                     [textMessage]="text.upsale_for_more"
+                     opReferrer="wp-filter#filters">
+  </enterprise-banner>
 </fieldset>

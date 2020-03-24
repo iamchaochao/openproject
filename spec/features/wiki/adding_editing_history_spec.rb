@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -57,7 +57,7 @@ describe 'wiki pages', type: :feature, js: true do
   end
 
   scenario 'adding, editing and history' do
-    visit settings_project_path(project, tab: 'modules')
+    visit settings_modules_project_path(project)
 
     expect(page).to have_no_selector('.menu-sidebar .main-item-wrapper', text: 'Wiki')
 
@@ -67,7 +67,7 @@ describe 'wiki pages', type: :feature, js: true do
       click_button 'Save'
     end
 
-    expect(page).to have_selector('#menu-sidebar .main-item-wrapper', text: 'Wiki')
+    expect(page).to have_selector('#menu-sidebar .main-item-wrapper', text: 'Wiki', visible: false)
 
     # creating by accessing the page
     visit project_wiki_path(project, 'new page')
@@ -98,5 +98,20 @@ describe 'wiki pages', type: :feature, js: true do
       expect(page).to have_selector('ins.diffmod', text: 'second')
       expect(page).to have_selector('del.diffmod', text: 'first')
     end
+
+    # Go back to history
+    find('.button', text: 'History').click
+
+    # Click on first version
+    # to determine text (Regression test #31531)
+    find('td.id a', text: 1).click
+
+    expect(page).to have_selector('.wiki-version--details', text: 'Version 1/2')
+    expect(page).to have_selector('.wiki-content', text: content_first_version)
+
+    find('.button', text: 'Next').click
+
+    expect(page).to have_selector('.wiki-version--details', text: 'Version 2/2')
+    expect(page).to have_selector('.wiki-content', text: content_second_version)
   end
 end

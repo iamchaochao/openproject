@@ -1,6 +1,6 @@
 <%#-- copyright
-OpenProject is a project management system.
-Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+OpenProject is an open source project management software.
+Copyright (C) 2012-2020 the OpenProject GmbH
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License version 3.
@@ -28,11 +28,7 @@ See docs/COPYRIGHT.rdoc for more details.
 ++#%>
 <%= error_messages_for 'message' %>
 <% replying ||= false %>
-<% representer_object = if replying
-                          f.object.parent
-                        else
-                          f.object
-                        end %>
+<% representer_object = f.object %>
 <% resource = message_attachment_representer(representer_object) %>
 
 <div class="form--field -required">
@@ -40,10 +36,10 @@ See docs/COPYRIGHT.rdoc for more details.
 </div>
 <% unless replying %>
   <div class="form--field">
-    <%= f.check_box :sticky, label: t(:label_board_sticky) %>
+    <%= f.check_box :sticky, label: I18n.t('js.label_board_sticky') %>
   </div>
   <div class="form--field">
-    <%= f.check_box :locked, label: t(:label_board_locked) %>
+    <%= f.check_box :locked, label: I18n.t('js.label_board_locked') %>
   </div>
 <% end %>
 <% if !replying && !@message.new_record? && User.current.allowed_to?(:edit_messages, @project) %>
@@ -52,7 +48,7 @@ See docs/COPYRIGHT.rdoc for more details.
   </div>
 <% end %>
 
-<div class="form--field -required">
+<div class="form--field -required -visible-overflow">
   <%= f.text_area :content,
                   label: t(:description_message_content),
                   class: 'wiki-edit',

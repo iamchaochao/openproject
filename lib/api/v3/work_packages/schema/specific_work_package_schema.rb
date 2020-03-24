@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -33,6 +33,8 @@ module API
       module Schema
         class SpecificWorkPackageSchema < BaseWorkPackageSchema
           attr_reader :work_package
+          include AssignableCustomFieldValues
+          include AssignableValuesContract
 
           def initialize(work_package:)
             @work_package = work_package
@@ -46,33 +48,12 @@ module API
                    :available_custom_fields,
                    to: :@work_package
 
-          def assignable_values(property, current_user)
-            case property
-            when :status
-              assignable_statuses_for(current_user)
-            when :type
-              if project.nil?
-                Type.includes(:color)
-              else
-                project.types.includes(:color)
-              end
-            when :version
-              @work_package.try(:assignable_versions) if project
-            when :priority
-              IssuePriority.active
-            when :category
-              project.categories if project.respond_to?(:categories)
-            end
-          end
-
-          def assignable_custom_field_values(custom_field)
-            case custom_field.field_format
-            when 'list'
-              custom_field.possible_values
-            when 'version'
-              assignable_values(:version, nil)
-            end
-          end
+          delegate :assignable_types,
+                   :assignable_statuses,
+                   :assignable_categories,
+                   :assignable_priorities,
+                   :assignable_versions,
+                   to: :contract
 
           def no_caching?
             true
@@ -92,20 +73,6 @@ module API
                 .new(work_package,
                      User.current)
             end
-          end
-
-          def assignable_statuses_for(user)
-            status_origin = @work_package
-
-            # do not allow to skip statuses without intermediately saving the work package
-            # we therefore take the original status of the work_package, while preserving all
-            # other changes to it (e.g. type, assignee, etc.)
-            if @work_package.persisted? && @work_package.status_id_changed?
-              status_origin = @work_package.clone
-              status_origin.status = Status.find_by(id: @work_package.status_id_was)
-            end
-
-            status_origin.new_statuses_allowed_to(user)
           end
         end
       end

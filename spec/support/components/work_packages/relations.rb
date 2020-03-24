@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -53,8 +53,8 @@ module Components
         row = find_row(relatable)
         row.find('.relation-row--type').click
 
-        expect(row).to have_selector('select.wp-inline-edit--field')
-        row.find('.wp-inline-edit--field option', text: to_type).select_option
+        expect(row).to have_selector('select.inline-edit--field')
+        row.find('.inline-edit--field option', text: to_type).select_option
       end
 
       def hover_action(relatable, action)
@@ -159,7 +159,7 @@ module Components
         container = find('.wp-relations--children')
         scroll_to_and_click(container.find('.wp-inline-create-button-row .wp-inline-create--add-link'))
 
-        subject = ::WorkPackageField.new(container, 'subject')
+        subject = ::EditField.new(container, 'subject')
         subject.expect_active!
         subject.update subject_text
       end

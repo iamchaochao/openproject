@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -32,13 +32,13 @@ describe Changeset, type: :model do
   let(:email) { 'bob@bobbit.org' }
 
   with_virtual_subversion_repository do
-    let(:changeset) {
+    let(:changeset) do
       FactoryBot.build(:changeset,
                        repository: repository,
                        revision: '1',
                        committer: email,
                        comments: 'Initial commit')
-    }
+    end
   end
 
   shared_examples_for 'valid changeset' do
@@ -82,13 +82,13 @@ describe Changeset, type: :model do
   describe 'stripping commit' do
     let(:comment) { 'This is a looooooooooooooong comment' + (' ' * 80 + "\n") * 5 }
     with_virtual_subversion_repository do
-      let(:changeset) {
+      let(:changeset) do
         FactoryBot.build(:changeset,
                          repository: repository,
                          revision: '1',
                          committer: email,
                          comments: comment)
-      }
+      end
     end
 
     it 'should for changeset comments strip' do
@@ -157,14 +157,18 @@ describe Changeset, type: :model do
     let(:comments) { "Some fix made, fixes ##{work_package.id} and fixes ##{other_work_package.id}" }
 
     with_virtual_subversion_repository do
-      let!(:work_package) { FactoryBot.create :work_package, project: repository.project, status: open_status }
-      let(:changeset) {
+      let!(:work_package) do
+        FactoryBot.create :work_package,
+                          project: repository.project,
+                          status: open_status
+      end
+      let(:changeset) do
         FactoryBot.create(:changeset,
                           repository: repository,
                           revision: '123',
                           committer: user.login,
                           comments: comments)
-      }
+      end
     end
 
     before do
@@ -224,13 +228,13 @@ describe Changeset, type: :model do
           '15m' => 0.25,
           '15min' => 0.25,
           '3h15' => 3.25,
-          '3h15m' => 3.25,
-          '3h15min' => 3.25,
-          '3:15' => 3.25,
-          '3.25' => 3.25,
-          '3.25h' => 3.25,
-          '3,25' => 3.25,
-          '3,25h' => 3.25
+          '2h15m' => 2.25,
+          '2h15min' => 2.25,
+          '2:15' => 2.25,
+          '2.25' => 2.25,
+          '1.25h' => 1.25,
+          '0,75' => 0.75,
+          '1,25h' => 1.25
         }.each do |syntax, expected_hours|
           c = Changeset.new repository: repository,
                             committed_on: 24.hours.ago,

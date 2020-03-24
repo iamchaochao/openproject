@@ -1,6 +1,6 @@
 //-- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -29,11 +29,35 @@
 @include breakpoint(680px down)
   body, html
     position: relative
-    overflow: hidden
     -webkit-overflow-scrolling: touch
     height: 100%
 
-  #main-menu ~ #content-wrapper
+  // ------------------- BEGIN CHANGED SCROLL BEHAVIOR
+  // Change scroll behavior on mobile:
+  // Let the window be the one who scrolls.
+  // Thus we make sure, that mobile browsers (like iOS Safari) hide their toolbars on scroll.
+  html
+    overflow: auto
+  body,
+  #main
+    overflow: visible
+
+  #wrapper,
+  #content-wrapper,
+  #content
+    overflow: hidden
+
+  #main
+    margin-top: $header-height
+
+    .-header-scrolled &
+      margin-top: 0
+
+  #content-wrapper
+    height: initial
+  // ------------------- END CHANGED SCROLL BEHAVIOR
+
+  #content-wrapper
     padding: 15px
 
   #main

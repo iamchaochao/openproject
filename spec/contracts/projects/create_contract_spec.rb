@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -35,11 +35,18 @@ describe Projects::CreateContract do
       Project.new(name: project_name,
                   identifier: project_identifier,
                   description: project_description,
-                  status: project_status,
-                  is_public: project_public,
-                  parent: project_parent)
+                  active: project_active,
+                  public: project_public,
+                  parent: project_parent,
+                  status: project_status)
     end
     let(:permissions) { [:add_project] }
+    let!(:allowed_to) do
+      allow(current_user)
+        .to receive(:allowed_to_globally?) do |permission|
+          permissions.include?(permission)
+        end
+    end
 
     subject(:contract) { described_class.new(project, current_user) }
   end

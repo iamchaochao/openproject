@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -33,25 +33,40 @@ describe Project, type: :model do
   include BecomeMember
   using_shared_fixtures :admin
 
-  let(:project) { FactoryBot.create(:project, is_public: false) }
+  let(:active) { true }
+  let(:project) { FactoryBot.create(:project, active: active) }
+  let(:build_project) { FactoryBot.build_stubbed(:project, active: active) }
   let(:user) { FactoryBot.create(:user) }
 
-  describe Project::STATUS_ACTIVE do
-    it 'equals 1' do
-      # spec that STATUS_ACTIVE has the correct value
-      expect(Project::STATUS_ACTIVE).to eq(1)
+  describe '#active?' do
+    context 'if active' do
+      it 'is true' do
+        expect(project).to be_active
+      end
+    end
+
+    context 'if not active' do
+      let(:active) { false }
+
+      it 'is false' do
+        expect(project).not_to be_active
+      end
     end
   end
 
-  describe '#active?' do
-    it 'is active when :status equals STATUS_ACTIVE' do
-      project = FactoryBot.build :project, status: :active
-      expect(project).to be_active
+  describe '#archived?' do
+    context 'if active' do
+      it 'is true' do
+        expect(project).not_to be_archived
+      end
     end
 
-    it "is not active when :status doesn't equal STATUS_ACTIVE" do
-      project = FactoryBot.build :project, status: :archived
-      expect(project).not_to be_active
+    context 'if not active' do
+      let(:active) { false }
+
+      it 'is false' do
+        expect(project).to be_archived
+      end
     end
   end
 
@@ -74,38 +89,31 @@ describe Project, type: :model do
     end
   end
 
-  describe 'copy_allowed?' do
-    let(:user) { FactoryBot.create(:user) }
-    let(:role_add_subproject) { FactoryBot.create(:role, permissions: [:add_subprojects]) }
-    let(:role_copy_projects) { FactoryBot.create(:role, permissions: [:edit_project, :copy_projects, :add_project]) }
-    let(:parent_project) { FactoryBot.create(:project) }
-    let(:project) { FactoryBot.create(:project, parent: parent_project) }
-    let!(:subproject_member) do
-      FactoryBot.create(:member,
-                         user: user,
-                         project: project,
-                         roles: [role_copy_projects])
-    end
+  describe '#copy_allowed?' do
+    let(:user) { FactoryBot.build_stubbed(:user) }
+    let(:project) { FactoryBot.build_stubbed(:project) }
+    let(:permission_granted) { true }
+
     before do
+      allow(user)
+        .to receive(:allowed_to?)
+        .with(:copy_projects, project)
+        .and_return(permission_granted)
+
       login_as(user)
     end
 
-    context 'with permission to add subprojects' do
-      let!(:member_add_subproject) do
-        FactoryBot.create(:member,
-                           user: user,
-                           project: parent_project,
-                           roles: [role_add_subproject])
-      end
-
-      it 'should allow copy' do
-        expect(project.copy_allowed?).to eq(true)
+    context 'with copy project permission' do
+      it 'is true' do
+        expect(project.copy_allowed?).to be_truthy
       end
     end
 
-    context 'with permission to add subprojects' do
-      it 'should not allow copy' do
-        expect(project.copy_allowed?).to eq(false)
+    context 'without copy project permission' do
+      let(:permission_granted) { false }
+
+      it 'is false' do
+        expect(project.copy_allowed?).to be_falsey
       end
     end
   end
@@ -154,12 +162,34 @@ describe Project, type: :model do
     end
   end
 
+  describe 'status' do
+    let(:status) { FactoryBot.build_stubbed(:project_status) }
+    let(:stubbed_project) do
+      FactoryBot.build_stubbed(:project,
+                               status: status)
+    end
+
+    it 'has a status' do
+      expect(stubbed_project.status)
+        .to eql status
+    end
+
+    it 'is destroyed along with the project' do
+      status = project.create_status explanation: 'some description'
+
+      project.destroy!
+
+      expect(Project::Status.where(id: status.id))
+        .not_to exist
+    end
+  end
+
   describe '#types_used_by_work_packages' do
     let(:project) { FactoryBot.create(:project_with_types) }
     let(:type) { project.types.first }
-    let(:other_type) { project.types.second }
+    let(:other_type) { FactoryBot.create(:type) }
     let(:project_work_package) { FactoryBot.create(:work_package, type: type, project: project) }
-    let(:other_project) { FactoryBot.create(:project, no_types: true, types: [other_type, type]) }
+    let(:other_project) { FactoryBot.create(:project, types: [other_type, type]) }
     let(:other_project_work_package) { FactoryBot.create(:work_package, type: other_type, project: other_project) }
 
     it 'returns the type used by a work package of the project' do
@@ -170,113 +200,129 @@ describe Project, type: :model do
     end
   end
 
-  describe '#allowed_parent?' do
-    let(:project) { FactoryBot.build_stubbed(:project) }
-    let(:other_project) { FactoryBot.build_stubbed(:project) }
-    let(:another_project) { FactoryBot.build_stubbed(:project) }
+  context '#rolled_up_versions' do
+    let!(:project) { FactoryBot.create(:project) }
+    let!(:parent_version1) { FactoryBot.create(:version, project: project) }
+    let!(:parent_version2) { FactoryBot.create(:version, project: project) }
 
-    it 'is false for nil on a persisted project with no allowed parents' do
-      allow(project)
-        .to receive(:allowed_parents)
-        .and_return([])
-
-      expect(project.allowed_parent?(nil)).to be_falsey
+    it 'should include the versions for the current project' do
+      expect(project.rolled_up_versions)
+        .to match_array [parent_version1, parent_version2]
     end
 
-    it 'is true for nil on a persisted project with allowed parents' do
-      allow(project)
-        .to receive(:allowed_parents)
-        .and_return(['something'])
+    it 'should include versions for a subproject' do
+      subproject = FactoryBot.create(:project, parent: project)
+      subproject_version = FactoryBot.create(:version, project: subproject)
 
-      expect(project.allowed_parent?(nil)).to be_truthy
+      project.reload
+
+      expect(project.rolled_up_versions)
+        .to match_array [parent_version1, parent_version2, subproject_version]
     end
 
-    it 'is true for nil on an unpersisted project with no allowed parents' do
-      project = FactoryBot.build(:project)
+    it 'should include versions for a sub-subproject' do
+      subproject = FactoryBot.create(:project, parent: project)
+      sub_subproject = FactoryBot.create(:project, parent: subproject)
+      sub_subproject_version = FactoryBot.create(:version, project: sub_subproject)
 
-      allow(project)
-        .to receive(:allowed_parents)
-        .and_return([])
+      project.reload
 
-      expect(project.allowed_parent?(nil)).to be_truthy
+      expect(project.rolled_up_versions)
+        .to match_array [parent_version1, parent_version2, sub_subproject_version]
     end
 
-    it 'is false for blank on a persisted project with no allowed parents' do
-      allow(project)
-        .to receive(:allowed_parents)
-        .and_return([])
+    it 'should only check active projects' do
+      subproject = FactoryBot.create(:project, parent: project)
+      FactoryBot.create(:version, project: subproject)
+      subproject.update(active: false)
 
-      expect(project.allowed_parent?('')).to be_falsey
+      project.reload
+
+      expect(subproject)
+        .not_to be_active
+      expect(project.rolled_up_versions)
+        .to match_array [parent_version1, parent_version2]
+    end
+  end
+
+  context '#notified_users' do
+    let(:project) { FactoryBot.create(:project) }
+    let(:role) { FactoryBot.create(:role) }
+
+    let(:principal) { raise NotImplementedError }
+    let(:mail_notification) { false }
+
+    before do
+      FactoryBot.create(:member,
+                        project: project,
+                        principal: principal,
+                        roles: [role],
+                        mail_notification: mail_notification)
     end
 
-    it 'is true for blank on a persisted project with allowed parents' do
-      allow(project)
-        .to receive(:allowed_parents)
-        .and_return(['something'])
+    context 'members with selected mail notification' do
+      let(:principal) { FactoryBot.create(:user, mail_notification: 'selected') }
+      let(:mail_notification) { true }
 
-      expect(project.allowed_parent?('')).to be_truthy
+      it 'are included' do
+        expect(project.notified_users)
+          .to include(principal)
+      end
     end
 
-    it 'is true for blank on an unpersisted project with no allowed parents' do
-      project = FactoryBot.build(:project)
+    context 'members with unselected mail notification' do
+      let(:principal) { FactoryBot.create(:user, mail_notification: 'selected') }
+      let(:mail_notification) { false }
 
-      allow(project)
-        .to receive(:allowed_parents)
-        .and_return([])
-
-      expect(project.allowed_parent?('')).to be_truthy
+      it 'are not included' do
+        expect(project.notified_users)
+          .to be_empty
+      end
     end
 
-    it 'is true for an id pointing to a project in allowed_parents' do
-      allow(Project)
-        .to receive(:find_by)
-        .with(id: 1)
-        .and_return(other_project)
-      allow(project)
-        .to receive(:allowed_parents)
-        .and_return([other_project])
+    context 'members with `all` notification' do
+      let(:principal) { FactoryBot.create(:user, mail_notification: 'all') }
 
-      expect(project.allowed_parent?(1)).to be_truthy
+      it 'are included' do
+        expect(project.notified_users)
+          .to include(principal)
+      end
     end
 
-    it 'is false for an id pointing to a project in allowed_parents' do
-      allow(Project)
-        .to receive(:find_by)
-        .with(id: 1)
-        .and_return(other_project)
-      allow(project)
-        .to receive(:allowed_parents)
-        .and_return([another_project])
+    context 'members with `none` mail notification' do
+      let(:principal) { FactoryBot.create(:user, mail_notification: 'none') }
 
-      expect(project.allowed_parent?(1)).to be_falsey
+      it 'are not included' do
+        expect(project.notified_users)
+          .to be_empty
+      end
     end
 
-    it 'is false for a non existing project id' do
-      allow(Project)
-        .to receive(:find_by)
-        .with(id: 1)
-        .and_return(nil)
-      allow(project)
-        .to receive(:allowed_parents)
-        .and_return([other_project])
+    context 'members with `only_my_events` mail notification' do
+      let(:principal) { FactoryBot.create(:user, mail_notification: 'only_my_events') }
 
-      expect(project.allowed_parent?(1)).to be_falsey
+      it 'are not included' do
+        expect(project.notified_users)
+          .to be_empty
+      end
     end
 
-    it 'is true for a project in allowed_projects' do
-      allow(project)
-        .to receive(:allowed_parents)
-        .and_return([other_project])
+    context 'members with `only_assigned` mail notification' do
+      let(:principal) { FactoryBot.create(:user, mail_notification: 'only_assigned') }
 
-      expect(project.allowed_parent?(other_project)).to be_truthy
+      it 'are not included' do
+        expect(project.notified_users)
+          .to be_empty
+      end
     end
 
-    it 'is false for a project not in allowed_projects' do
-      allow(project)
-        .to receive(:allowed_parents)
-        .and_return([another_project])
+    context 'members with `only_owner` mail notification' do
+      let(:principal) { FactoryBot.create(:user, mail_notification: 'only_owner') }
 
-      expect(project.allowed_parent?(other_project)).to be_falsey
+      it 'are not included' do
+        expect(project.notified_users)
+          .to be_empty
+      end
     end
   end
 end

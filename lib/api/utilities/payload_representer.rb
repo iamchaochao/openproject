@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -37,9 +37,16 @@ module API
         base.representable_attrs.each do |property|
           if property.name == 'links'
             add_filter(property, LinkRenderBlock)
-          elsif property[:writeable] == false
+            next
+          end
+
+          writeable = property[:writeable]
+          if writeable == false
             property.merge!(readable: false)
-          else
+          end
+
+          # Only filter unwritable if not a lambda
+          unless writeable&.respond_to?(:call)
             add_filter(property, UnwriteablePropertyFilter)
           end
         end

@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -51,9 +51,7 @@ FactoryBot.define do
       first_login { false if User.table_exists? and User.columns.map(&:name).include? 'first_login' }
     end
 
-    factory :deleted_user, class: DeletedUser do
-      status { User::STATUSES[:builtin] }
-    end
+    factory :deleted_user, class: DeletedUser
 
     factory :locked_user do
       firstname { 'Locked' }
@@ -71,7 +69,10 @@ FactoryBot.define do
   end
 
   factory :anonymous, class: AnonymousUser do
-    status { User::STATUSES[:builtin] }
     initialize_with { User.anonymous }
+  end
+
+  factory :system, class: SystemUser do
+    initialize_with { User.system }
   end
 end

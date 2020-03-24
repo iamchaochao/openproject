@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -50,7 +50,7 @@ class MailHandler < ActionMailer::Base
   end
 
   def self.with_options(options)
-    handler = self.new
+    handler = new
 
     handler.options = options
 
@@ -84,6 +84,7 @@ class MailHandler < ActionMailer::Base
         end
       end
     end
+
     @user = User.find_by_mail(sender_email) if sender_email.present?
     if @user && !@user.active?
       log "ignoring email from non-active user [#{@user.login}]"
@@ -98,7 +99,7 @@ class MailHandler < ActionMailer::Base
         @user = MailHandler.create_user_from_email(email)
         if @user
           log "[#{@user.login}] account created"
-          UserMailer.account_information(@user, @user.password).deliver_now
+          UserMailer.account_information(@user, @user.password).deliver_later
         else
           log "could not create account for [#{sender_email}]", :error
           return false
@@ -292,7 +293,7 @@ class MailHandler < ActionMailer::Base
     else
       @keywords[attr] = begin
         if (options[:override] || self.options[:allow_override].include?(attr)) &&
-          (v = extract_keyword!(plain_text_body, attr, options[:format]))
+           (v = extract_keyword!(plain_text_body, attr, options[:format]))
           v
         else
           # Return either default or nil
@@ -333,13 +334,13 @@ class MailHandler < ActionMailer::Base
     project = issue.project
 
     attrs = {
-      'type_id' => (k = get_keyword(:type)) && project.types.find_by(name: k).try(:id),
-      'status_id' => (k = get_keyword(:status)) && Status.find_by(name: k).try(:id),
+      'type_id' => lookup_case_insensitive_key(project.types, :type),
+      'status_id' => lookup_case_insensitive_key(Status, :status),
       'parent_id' => (k = get_keyword(:parent)),
-      'priority_id' => (k = get_keyword(:priority)) && IssuePriority.find_by(name: k).try(:id),
-      'category_id' => (k = get_keyword(:category)) && project.categories.find_by(name: k).try(:id),
+      'priority_id' => lookup_case_insensitive_key(IssuePriority, :priority),
+      'category_id' => lookup_case_insensitive_key(project.categories, :category),
       'assigned_to_id' => assigned_to.try(:id),
-      'fixed_version_id' => (k = get_keyword(:fixed_version)) && project.shared_versions.find_by(name: k).try(:id),
+      'fixed_version_id' => lookup_case_insensitive_key(project.shared_versions, :fixed_version, Arel.sql("#{Version.table_name}.name")),
       'start_date' => get_keyword(:start_date, override: true, format: '\d{4}-\d{2}-\d{2}'),
       'due_date' => get_keyword(:due_date, override: true, format: '\d{4}-\d{2}-\d{2}'),
       'estimated_hours' => get_keyword(:estimated_hours, override: true),
@@ -359,6 +360,12 @@ class MailHandler < ActionMailer::Base
         h[v.id.to_s] = v.value_of value
       end
       h
+    end
+  end
+
+  def lookup_case_insensitive_key(scope, attribute, column_name = Arel.sql('name'))
+    if k = get_keyword(attribute)
+      scope.find_by("lower(#{column_name}) = ?", k.downcase).try(:id)
     end
   end
 
@@ -547,8 +554,7 @@ class MailHandler < ActionMailer::Base
 
   def log(message, level = :info)
     message = "MailHandler: #{message}"
-
-    logger.send(level, message) if logger&.send(level)
+    logger.public_send(level, message)
   end
 
   def work_package_create_contract_class

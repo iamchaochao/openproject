@@ -1,6 +1,6 @@
 //-- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 //++
 
 import {OpContextMenuItem} from 'core-components/op-context-menu/op-context-menu.types';
@@ -36,7 +36,6 @@ import {TypeResource} from 'core-app/modules/hal/resources/type-resource';
 import {Highlighting} from 'core-app/components/wp-fast-table/builders/highlighting/highlighting.functions';
 import {BrowserDetector} from "core-app/modules/common/browser/browser-detector.service";
 import {WorkPackageCreateService} from 'core-components/wp-new/wp-create.service';
-import {IWorkPackageCreateServiceToken} from 'core-components/wp-new/wp-create.service.interface';
 
 @Directive({
   selector: '[opTypesCreateDropdown]'
@@ -51,8 +50,8 @@ export class OpTypesContextMenuDirective extends OpContextMenuTrigger {
   constructor(readonly elementRef:ElementRef,
               readonly opContextMenu:OPContextMenuService,
               readonly browserDetector:BrowserDetector,
-              readonly $state:StateService,
-              @Inject(IWorkPackageCreateServiceToken) protected wpCreate:WorkPackageCreateService) {
+              readonly wpCreate:WorkPackageCreateService,
+              readonly $state:StateService) {
     super(elementRef, opContextMenu);
   }
 

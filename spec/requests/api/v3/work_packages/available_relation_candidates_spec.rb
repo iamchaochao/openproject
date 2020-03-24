@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -159,7 +159,7 @@ describe ::API::V3::Relations::RelationRepresenter, type: :request do
     end
 
     context 'when a project is archived' do
-      let(:project_1) { FactoryBot.create :project, status: Project::STATUS_ARCHIVED }
+      let(:project_1) { FactoryBot.create :project, active: false }
       let(:href) { "/api/v3/work_packages/#{wp_2.id}/available_relation_candidates?query=WP" }
 
       it 'does not return work packages from that project' do

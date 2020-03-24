@@ -1,11 +1,18 @@
 #-- copyright
-# ReportingEngine
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
-# Copyright (C) 2010 - 2014 the OpenProject Foundation (OPF)
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License version 3.
+#
+# OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+# Copyright (C) 2006-2017 Jean-Philippe Lang
+# Copyright (C) 2010-2013 the ChiliProject Team
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
-# version 3.
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,23 +22,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
+# See docs/COPYRIGHT.rdoc for more details.
 #++
 
 class Widget::Settings < Widget::Base
   dont_cache! # Settings may change due to permissions
 
-  @@settings_to_render = [:filter, :group_by, :controls]
-
   def render_filter_settings
     render_widget Widget::Settings::Fieldset, @subject,
-                  type: 'filters'  do
+                  type: 'filters' do
       render_widget Widget::Filters, @subject
     end
   end
 
   def render_group_by_settings
     render_widget Widget::Settings::Fieldset, @subject,
-                  type: 'group_by'  do
+                  type: 'group_by' do
       render_widget Widget::GroupBys, @subject
     end
   end
@@ -59,12 +66,16 @@ class Widget::Settings < Widget::Base
         # To add new settings, write a new instance method render_<a name>_setting
         # and add <a name> to the @@settings_to_render list.
         content = ''.html_safe
-        @@settings_to_render.each do |setting_name|
+        settings_to_render.each do |setting_name|
           render_method_name = "render_#{setting_name}_settings"
           content << send(render_method_name) if respond_to? render_method_name
         end
         content
       end
     end)
+  end
+
+  def settings_to_render
+    @settings_to_render ||= %i[filter group_by controls]
   end
 end

@@ -1,6 +1,6 @@
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
@@ -34,9 +34,12 @@ import {I18nService} from "core-app/modules/common/i18n/i18n.service";
 import {Observable} from "rxjs";
 import {map} from "rxjs/operators";
 import {DebouncedRequestSwitchmap, errorNotificationHandler} from "core-app/helpers/rxjs/debounced-input-switchmap";
-import {WorkPackageNotificationService} from "core-components/wp-edit/wp-notification.service";
+import {HalResourceNotificationService} from "core-app/modules/hal/services/hal-resource-notification.service";
 import {NgSelectComponent} from "@ng-select/ng-select";
 import {DynamicBootstrapper} from "core-app/globals/dynamic-bootstrapper";
+import {HalResource} from "core-app/modules/hal/resources/hal-resource";
+
+export const usersAutocompleterSelector = 'user-autocompleter';
 
 @Component({
   template: `
@@ -51,7 +54,7 @@ import {DynamicBootstrapper} from "core-app/globals/dynamic-bootstrapper";
                (focus)="onFocus()"
                (change)="onModelChange($event)">
       <ng-template ng-option-tmp let-item="item" let-index="index">
-        <user-avatar *ngIf="item"
+        <user-avatar *ngIf="item && item.id"
                      [user]="item"
                      data-class-list="avatar-mini">
         </user-avatar>
@@ -59,7 +62,7 @@ import {DynamicBootstrapper} from "core-app/globals/dynamic-bootstrapper";
       </ng-template>
     </ng-select>
   `,
-  selector: 'user-autocompleter'
+  selector: usersAutocompleterSelector
 })
 export class UserAutocompleterComponent implements OnInit {
   userTracker = (item:any) => item.href;
@@ -81,7 +84,7 @@ export class UserAutocompleterComponent implements OnInit {
   /** Keep a switchmap for search term and loading state */
   public requests = new DebouncedRequestSwitchmap<string, {[key:string]:string|null}>(
     (searchTerm:string) => this.getAvailableUsers(this.url, searchTerm),
-    errorNotificationHandler(this.wpNotification)
+    errorNotificationHandler(this.halNotification)
   );
 
   public inputFilters:ApiV3FilterBuilder = new ApiV3FilterBuilder();
@@ -89,7 +92,7 @@ export class UserAutocompleterComponent implements OnInit {
   constructor(protected elementRef:ElementRef,
               protected halResourceService:HalResourceService,
               protected I18n:I18nService,
-              protected wpNotification:WorkPackageNotificationService,
+              protected halNotification:HalResourceNotificationService,
               readonly pathHelper:PathHelperService) {
   }
 
@@ -106,7 +109,7 @@ export class UserAutocompleterComponent implements OnInit {
     if (filterInput) {
       JSON.parse(filterInput).forEach((filter:{selector:string; operator:FilterOperator, values:string[]}) => {
         this.inputFilters.add(filter['selector'], filter['operator'], filter['values']);
-      })
+      });
     }
 
     if (allowEmpty === 'true') {
@@ -115,7 +118,9 @@ export class UserAutocompleterComponent implements OnInit {
   }
 
   public onFocus() {
-    this.requests.input$.next('');
+    if (!this.requests.lastRequestedValue) {
+      this.requests.input$.next('');
+    }
   }
 
   public onModelChange(user:any) {
@@ -134,9 +139,11 @@ export class UserAutocompleterComponent implements OnInit {
   }
 
   private getAvailableUsers(url:string, searchTerm:any):Observable<{[key:string]:string|null}[]> {
-    let searchFilters = this.inputFilters;
+    // Need to clone the filters to not add additional filters on every
+    // search term being processed.
+    let searchFilters = this.inputFilters.clone();
 
-    if (searchTerm) {
+    if (searchTerm && searchTerm.length) {
       searchFilters.add('name', '~', [searchTerm]);
     }
 
@@ -165,4 +172,3 @@ export class UserAutocompleterComponent implements OnInit {
   }
 }
 
-DynamicBootstrapper.register({selector: 'user-autocompleter', cls: UserAutocompleterComponent});

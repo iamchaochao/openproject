@@ -1,8 +1,30 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
+#---
 ja:
   activerecord:
     attributes:
       cost_entry:
-        work_package: "作業項目"
+        work_package: "ワーク パッケージ"
         overridden_costs: "オーバーライドされたコスト"
         spent: "使用済"
         spent_on: "日付"
@@ -55,7 +77,7 @@ ja:
     cost_type: "コスト種類"
     costs: "コスト"
     current_rate: "現状原価率"
-    hours: "時間"
+    hours: " 時間"
     units: "単位"
     valid_from: "から有効"
   button_add_budget_item: "計画コストを追加"
@@ -67,7 +89,7 @@ ja:
   button_log_costs: "単価を記録"
   button_log_time: "時間を記録"
   caption_booked_on_project: "プロジェクトの予約"
-  caption_default: "デフォルト"
+  caption_default: "既定の項目"
   caption_default_rate_history_for: "%{user} のデフォルト率の履歴"
   caption_labor: "労働"
   caption_labor_costs: "実際の労働コスト"
@@ -81,9 +103,6 @@ ja:
   caption_set_rate: "現在の進捗を設定する"
   caption_show_locked: "ロックの種類を表示します。"
   cost_objects_title: "予算"
-  label_cost_type_plural: "コスト種類"
-  currency_delimiter: "、"
-  currency_separator: "。"
   description_date_for_new_rate: "新しいレートの日付"
   events:
     cost_object: "予算の編集"
@@ -101,6 +120,7 @@ ja:
   label_cost_plural: "コスト"
   label_cost_report: "コストレポート"
   label_cost_type_specific: "予算 #%{id}: %{name}"
+  label_cost_type_plural: "コスト種類"
   label_costs_per_page: "1ページあたりのコスト"
   label_currency: "通貨"
   label_currency_format: "通貨の形式"

@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -36,10 +36,10 @@ module Components
     def confirm_flow_with(password, should_fail: false)
       expect_open
 
-      expect(submit_button[:disabled]).to be_truthy
+      expect(submit_button).to be_disabled
       fill_in 'request_for_confirmation_password', with: password
 
-      expect(submit_button[:disabled]).to be_falsey
+      expect(submit_button).not_to be_disabled
       submit(should_fail)
     end
 

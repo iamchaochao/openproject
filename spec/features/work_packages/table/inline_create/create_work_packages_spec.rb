@@ -20,7 +20,7 @@ describe 'inline create work package', js: true do
                       role: role
   end
 
-  let!(:project) { FactoryBot.create(:project, is_public: true, types: types) }
+  let!(:project) { FactoryBot.create(:project, public: true, types: types) }
   let!(:existing_wp) { FactoryBot.create(:work_package, project: project) }
   let!(:priority) { FactoryBot.create :priority, is_default: true }
   let(:filters) { ::Components::WorkPackages::Filters.new }
@@ -104,6 +104,9 @@ describe 'inline create work package', js: true do
         wp_table.visit!
         filters.open
         filters.add_filter_by cf_list.name, 'is', cf_list.custom_options.second.name, cf_accessor_frontend
+
+        sleep(0.3)
+
         columns.open_modal
         columns.add(cf_list.name, save_changes: true)
 

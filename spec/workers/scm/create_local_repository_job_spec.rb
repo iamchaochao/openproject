@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,8 +29,9 @@
 
 require 'spec_helper'
 
-describe Scm::CreateLocalRepositoryJob do
-  subject { described_class.new(repository) }
+describe SCM::CreateLocalRepositoryJob do
+  let(:instance) { described_class.new }
+  subject { instance.perform(repository) }
 
   # Allow to override configuration values to determine
   # whether to activate managed repositories
@@ -61,7 +62,7 @@ describe Scm::CreateLocalRepositoryJob do
 
     shared_examples 'creates a directory with mode' do |expected|
       it 'creates the directory' do
-        subject.perform
+        subject
         expect(Dir.exists?(repository.root_url)).to be true
 
         file_mode = File.stat(repository.root_url).mode
@@ -73,8 +74,8 @@ describe Scm::CreateLocalRepositoryJob do
       let(:mode) { 0770 }
 
       it 'uses the correct mode' do
-        expect(subject).to receive(:create).with(mode)
-        subject.perform
+        expect(instance).to receive(:create).with(mode)
+        subject
       end
 
       it_behaves_like 'creates a directory with mode', '0770'
@@ -83,8 +84,8 @@ describe Scm::CreateLocalRepositoryJob do
     context 'with string mode' do
       let(:mode) { '0770' }
       it 'uses the correct mode' do
-        expect(subject).to receive(:create).with(0770)
-        subject.perform
+        expect(instance).to receive(:create).with(0770)
+        subject
       end
 
       it_behaves_like 'creates a directory with mode', '0770'
@@ -93,8 +94,8 @@ describe Scm::CreateLocalRepositoryJob do
     context 'with no mode set' do
       let(:mode) { nil }
       it 'uses the default mode' do
-        expect(subject).to receive(:create).with(0700)
-        subject.perform
+        expect(instance).to receive(:create).with(0700)
+        subject
       end
 
       it_behaves_like 'creates a directory with mode', '0700'

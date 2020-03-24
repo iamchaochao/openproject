@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -46,13 +46,24 @@ describe ProjectsController, type: :controller do
       expect(response).to be_successful
       expect(response).to render_template 'new'
     end
+
+    context 'with parent project' do
+      let!(:parent) { FactoryBot.create :project, name: 'Parent' }
+
+      it 'sets the parent of the project' do
+        get 'new', params: { parent_id: parent.id }
+        expect(response).to be_successful
+        expect(response).to render_template 'new'
+        expect(assigns(:project).parent).to eq parent
+      end
+    end
   end
 
   describe 'index.html' do
-    let(:project_a) { FactoryBot.create(:project, name: 'Project A', is_public: false, status: :active) }
-    let(:project_b) { FactoryBot.create(:project, name: 'Project B', is_public: false, status: :active) }
-    let(:project_c) { FactoryBot.create(:project, name: 'Project C', is_public: true, status: :active)  }
-    let(:project_d) { FactoryBot.create(:project, name: 'Project D', is_public: true, status: :archived) }
+    let(:project_a) { FactoryBot.create(:project, name: 'Project A', public: false, active: true) }
+    let(:project_b) { FactoryBot.create(:project, name: 'Project B', public: false, active: true) }
+    let(:project_c) { FactoryBot.create(:project, name: 'Project C', public: true, active: true)  }
+    let(:project_d) { FactoryBot.create(:project, name: 'Project D', public: true, active: false) }
 
     let(:projects) { [project_a, project_b, project_c, project_d] }
 
@@ -145,7 +156,7 @@ describe ProjectsController, type: :controller do
         end
 
         it 'redirects to settings#types' do
-          expect(response).to redirect_to(settings_project_path(project.identifier, tab: 'types'))
+          expect(response).to redirect_to(controller: '/project_settings/types', id: project, action: 'show')
         end
       end
 
@@ -165,7 +176,7 @@ describe ProjectsController, type: :controller do
         end
 
         it 'redirects to settings#types' do
-          expect(response).to redirect_to(settings_project_path(project.identifier, tab: 'types'))
+          expect(response).to redirect_to(controller: '/project_settings/types', id: project, action: 'show')
         end
       end
     end
@@ -178,9 +189,8 @@ describe ProjectsController, type: :controller do
 
       before do
         allow(Project).to receive(:find).and_return(project)
-        expect_any_instance_of(::Projects::DeleteProjectService)
+        expect_any_instance_of(::Projects::ScheduleDeletionService)
           .to receive(:call)
-          .with(delayed: true)
           .and_return service_result
       end
 
@@ -224,7 +234,7 @@ describe ProjectsController, type: :controller do
           request
         end
 
-        it { expect(response).to redirect_to(settings_project_path(project, 'custom_fields')) }
+        it { expect(response).to redirect_to(controller: '/project_settings/custom_fields', id: project, action: 'show') }
 
         it 'sets flash[:notice]' do
           expect(flash[:notice]).to eql(I18n.t(:notice_successful_update))
@@ -237,7 +247,7 @@ describe ProjectsController, type: :controller do
           request
         end
 
-        it { expect(response).to redirect_to(settings_project_path(project, 'custom_fields')) }
+        it { expect(response).to redirect_to(controller: '/project_settings/custom_fields', id: project, action: 'show') }
 
         it 'sets flash[:error]' do
           expect(flash[:error]).to include(

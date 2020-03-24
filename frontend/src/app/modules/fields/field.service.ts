@@ -1,6 +1,6 @@
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 
 import {Injector} from '@angular/core';
@@ -67,6 +67,17 @@ export abstract class AbstractFieldService<T extends Field, C extends IFieldType
     return this.classes[key];
   }
 
+  public getSpecificClassFor(resourceType:string, fieldName:string, type:string = 'unknown'):C {
+    let key = this.fieldType(`${resourceType}-${fieldName}`) ||
+              this.fieldType(`${resourceType}-${type}`);
+
+    if (key) {
+      return this.classes[key];
+    }
+
+    return this.getClassFor(fieldName, type);
+  }
+
   /**
    * Add a field class for the given attribute names.
    *
@@ -78,6 +89,24 @@ export abstract class AbstractFieldService<T extends Field, C extends IFieldType
    */
   public addFieldType(fieldClass:any, fieldType:string, attributes:string[]) {
     fieldClass.fieldType = fieldType;
+    this.register(fieldClass, attributes);
+
+    return this;
+  }
+
+  /**
+   * Add a field class for the given attribute names and a specify resource.
+   *
+   * @param resourceType The resource type (e.g Work Package)
+   * @param fieldClass The field class
+   * @param {string} fieldType the field type identifier (e.g., 'progress')
+   * @param {string[]} attributes The schema attribute names to register for (e.g., 'Progress')
+   *
+   * @returns {this}
+   */
+  public addSpecificFieldType(resourceType:string, fieldClass:any, fieldType:string, attributes:string[]) {
+    fieldClass.fieldType = `${resourceType}-${fieldType}`;
+    attributes = attributes.map((attribute) => `${resourceType}-${attribute}`);
     this.register(fieldClass, attributes);
 
     return this;

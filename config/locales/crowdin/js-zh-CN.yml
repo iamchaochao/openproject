@@ -1,3 +1,24 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
 zh-CN:
   js:
     ajax:
@@ -20,7 +41,7 @@ zh-CN:
     button_back_to_list_view: "返回列表视图"
     button_cancel: "取消"
     button_close: "关闭"
-    button_change_project: "Change project"
+    button_change_project: "更改项目"
     button_check_all: "全选"
     button_configure-form: "配置表单"
     button_confirm: "确认"
@@ -41,8 +62,8 @@ zh-CN:
     button_open_details: "打开详细信息视图"
     button_close_details: "关闭细节显示"
     button_open_fullscreen: "打开全屏视图"
-    button_show_cards: "Show card view"
-    button_show_list: "Show list view"
+    button_show_cards: "显示卡片视图"
+    button_show_list: "显示列表视图"
     button_quote: "引用"
     button_save: "保存"
     button_settings: "设置"
@@ -52,33 +73,34 @@ zh-CN:
     button_export-atom: "下载原子"
     calendar:
       title: '日历'
-      too_many: 'There are %{count} work packages in total, but only %{max} can be shown.'
+      too_many: '总共有 %{count} 个工作包，但只能显示 %{max} 个。'
     card:
       add_new: '添加新卡'
       highlighting:
         inline: '突出显示内联：'
         entire_card_by: '整个卡'
       remove_from_list: '从列表中移除卡'
+    caption_rate_history: "费率历史记录"
     clipboard:
       browser_error: "您的浏览器不支持复制到剪贴板，请手动复制选定的文本。"
       copied_successful: "成功复制到剪贴板!"
     chart:
-      type: 'Chart type'
-      axis_criteria: 'Axis criteria'
-      modal_title: 'Work package graph configuration'
+      type: '图表类型'
+      axis_criteria: '轴条件'
+      modal_title: '工作包图配置'
       types:
-        line: 'Line'
-        horizontal_bar: 'Horizontal bar'
-        bar: 'Bar'
-        pie: 'Pie'
-        doughnut: 'Doughnut'
-        radar: 'Radar'
-        polar_area: 'Polar area'
+        line: '线图'
+        horizontal_bar: '水平条形图'
+        bar: '条形图'
+        pie: '饼图'
+        doughnut: '圆环图'
+        radar: '雷达图'
+        polar_area: '极地区域图'
       tabs:
         graph_settings: '通用'
-        dataset: 'Dataset %{number}'
+        dataset: '数据集 %{number}'
       errors:
-        could_not_load: 'The data to display the graph could not be loaded. The necessary permissions may be lacking.'
+        could_not_load: '无法加载用于显示图表的数据。可能缺少必要的权限。'
     description_available_columns: "可用的列"
     description_current_position: "您现在的位置："
     description_select_work_package: "选择工作包 #%{id}"
@@ -138,7 +160,7 @@ zh-CN:
         drag_to_activate: "从此处拖动字段将其激活"
         add_group: "增加属性组"
         add_table: "添加相关工作包表"
-        edit_query: 'Edit query'
+        edit_query: '编辑查询'
         new_group: '新的组'
         reset_to_defaults: '重置为默认值'
     custom_actions:
@@ -150,6 +172,9 @@ zh-CN:
       cannot_save_changes_with_message: "由于%{error} 原因，无法保存您的更改。"
       query_saving: "无法保存此视图。"
       embedded_table_loading: "无法加载嵌入式视图：%{message}"
+    enumeration_activities: "活动 （时间跟踪）"
+    enumeration_doc_categories: "文档类别"
+    enumeration_work_package_priorities: "工作包优先级"
     filter:
       description:
         text_open_filter: "使用 ALT 和方向键打开筛选器。"
@@ -171,16 +196,28 @@ zh-CN:
     general_text_yes: "是"
     general_text_No: "否"
     general_text_Yes: "是"
+    global_roles: 全局角色
+    hal:
+      error:
+        update_conflict_refresh: "点击此处刷新资源并更新到最新版本。"
+        edit_prohibited: "已阻止对此工作包编辑 %{attribute}。此属性来自于关系继承(如子项目)或其他无法配置的来源。"
+        format:
+          date: "%{attribute} 不是有效日期 - 需要 YYYY-MM-DD。"
+        general: "发生错误。"
     homescreen:
       blocks:
         new_features:
           text_new_features: "了解新功能和产品更新。"
-          current_new_feature_html: "OpenProject 包含一个用于敏捷项目管理的新<b>开发板视图</b>。</br>要为现有项目激活此新功能，请按以下步骤操作：<ul><li>在现有项目的设置中激活开发板模块。</li><li>在项目中配置您的开发板。</li><li>验证角色和权限</li></ul>"
-          image_alt_text: "开发板宣传图像"
-          learn_about: "详细了解敏捷开发板"
+          learn_about: "详细了解新功能"
+          standard:
+            learn_about_link: https://www.openproject.org/openproject-10-4
+            current_new_feature_html: >
+              该版本包含各种新功能和改进：<br><br> <ul> <li>默认<b>设计模板</b>，用于选择浅色或深色主题（高级功能）。</li> <li><i>我的页面</i>新增<b>时间跟踪微件</b>，在条形图中显示花费的时间。</li> <li><b>以 XLS 导出费用报告</b>和工作包 PDF 导出结果中的格式化文本。</li> <li><b>改进了设计和实用性</b>，在项目设置和管理中添加了更多选项卡。</li> </ul>
+          bim:
+            learn_about_link: https://www.openproject.org/openproject-bim-10-4
+            current_new_feature_html: >
+              OpenProject 包含<b>一个新的 IFC 模块</b>，可用于将 3D 模型集成到您的项目管理应用程序中以及与您的团队合作处理这些文件，而无需单独安装昂贵的软件或许可证。<br><br> <ul> <li><b>将构建模型的 IFC 文件导入</b>您的 OpenProject 应用程序。</li> <li>在您的浏览器中<b>打开 3D 模型并可视化构建模型</b>。</li> <li>直接在 OpenProject 中轻松地与您的团队<b>合作处理多个 IFC 文件</b>，无需单独安装昂贵的软件。</li> </ul>
     label_activate: "激活"
-    label_activity_no: "活动条目编号 %{activityNo}"
-    label_activity_with_comment_no: "活动条目编号 %{activityNo}，有用户评论。"
     label_add_column_after: "之后添加列"
     label_add_column_before: "在之前添加列"
     label_add_columns: "增添列"
@@ -197,6 +234,7 @@ zh-CN:
     label_and: "和"
     label_ascending: "升序"
     label_author: "作者: %{user}"
+    label_avatar: "头像"
     label_between: "介于"
     label_board: "面板"
     label_board_locked: "锁定"
@@ -210,6 +248,8 @@ zh-CN:
     label_deactivate: "停用"
     label_descending: "降序"
     label_description: "描述"
+    label_details: "详细信息"
+    label_display: "显示"
     label_cancel_comment: "取消注释"
     label_closed_work_packages: "关闭"
     label_collapse: "折叠"
@@ -230,22 +270,29 @@ zh-CN:
     label_export: "导出"
     label_filename: "文件"
     label_filesize: "大小"
+    label_general: "通用"
     label_greater_or_equal: ">="
     label_group: '组'
-    label_group_by: "分组按照"
+    label_group_by: "分组依据"
+    label_group_plural: "组"
     label_hide_attributes: "隐藏显示"
     label_hide_column: "隐藏列"
     label_hide_project_menu: "折叠项目菜单"
     label_in: "在"
     label_in_less_than: "在小于"
     label_in_more_than: "在多于"
+    label_incoming_emails: "传入电子邮件"
+    label_information_plural: "信息"
     label_import: "导入"
     label_latest_activity: "最新活动"
     label_last_updated_on: "最后更新日期"
     label_less_or_equal: "<="
     label_less_than_ago: "小于数日前"
     label_loading: "正在加载..."
+    label_mail_notification: "电子邮件通知"
     label_me: "我"
+    label_meeting_agenda: "议程"
+    label_meeting_minutes: "会议记录"
     label_menu_collapse: "折叠"
     label_menu_expand: "展开"
     label_more_than_ago: "更多天前"
@@ -254,6 +301,7 @@ zh-CN:
     label_no_data: "没有要显示的数据"
     label_no_due_date: "没有结束日期"
     label_no_start_date: "没有开始日期"
+    label_no_value: "无值"
     label_none: "无"
     label_not_contains: "不包含"
     label_not_equals: "不是"
@@ -265,12 +313,16 @@ zh-CN:
     label_previous: "上一个"
     label_per_page: "每页："
     label_please_wait: "请稍等"
+    label_project_plural: "项目"
     label_visibility_settings: "可见性设置"
     label_quote_comment: "引用这个评论"
+    label_recent: "最近"
     label_reset: "重置"
     label_remove_column: "删除列"
     label_remove_columns: "删除选定的列"
     label_remove_row: "删除行"
+    label_report: "报告"
+    label_repository_plural: "代码库"
     label_save_as: "另存为"
     label_select_watcher: "选择一位关注者..."
     label_selected_filter_list: "所选的筛选器"
@@ -281,6 +333,7 @@ zh-CN:
     label_sort_higher: "向上移动"
     label_sort_lower: "向下移动"
     label_sorting: "排序"
+    label_spent_time: "已耗时间"
     label_star_query: "最爱"
     label_press_enter_to_save: "按回车键可以保存。"
     label_public_query: "公开"
@@ -289,13 +342,15 @@ zh-CN:
     label_subject: "主题"
     label_this_week: "这一周"
     label_today: "今天"
+    label_time_entry_plural: "已耗时间"
     label_up: "向上"
+    label_user_plural: "用户"
     label_activity_show_only_comments: "仅显示批注的活动"
     label_activity_show_all: "显示所有项目"
     label_total_progress: "%{percent} %总进度"
     label_total_amount: "总计: %{amount}"
     label_updated_on: "更新于"
-    label_value_derived_from_children: "(value derived from children)"
+    label_value_derived_from_children: "（来自子项的值）"
     label_warning: "警告"
     label_work_package: "工作包"
     label_work_package_plural: "工作包"
@@ -331,7 +386,8 @@ zh-CN:
     label_wait: "请等待配置..."
     label_upload_counter: "%{count} 个中的 %{done} 个文件已完成"
     label_validation_error: "由于下列错误，无法保存工作包:"
-    label_view_has_changed: "This view has unsaved changes. Click to save them."
+    label_version_plural: "版本"
+    label_view_has_changed: "此视图有未保存的变更。单击以保存。"
     help_texts:
       show_modal: '显示属性帮助文本项'
     onboarding:
@@ -397,23 +453,22 @@ zh-CN:
         upgrade_to_ee_text: "哇！如果您需要使用此功能，说明您非常专业！您是否愿意成为企业版客户来支持 OpenSource 开发人员？"
         more_information: "更多信息"
         nevermind: "我愿意"
-        filter_types:
-          parent: "父级"
-          precedes: "前导"
-          follows: "跟随"
-          relates: "关于"
-          duplicates: "复制"
-          duplicated: "复制于"
-          blocks: "阻止"
-          blocked: "阻止于"
-          partof: "属于"
-          includes: "包括"
-          requires: "要求"
-          required: "要求于"
+      edit:
+        form_configuration: "表单配置"
+        projects: "项目"
+        settings: "设置"
     time_entry:
+      project: '项目'
+      work_package: '工作包'
+      work_package_required: '需要先选择一个工作包。'
       activity: '活动'
       comment: '评论'
+      duration: '持续时间'
+      spent_on: '日期'
       hours: '小时'
+      label: '时间条目'
+    two_factor_authentication:
+      label_two_factor_authentication: '双重身份验证'
     watchers:
       label_loading: 正在加载关注者...
       label_error_loading: 加载关注者时出错
@@ -444,8 +499,8 @@ zh-CN:
       set_parent: "设置父级"
       change_parent: "更改父级"
       remove_parent: "删除上一级"
-      hierarchy_indent: "Indent hierarchy"
-      hierarchy_outdent: "Outdent hierarchy"
+      hierarchy_indent: "缩进层次结构"
+      hierarchy_outdent: "减少缩进层次结构"
       group_by_wp_type: "按工作包类型分组"
       group_by_relation_type: "按关系类型分组"
       add_parent: "添加现有的上一级"
@@ -473,11 +528,13 @@ zh-CN:
     field_value_enter_prompt: "为'%{field}'输入值"
     select2:
       input_too_short:
+        zero: "请输入更多字符。"
         other: "请再输入{{count}} 个字符"
       load_more: "正在加载更多的结果..."
       no_matches: "未找到匹配项"
       searching: "正在搜索..."
       selection_too_big:
+        zero: "您无法选择任何项"
         other: "您可以只选择 {{limit}} 个条目"
     project_menu_details: "详细信息"
     sort:
@@ -571,7 +628,7 @@ zh-CN:
       image: "图片"
     work_packages:
       bulk_actions:
-        move: 'Bulk change of project'
+        move: '批量更改项目'
         edit: '批量编辑'
         copy: '批量复制'
         delete: '批量删除'
@@ -584,12 +641,6 @@ zh-CN:
       description_enter_text: "输入文本"
       description_options_hide: "隐藏选项"
       description_options_show: "显示选项"
-      error:
-        update_conflict_refresh: "单击此处可刷新工作包并更新到最新版本。"
-        edit_prohibited: "已阻止对此工作包编辑 %{attribute}。此属性来源于关系（如儿童）或无法配置。"
-        format:
-          date: "%{attribute} 不是有效日期 - 需要 YYYY-MM-DD。"
-        general: "发生错误。"
       edit_attribute: "%{attribute} - 编辑"
       key_value: "%{key}: %{value}"
       label_enable_multi_select: "启用多选"
@@ -603,8 +654,7 @@ zh-CN:
       message_successful_show_in_fullscreen: "单击此处以全屏视图打开此工作包。"
       message_view_spent_time: "显示这个工作包所花费的时间"
       message_work_package_read_only: "工作包被锁定在此状态。除状态外，其他属性均不可更改。"
-      message_work_package_status_blocked: "Work package status is not writable due to closed status and closed version being assigned."
-      no_value: "无值"
+      message_work_package_status_blocked: "由于处于关闭状态并且分配了关闭版本，因此工作包状态不可写。"
       placeholder_filter_by_text: "主题, 描述, 评论,..。"
       inline_create:
         title: '单击此处将新工作包添加至此列表'
@@ -629,8 +679,7 @@ zh-CN:
       no_results:
         title: 没有要显示的工作包。
         description: 没有已创建的工作包或所有工作包都被筛选排除。
-      limited_results: >
-        There are %{total} total work packages, but only %{count} can be shown in manual sorting mode. Please reduce the results by filtering.
+      limited_results: 手动排序模式下只能显示 %{count} 个工作包。请通过筛选减少结果。
       property_groups:
         details: "详细信息"
         people: "人员"
@@ -672,11 +721,11 @@ zh-CN:
         label_content: "单击此处跳过菜单，转到内容"
       placeholders:
         default: "-"
-        description: "点击此处输入描述......"
+        formattable: "%{name}：点击以编辑…"
       query:
         column_names: "列"
         group_by: "汇总结果根据"
-        group: "分组按照"
+        group: "分组依据"
         group_by_disabled_by_hierarchy: "分组依据已禁用，因为层次结构模式处于活动状态。"
         hierarchy_disabled_by_group_by: "层次结构模式已禁用，因为结果依据 %{column} 分组。"
         sort_ascending: "升序排序"
@@ -690,9 +739,9 @@ zh-CN:
         confirm_edit_cancel: "确定要取消编辑此视图的名称吗？标题将重置为上一个值。"
         click_to_edit_query_name: "单击可以编辑此视图的标题。"
         rename_query_placeholder: "此视图的名称"
-        star_text: "Mark this view as favorite and add to the saved views sidebar on the left."
+        star_text: "将该视图标记为收藏项，并添加到左侧的已保存视图边栏中。"
         public_text: >
-          Publish this view, allowing other users to access your view. Users with the 'Manage public views' permission can modify or remove public query. This does not affect the visibility of work package results in that view and depending on their permissions, users may see different results.
+          发布此视图，以允许其他用户访问您的视图。具有“管理公共视图”权限的用户可以修改或移除公共查询。这不会影响工作包结果在该视图中的可见性，并且用户可能会看到不同的结果，具体取决于他们的权限。
         errors:
           unretrievable_query: "无法从 URL 检索视图"
           not_found: "无此视图"
@@ -727,18 +776,17 @@ zh-CN:
           priority: '优先级'
           type: '类型'
         sorting_mode:
-          description: 'Chose the mode to sort your Work packages:'
-          automatic: 'Automatic'
-          manually: 'Manually'
-          warning: 'You will lose your previous sorting when activating the automatic sorting mode.'
+          description: '选择对您的工作包排序的模式：'
+          automatic: '自动'
+          manually: '手动'
+          warning: '激活自动排序模式时，您将丢失以前的排序结果。'
         columns_help_text: "使用上面的输入向表视图添加或删除列。 您可以拖放列以重新排序它们。"
         upsale:
           attribute_highlighting: '需要特定的工作包以脱颖而出？'
           relation_columns: '需要查看工作包列表中的关系吗？'
           check_out_link: '签出企业版。'
         relation_filters:
-          first_part: "显示所有工作包"
-          second_part: "当前工作包"
+          filter_work_packages_by_relation_type: '按关系类型筛选工作包'
       tabs:
         overview: 概述
         activity: 活动
@@ -822,7 +870,8 @@ zh-CN:
       child_work_packages:
         other: "%{count} 子工作包"
       hour:
-        other: "%{count} h"
+        zero: "0 h"
+        other: "%{count} 小时"
     zen_mode:
       button_activate: '激活 zen 模式'
       button_deactivate: '取消激活 zen 模式'
@@ -837,6 +886,6 @@ zh-CN:
         project_and_subprojects: "和所有子项目"
         search_for: "搜索"
     views:
-      card: 'Cards'
-      list: 'Table'
+      card: '卡片'
+      list: '表'
       timeline: '甘特图'

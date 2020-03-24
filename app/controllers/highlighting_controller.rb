@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -46,7 +46,7 @@ class HighlightingController < ApplicationController
   private
 
   def determine_freshness
-    @max_updated_at = helpers.highlight_css_updated_at || Time.now.iso8601
+    @max_updated_at = helpers.highlight_css_updated_at.to_s || Time.now.iso8601
     @highlight_version_tag = helpers.highlight_css_version_tag(@max_updated_at)
   end
 end

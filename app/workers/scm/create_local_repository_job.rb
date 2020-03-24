@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -34,22 +34,22 @@
 # We envision a repository management wrapper that covers transactional
 # creation and deletion of repositories BOTH on the database and filesystem.
 # Until then, a synchronous process is more failsafe.
-class Scm::CreateLocalRepositoryJob < ApplicationJob
-  def initialize(repository)
+class SCM::CreateLocalRepositoryJob < ApplicationJob
+
+  def self.ensure_not_existing!(repository)
     # Cowardly refusing to override existing local repository
     if File.directory?(repository.root_url)
-      raise OpenProject::Scm::Exceptions::ScmError.new(
+      raise OpenProject::SCM::Exceptions::SCMError.new(
         I18n.t('repositories.errors.exists_on_filesystem')
       )
     end
-
-    # TODO currently uses the full repository object,
-    # as the Job is performed synchronously.
-    # Change this to serialize the ID once its turned to process asynchronously.
-    @repository = repository
   end
 
-  def perform
+  def perform(repository)
+    @repository = repository
+
+    self.class.ensure_not_existing!(repository)
+
     # Create the repository locally.
     mode = (config[:mode] || default_mode)
 

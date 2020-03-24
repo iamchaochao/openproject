@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,9 +27,12 @@
 #++
 
 require 'support/pages/page'
+require_relative 'concerns/work_package_by_button_creator'
 
 module Pages
   class WorkPackagesTable < Page
+    include ::Pages::WorkPackages::Concerns::WorkPackageByButtonCreator
+
     attr_reader :project
 
     def initialize(project = nil)
@@ -135,32 +138,6 @@ module Pages
       expect(container).to have_selector('.wp-inline-create-row', wait: 10)
     end
 
-    def create_wp_split_screen(type)
-      click_wp_create_button
-
-      find('#types-context-menu .menu-item', text: type.name.upcase, wait: 10).click
-
-      SplitWorkPackageCreate.new(project: project)
-    end
-
-    def click_wp_create_button
-      find('.add-work-package:not([disabled])', text: 'Create').click
-    end
-
-    def expect_type_available_for_create(type)
-      click_wp_create_button
-
-      expect(page)
-        .to have_selector('#types-context-menu .menu-item', text: type.name.upcase)
-    end
-
-    def expect_type_not_available_for_create(type)
-      click_wp_create_button
-
-      expect(page)
-        .to have_no_selector('#types-context-menu .menu-item', text: type.name.upcase)
-    end
-
     def open_split_view(work_package)
       split_page = SplitWorkPackage.new(work_package, project)
 
@@ -181,7 +158,7 @@ module Pages
     def open_full_screen_by_doubleclick(work_package)
       loading_indicator_saveguard
       # The 'id' column should have enough space to be clicked
-      click_target = row(work_package).find('.wp-table--cell-span.id')
+      click_target = row(work_package).find('.inline-edit--display-field.id')
       page.driver.browser.action.double_click(click_target.native).perform
 
       FullWorkPackage.new(work_package, project)
@@ -194,7 +171,7 @@ module Pages
     end
 
     def drag_and_drop_work_package(from:, to:)
-      # Wait a bit because drag & drop in selenium is easily offendedA
+      # Wait a bit because drag & drop in selenium is easily offended
       sleep 1
 
       rows = page.all('.wp-table--row')
@@ -238,7 +215,7 @@ module Pages
         .release
         .perform
 
-      # Wait a bit because drag & drop in selenium is easily offendedA
+      # Wait a bit because drag & drop in selenium is easily offended
       sleep 1
     end
 
@@ -259,7 +236,7 @@ module Pages
           row(work_package)
         end
 
-      ::WorkPackageField.new(context, attribute)
+      ::EditField.new(context, attribute)
     end
 
     def click_setting_item(label)
@@ -310,6 +287,10 @@ module Pages
         raise 'Missing ID on Filter (Angular not ready?)' if filter_container['id'].nil?
         filter_container['id'].gsub('filter_', '')
       end
+    end
+
+    def create_page_class
+      SplitWorkPackageCreate
     end
   end
 end

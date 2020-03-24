@@ -1,6 +1,6 @@
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 
 import {PaginationService} from 'core-components/table-pagination/pagination-service';
@@ -39,16 +39,19 @@ import {
   Output
 } from '@angular/core';
 import {I18nService} from 'core-app/modules/common/i18n/i18n.service';
+import {UntilDestroyedMixin} from "core-app/helpers/angular/until-destroyed.mixin";
 
 @Component({
   selector: '[tablePagination]',
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './table-pagination.component.html'
 })
-export class TablePaginationComponent implements OnInit {
+export class TablePaginationComponent extends UntilDestroyedMixin implements OnInit {
   @Input() totalEntries:string;
   @Input() hideForSinglePageResults:boolean = false;
-  @Input() calculatePerPage:boolean = false;
+  @Input() showPerPage:boolean = true;
+  @Input() showPageSelections:boolean = true;
+  @Input() infoText?:string;
   @Output() updateResults = new EventEmitter<PaginationInstance>();
 
   public pagination:PaginationInstance;
@@ -68,6 +71,7 @@ export class TablePaginationComponent implements OnInit {
   constructor(protected paginationService:PaginationService,
               protected cdRef:ChangeDetectorRef,
               protected I18n:I18nService) {
+    super();
   }
 
   ngOnInit():void {
@@ -117,7 +121,11 @@ export class TablePaginationComponent implements OnInit {
    */
   public updateCurrentRangeLabel() {
     if (this.pagination.total) {
-      this.currentRange = '(' + this.pagination.getLowerPageBound() + ' - ' + this.pagination.getUpperPageBound(this.pagination.total) + '/' + this.pagination.total + ')';
+      let totalItems = this.pagination.total;
+      let lowerBound = this.pagination.getLowerPageBound();
+      let upperBound = this.pagination.getUpperPageBound(this.pagination.total);
+
+      this.currentRange = '(' + lowerBound + ' - ' + upperBound + '/' + totalItems + ')';
     } else {
       this.currentRange = '(0 - 0/0)';
     }
@@ -129,6 +137,12 @@ export class TablePaginationComponent implements OnInit {
    * @description Defines a list of all pages in numerical order inside the scope
    */
   public updatePageNumbers() {
+    if (!this.showPageSelections) {
+      this.pageNumbers = [];
+      this.postPageNumbers = [];
+      return;
+    }
+
     var maxVisible = this.paginationService.getMaxVisiblePageOptions();
     var truncSize = this.paginationService.getOptionsTruncationSize();
 
@@ -143,10 +157,9 @@ export class TablePaginationComponent implements OnInit {
 
       // This avoids a truncation when there are not enough elements to truncate for the first elements
       var startingDiff = currentPage - 2 * truncSize;
-      if ( 0 <= startingDiff && startingDiff <= 1 ) {
+      if (0 <= startingDiff && startingDiff <= 1) {
         this.postPageNumbers = this.truncatePageNums(pageNumbers, pageNumbers.length >= maxVisible + (truncSize * 2), maxVisible + truncSize, pageNumbers.length, 0);
-      }
-      else {
+      } else {
         this.prePageNumbers = this.truncatePageNums(pageNumbers, currentPage >= maxVisible, 0, Math.min(currentPage - Math.ceil(maxVisible / 2), pageNumbers.length - maxVisible), truncSize);
         this.postPageNumbers = this.truncatePageNums(pageNumbers, pageNumbers.length >= maxVisible + (truncSize * 2), maxVisible, pageNumbers.length, 0);
       }
@@ -156,9 +169,9 @@ export class TablePaginationComponent implements OnInit {
   }
 
   public showPerPageOptions() {
-    return !this.calculatePerPage &&
-           this.perPageOptions.length > 0 &&
-           this.pagination.total > this.perPageOptions[0];
+    return this.showPerPage &&
+      this.perPageOptions.length > 0 &&
+      this.pagination.total > this.perPageOptions[0];
   }
 
   private truncatePageNums(pageNumbers:any, perform:any, disectFrom:any, disectLength:any, truncateFrom:any) {

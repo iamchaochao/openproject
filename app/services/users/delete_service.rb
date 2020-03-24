@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -48,7 +48,7 @@ module Users
         # as destroying users is a lengthy process we handle it in the background
         # and lock the account now so that no action can be performed with it
         user.lock!
-        Delayed::Job.enqueue DeleteUserJob.new(user.id), priority: ::ApplicationJob.priority_number(:low)
+        DeleteUserJob.perform_later(user)
 
         logout! if self_delete?
 

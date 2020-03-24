@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -112,6 +112,23 @@ describe Workflows::BulkUpdateService, 'integration', type: :model do
     context 'without transitions' do
       let(:params) do
         {}
+      end
+
+      before do
+        Workflow.create!(role_id: role.id, type_id: type.id, old_status_id: status3.id, new_status_id: status2.id)
+      end
+
+      it 'should clear all workflows' do
+        subject
+
+        expect(Workflow.where(type_id: type.id, role_id: role.id).count)
+          .to eql 0
+      end
+    end
+
+    context 'with no params' do
+      let(:params) do
+        nil
       end
 
       before do

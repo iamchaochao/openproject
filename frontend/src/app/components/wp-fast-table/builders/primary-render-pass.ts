@@ -3,19 +3,18 @@ import {I18nService} from 'core-app/modules/common/i18n/i18n.service';
 import {timeOutput} from '../../../helpers/debug_output';
 import {WorkPackageResource} from 'core-app/modules/hal/resources/work-package-resource';
 import {States} from '../../states.service';
-import {WorkPackageEditingService} from '../../wp-edit-form/work-package-editing-service';
+
+import {HalResourceEditingService} from "core-app/modules/fields/edit/services/hal-resource-editing.service";
 import {WorkPackageTable} from '../wp-fast-table';
 import {RelationRenderInfo, RelationsRenderPass} from './relations/relations-render-pass';
 import {SingleRowBuilder} from './rows/single-row-builder';
 import {TimelineRenderPass} from './timeline/timeline-render-pass';
-import {
-  IWorkPackageEditingServiceToken
-} from "../../wp-edit-form/work-package-editing.service.interface";
 import {HighlightingRenderPass} from "core-components/wp-fast-table/builders/highlighting/row-highlight-render-pass";
 import {DragDropHandleRenderPass} from "core-components/wp-fast-table/builders/drag-and-drop/drag-drop-handle-render-pass";
 import {RenderedWorkPackage} from "core-app/modules/work_packages/render-info/rendered-work-package.type";
+import {InjectField} from "core-app/helpers/angular/inject-field.decorator";
 
-export type RenderedRowType = 'primary' | 'relations';
+export type RenderedRowType = 'primary'|'relations';
 
 export interface RowRenderInfo {
   // The rendered row
@@ -25,7 +24,7 @@ export interface RowRenderInfo {
   // Additional classes to be added by any secondary render passes
   additionalClasses:string[];
   // If this row is a work package, contains a reference to the rendered WP
-  workPackage:WorkPackageResource | null;
+  workPackage:WorkPackageResource|null;
   // If this is an additional row not present, this contains a reference to the WP
   // it originated from
   belongsTo?:WorkPackageResource;
@@ -39,9 +38,9 @@ export interface RowRenderInfo {
 
 export abstract class PrimaryRenderPass {
 
-  protected readonly wpEditing:WorkPackageEditingService = this.injector.get<WorkPackageEditingService>(IWorkPackageEditingServiceToken);
-  protected readonly states:States = this.injector.get(States);
-  protected readonly I18n:I18nService = this.injector.get(I18nService);
+  @InjectField() halEditing:HalResourceEditingService;
+  @InjectField() states:States;
+  @InjectField() I18n:I18nService;
 
   /** The rendered order of rows of work package IDs or <null>, if not a work package row */
   public renderedOrder:RowRenderInfo[];
@@ -111,7 +110,7 @@ export abstract class PrimaryRenderPass {
    */
   public refresh(row:RowRenderInfo, workPackage:WorkPackageResource, body:HTMLElement) {
     let oldRow = jQuery(body).find(`.${row.classIdentifier}`);
-    let replacement:JQuery | null = null;
+    let replacement:JQuery|null = null;
 
     switch (row.renderType) {
       case 'primary':

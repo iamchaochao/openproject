@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2017 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -25,15 +25,56 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-# See doc/COPYRIGHT.rdoc for more details.
+# See docs/COPYRIGHT.rdoc for more details.
 #++
 
 module OpenProject::TextFormatting
   module Filters
     class SanitizationFilter < HTML::Pipeline::SanitizationFilter
-      WHITELIST[:elements] << 'macro'
-      # Whitelist class and data-* attributes on all macros
-      WHITELIST[:attributes].merge!('macro' => ['class', :data])
+      def context
+        super.merge(whitelist: WHITELIST.merge(
+          elements: WHITELIST[:elements] + ['macro'],
+          # Whitelist class and data-* attributes on all macros
+          attributes: WHITELIST[:attributes].merge('macro' => ['class', :data]),
+          transformers: WHITELIST[:transformers] + [
+            # Add rel attribute to prevent tabnabbing
+            lambda { |env|
+              name = env[:node_name]
+              node = env[:node]
+              if name == 'a'
+                node['rel'] = 'noopener noreferrer'
+              end
+            },
+            # Replace to do lists in tables with their markdown equivalent
+            lambda { |env|
+              name = env[:node_name]
+              table = env[:node]
+
+              next unless name == 'table'
+
+              table.css('label.todo-list__label').each do |label|
+                checkbox = label.css('input[type=checkbox]').first
+                checked = checkbox.attr('checked') == 'checked' ? 'x' : ' '
+                checkbox.unlink
+
+                # assign all children of the label to its parent
+                # that might be the LI, or another element (code, link)
+                parent = label.parent
+                # However the task list text must be added to the LI
+                li_node = label.ancestors.detect { |node| node.name == 'li' }
+                li_node.prepend_child " [#{checked}] "
+
+                # Prepend if there is a parent in between
+                if parent == li_node
+                  parent.add_child label.children
+                else
+                  parent.prepend_child label.children
+                end
+              end
+            }
+          ]
+        ))
+      end
     end
   end
 end

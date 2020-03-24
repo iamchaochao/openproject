@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2019 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -25,72 +25,26 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-# See doc/COPYRIGHT.rdoc for more details.
+# See docs/COPYRIGHT.rdoc for more details.
 #++
 
 module BaseServices
-  class Update
-    include Concerns::Contracted
-    include Shared::ServiceContext
+  class Update < Write
+    attr_reader :model
 
-    attr_reader :user,
-                :model
-
-    def initialize(user:, model:, contract_class: nil)
-      @user = user
+    def initialize(user:, model:, contract_class: nil, contract_options: {})
       @model = model
-      self.contract_class = contract_class || default_contract_class
-    end
-
-    def call(params)
-      in_context(false) do
-        update(params)
-      end
+      super(user: user, contract_class: contract_class, contract_options: contract_options)
     end
 
     private
 
-    def update(params)
-      attributes_call = set_attributes(params)
-
-      if attributes_call.failure?
-        # nothing to do
-      elsif !attributes_call.result.save
-        attributes_call.errors = attributes_call.result.errors
-        attributes_call.success = false
-      else
-        after_save
-      end
-
-      attributes_call
-    end
-
-    def set_attributes(params)
-      attributes_service_class
-        .new(user: user,
-             model: model,
-             contract_class: contract_class)
-        .call(params)
-    end
-
-    def after_save
-      # nothing for now
+    def instance(_params)
+      model
     end
 
     def default_contract_class
       "#{namespace}::UpdateContract".constantize
-    end
-
-    def attributes_service_class
-      "#{namespace}::SetAttributesService".constantize
-    end
-
-    def instance_class
-      namespace.singularize.constantize
-    end
-
-    def namespace
-      self.class.name.deconstantize
     end
   end
 end

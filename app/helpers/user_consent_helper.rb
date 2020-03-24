@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2017 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -24,11 +24,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-# See doc/COPYRIGHT.rdoc for more details.
+# See docs/COPYRIGHT.rdoc for more details.
 #++
 
 module ::UserConsentHelper
-
   def consent_param?
     params[:consent_check].present?
   end
@@ -38,10 +37,22 @@ module ::UserConsentHelper
     Setting.consent_required? && consent_configured?
   end
 
-  def user_consent_instructions(user)
-    language = user.try(:language) || Setting.default_language
+  ##
+  # Gets consent instructions for the given user.
+  #
+  # @param user [User] The user to get instructions for.
+  # @param locale [String] ISO-639-1 code for the desired locale (e.g. de, en, fr).
+  #                        `I18n.locale` is set for each request individually depending
+  #                        among other things on the user's Accept-Language headers.
+  # @return [String] Instructions in the respective language.
+  def user_consent_instructions(user, locale: I18n.locale)
     all = Setting.consent_info
-    all.fetch(language) { all.values.first }
+
+    all.fetch(locale) { all.values.first }
+  end
+
+  def consent_checkbox_label(locale: I18n.locale)
+    I18n.t('consent.checkbox_label', locale: locale)
   end
 
   def consent_configured?

@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -38,14 +38,14 @@ FactoryBot.define do
       name { 'Non member' }
       builtin { Role::BUILTIN_NON_MEMBER }
       assignable { false }
-      initialize_with { Role.find_or_create_by(name: name) }
+      initialize_with { Role.where(name: name).first_or_initialize }
     end
 
     factory :anonymous_role do
       name { 'Anonymous' }
       builtin { Role::BUILTIN_ANONYMOUS }
       assignable { false }
-      initialize_with { Role.find_or_create_by(name: name) }
+      initialize_with { Role.where(name: name).first_or_initialize }
     end
 
     factory :existing_role do

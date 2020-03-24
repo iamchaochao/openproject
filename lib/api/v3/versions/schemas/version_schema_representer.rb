@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -45,30 +45,25 @@ module API
           end
 
           schema :id,
-                 type: 'Integer',
-                 visibility: false
+                 type: 'Integer'
 
           schema :name,
                  type: 'String',
                  min_length: 1,
-                 max_length: 60,
-                 visibility: false
+                 max_length: 60
 
           schema :description,
                  type: 'Formattable',
-                 required: false,
-                 visibility: false
+                 required: false
 
           schema :start_date,
                  type: 'Date',
-                 required: false,
-                 visibility: false
+                 required: false
 
           schema :due_date,
                  as: 'endDate',
                  type: 'Date',
-                 required: false,
-                 visibility: false
+                 required: false
 
           schema_with_allowed_string_collection :status,
                                                 type: 'String'
@@ -80,7 +75,6 @@ module API
                                    as: :definingProject,
                                    has_default: false,
                                    required: true,
-                                   visibility: false,
                                    href_callback: ->(*) {
                                      next unless represented.new_record?
 
@@ -88,12 +82,10 @@ module API
                                    }
 
           schema :created_at,
-                 type: 'DateTime',
-                 visibility: false
+                 type: 'DateTime'
 
           schema :updated_at,
-                 type: 'DateTime',
-                 visibility: false
+                 type: 'DateTime'
 
           def self.represented_class
             Version

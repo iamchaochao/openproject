@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,6 +30,8 @@
 class GroupsController < ApplicationController
   include GroupsHelper
   layout 'admin'
+
+  helper_method :gon
 
   before_action :require_admin
   before_action :find_group, only: [:destroy,
@@ -97,7 +99,7 @@ class GroupsController < ApplicationController
     @group = Group.includes(:users).find(params[:id])
 
     respond_to do |format|
-      if @group.update_attributes(permitted_params.group)
+      if @group.update(permitted_params.group)
         flash[:notice] = l(:notice_successful_update)
         format.html do redirect_to(groups_path) end
         format.xml  do head :ok end

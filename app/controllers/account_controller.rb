@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,12 +30,12 @@
 class AccountController < ApplicationController
   include CustomFieldsHelper
   include OmniauthHelper
-  include Concerns::OmniauthLogin
-  include Concerns::RedirectAfterLogin
-  include Concerns::AuthenticationStages
-  include Concerns::UserConsent
-  include Concerns::UserLimits
-  include Concerns::UserPasswordChange
+  include Accounts::OmniauthLogin
+  include Accounts::RedirectAfterLogin
+  include Accounts::AuthenticationStages
+  include Accounts::UserConsent
+  include Accounts::UserLimits
+  include Accounts::UserPasswordChange
 
   # prevents login action to be filtered by check_if_login_required application scope filter
   skip_before_action :check_if_login_required
@@ -112,7 +112,7 @@ class AccountController < ApplicationController
       # create a new token for password recovery
       token = Token::Recovery.new(user_id: user.id)
       if token.save
-        UserMailer.password_lost(token).deliver_now
+        UserMailer.password_lost(token).deliver_later
         flash[:notice] = l(:notice_account_lost_email_sent)
         redirect_to action: 'login', back_url: home_url
         return
@@ -134,6 +134,8 @@ class AccountController < ApplicationController
       end
 
       self_registration!
+
+      call_hook :user_registered, { user: @user } if @user.persisted?
     end
   end
 
@@ -248,7 +250,7 @@ class AccountController < ApplicationController
   # When making changes here, also check MyController.change_password
   def change_password
     # Retrieve user_id from session
-    @user = User.find(flash[:_password_change_user_id])
+    @user = User.find(params[:password_change_user_id])
 
     change_password_flow(user: @user, params: params, show_user_name: true) do
       password_authentication(@user.login, params[:new_password])
@@ -349,7 +351,10 @@ class AccountController < ApplicationController
 
       redirect_to direct_login_provider_url(ps)
     elsif Setting.login_required?
-      error = user.active? || flash[:error]
+      # I'm not sure why it is considered an error if we don't have the anonymous user here.
+      # Before the line read `user.active? || flash[:error]` but since a recent
+      # change the anonymous user is active too which breaks this.
+      error = !user.anonymous? || flash[:error]
       instructions = error ? :after_error : :after_registration
 
       render :exit, locals: { instructions: instructions }
@@ -460,7 +465,7 @@ class AccountController < ApplicationController
   end
 
   def send_activation_email!(token)
-    UserMailer.user_signed_up(token).deliver_now
+    UserMailer.user_signed_up(token).deliver_later
   end
 
   def pending_auth_source_registration?
@@ -497,10 +502,9 @@ class AccountController < ApplicationController
   def register_user_according_to_setting(user, opts = {}, &block)
     return register_automatically(user, opts, &block) if user.invited?
 
-    case Setting.self_registration
-    when '1'
+    if Setting::SelfRegistration.by_email?
       register_by_email_activation(user, opts, &block)
-    when '3'
+    elsif Setting::SelfRegistration.automatic?
       register_automatically(user, opts, &block)
     else
       register_manually_by_administrator(user, opts, &block)
@@ -579,7 +583,7 @@ class AccountController < ApplicationController
       # Sends an email to the administrators
       admins = User.admin.active
       admins.each do |admin|
-        UserMailer.account_activation_requested(admin, user).deliver_now
+        UserMailer.account_activation_requested(admin, user).deliver_later
       end
       account_pending
     elsif block_given?

@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -96,8 +96,6 @@ describe ::API::V3::Memberships::Schemas::MembershipSchemaRepresenter do
         let(:required) { true }
         let(:writable) { false }
       end
-
-      it_behaves_like 'has no visibility property'
     end
 
     describe 'createdAt' do
@@ -109,8 +107,6 @@ describe ::API::V3::Memberships::Schemas::MembershipSchemaRepresenter do
         let(:required) { true }
         let(:writable) { false }
       end
-
-      it_behaves_like 'has no visibility property'
     end
 
     describe 'project' do
@@ -190,7 +186,7 @@ describe ::API::V3::Memberships::Schemas::MembershipSchemaRepresenter do
           context 'if having no project' do
             it_behaves_like 'links to allowed values via collection link' do
               let(:href) do
-                statuses = [Principal::STATUSES[:builtin].to_s, Principal::STATUSES[:locked].to_s]
+                statuses = [Principal::STATUSES[:locked].to_s]
                 filters = [{ 'status' => { 'operator' => '!', 'values' => statuses } }]
 
                 api_v3_paths.path_for(:principals, filters: filters)
@@ -203,7 +199,7 @@ describe ::API::V3::Memberships::Schemas::MembershipSchemaRepresenter do
 
             it_behaves_like 'links to allowed values via collection link' do
               let(:href) do
-                statuses = [Principal::STATUSES[:builtin].to_s, Principal::STATUSES[:locked].to_s]
+                statuses = [Principal::STATUSES[:locked].to_s]
                 status_filter = { 'status' => { 'operator' => '!', 'values' => statuses } }
                 member_filter = { 'member' => { 'operator' => '!', 'values' => [assigned_project.id.to_s] } }
 

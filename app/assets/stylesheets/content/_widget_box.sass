@@ -1,6 +1,6 @@
 //-- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -104,7 +104,6 @@ $widget-box--enumeration-width: 20px
 
     .widget-box--teaser-image
       max-width: 30%
-      max-height: 100px
       margin-left: auto
       margin-right: auto
 
@@ -112,6 +111,10 @@ $widget-box--enumeration-width: 20px
   font-weight: bold
   font-size: 1.25rem
   display: flex
+  margin-top: 4px
+  margin-bottom: 13px
+  border-bottom: none
+  padding-bottom: 0
 
 .widget-box--header-title
   vertical-align: middle
@@ -119,18 +122,14 @@ $widget-box--enumeration-width: 20px
   flex-grow: 1
   align-self: center
 
-  .widget-box--header-icon + &
-    padding-left: 5px
-
   // Ensure style for read-only widget headers
-  .editable-toolbar-title--fixed
+  .editable-toolbar-title--fixed,
+  input[type="text"].toolbar--editable-toolbar
     color: #5F5F5F
-    font-size: 20px
-    font-weight: normal
-
-.widget-box--header-icon
-  align-self: center
-  line-height: 28px
+    font-size: 16px
+    letter-spacing: 1px
+    text-transform: uppercase
+    font-weight: bold
 
 .widget-box--additional-info
   font-style: italic

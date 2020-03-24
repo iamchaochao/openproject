@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -40,11 +40,17 @@ class Type::FormGroup
   end
 
   ##
+  # Returns the symbol key, if it is not translated
+  def internal_key?
+    key.is_a?(Symbol)
+  end
+
+  ##
   # Translate the given attribute group if its internal
   # (== if it's a symbol)
   def translated_key
-    if key.is_a? Symbol
-      I18n.t(Type.default_groups[key])
+    if internal_key?
+      I18n.t(Type.default_groups[key], default: key.to_s)
     else
       key
     end

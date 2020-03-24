@@ -1,6 +1,6 @@
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,22 +23,25 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 
 import {Field, IFieldSchema} from "core-app/modules/fields/field.base";
-import {WorkPackageChangeset} from "core-components/wp-edit-form/work-package-changeset";
 import {I18nService} from "core-app/modules/common/i18n/i18n.service";
 import {DisplayFieldContext} from "core-app/modules/fields/display/display-field.service";
+import {WorkPackageChangeset} from "core-components/wp-edit/work-package-changeset";
+import {ResourceChangeset} from "core-app/modules/fields/changeset/resource-changeset";
+import {HalResource} from "core-app/modules/hal/resources/hal-resource";
+import {InjectField} from "core-app/helpers/angular/inject-field.decorator";
 
 export const cssClassCustomOption = 'custom-option';
 
-export class DisplayField extends Field {
+export class DisplayField<T extends HalResource = HalResource> extends Field {
   public static type:string;
   public mode:string | null = null;
-  public changeset:WorkPackageChangeset|null = null;
+  public activeChange:ResourceChangeset<T>|null = null;
 
-  protected I18n:I18nService = this.$injector.get(I18nService);
+  @InjectField() I18n:I18nService;
 
   constructor(public name:string, public context:DisplayFieldContext) {
     super();
@@ -49,13 +52,13 @@ export class DisplayField extends Field {
    * @param resource
    * @param schema
    */
-  public apply(resource:any, schema:IFieldSchema) {
+  public apply(resource:T, schema:IFieldSchema) {
     this.resource = resource;
     this.schema = schema;
   }
 
   public texts = {
-    empty: this.I18n.t('js.work_packages.no_value'),
+    empty: this.I18n.t('js.label_no_value'),
     placeholder: this.I18n.t('js.placeholders.default')
   };
 
@@ -68,7 +71,7 @@ export class DisplayField extends Field {
    * which is relevant to provide the display field
    * the current space context.
    */
-  protected get $injector() {
+  public get injector() {
     return this.context.injector;
   }
 
@@ -77,8 +80,8 @@ export class DisplayField extends Field {
       return null;
     }
 
-    if (this.changeset) {
-      return this.changeset.value(this.name);
+    if (this.activeChange) {
+      return this.activeChange.projectedResource[this.name];
     }
     else {
       return this.attribute;
@@ -116,7 +119,7 @@ export class DisplayField extends Field {
     return this.valueString;
   }
 
-  public render(element:HTMLElement, displayText:string):void {
+  public render(element:HTMLElement, displayText:string, options:any = {}):void {
     element.textContent = displayText;
   }
 

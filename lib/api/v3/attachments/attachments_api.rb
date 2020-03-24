@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -59,23 +59,13 @@ module API
               AttachmentRepresenter.new(@attachment, embed_links: true, current_user: current_user)
             end
 
-            delete do
-              raise API::Errors::Unauthorized unless @attachment.deletable?(current_user)
-
-              if @attachment.container
-                @attachment.container.attachments.delete(@attachment)
-              else
-                @attachment.destroy
-              end
-
-              status 204
-            end
+            delete &::API::V3::Utilities::Endpoints::Delete.new(model: Attachment).mount
 
             namespace :content do
               helpers ::API::Helpers::AttachmentRenderer
 
               get do
-                respond_with_attachment @attachment
+                respond_with_attachment @attachment, cache_seconds: 1.year.to_i
               end
             end
           end

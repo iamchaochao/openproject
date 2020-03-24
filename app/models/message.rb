@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -97,10 +97,13 @@ class Message < ApplicationRecord
                       end
   end
 
+  # TODO: move into create contract
   def update_last_reply_in_parent
     if parent
-      parent.reload.update_attribute(:last_reply_id, id)
+      parent.reload
+      parent.update_attribute(:last_reply_id, id)
     end
+
     forum.reset_counters!
   end
 
@@ -153,7 +156,7 @@ class Message < ApplicationRecord
               forum.watcher_recipients
 
     to_mail.uniq.each do |user|
-      UserMailer.message_posted(user, self, User.current).deliver_now
+      UserMailer.message_posted(user, self, User.current).deliver_later
     end
   end
 end

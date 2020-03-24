@@ -1,11 +1,18 @@
 #-- copyright
-# OpenProject Reporting Plugin
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
-# Copyright (C) 2010 - 2014 the OpenProject Foundation (OPF)
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License version 3.
+#
+# OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+# Copyright (C) 2006-2017 Jean-Philippe Lang
+# Copyright (C) 2010-2013 the ChiliProject Team
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
-# version 3.
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,6 +22,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
+# See docs/COPYRIGHT.rdoc for more details.
 #++
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
@@ -22,8 +31,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 describe CostQuery, type: :model, reporting_query_helper: true do
   minimal_query
 
-  let!(:project1) { FactoryBot.create(:project, name: "project1", created_on: 5.minutes.ago) }
-  let!(:project2) { FactoryBot.create(:project, name: "project2", created_on: 6.minutes.ago) }
+  let!(:project1) { FactoryBot.create(:project, name: "project1", created_at: 5.minutes.ago) }
+  let!(:project2) { FactoryBot.create(:project, name: "project2", created_at: 6.minutes.ago) }
 
   describe CostQuery::Operator do
     def query(table, field, operator, *values)
@@ -40,10 +49,7 @@ describe CostQuery, type: :model, reporting_query_helper: true do
     end
 
     def create_project(options = {})
-      parent = options.delete :parent
-      p = FactoryBot.create(:project, options)
-      p.set_parent! parent if parent
-      p
+      FactoryBot.create(:project, options)
     end
 
     it "does =" do
@@ -113,69 +119,69 @@ describe CostQuery, type: :model, reporting_query_helper: true do
 
     it "does w (this week)" do
       #somehow this test doesn't work on sundays
-      n = query('projects', 'created_on', 'w').size
+      n = query('projects', 'created_at', 'w').size
       day_in_this_week = Time.now.at_beginning_of_week + 1.day
-      FactoryBot.create(:project, created_on: day_in_this_week)
-      expect(query('projects', 'created_on', 'w').size).to eq(n + 1)
-      FactoryBot.create(:project, created_on: day_in_this_week + 7.days)
-      FactoryBot.create(:project, created_on: day_in_this_week - 7.days)
-      expect(query('projects', 'created_on', 'w').size).to eq(n + 1)
+      FactoryBot.create(:project, created_at: day_in_this_week)
+      expect(query('projects', 'created_at', 'w').size).to eq(n + 1)
+      FactoryBot.create(:project, created_at: day_in_this_week + 7.days)
+      FactoryBot.create(:project, created_at: day_in_this_week - 7.days)
+      expect(query('projects', 'created_at', 'w').size).to eq(n + 1)
     end
 
     it "does t (today)" do
-      s = query('projects', 'created_on', 't').size
-      FactoryBot.create(:project, created_on: Date.yesterday)
-      expect(query('projects', 'created_on', 't').size).to eq(s)
-      FactoryBot.create(:project, created_on: Time.now)
-      expect(query('projects', 'created_on', 't').size).to eq(s + 1)
+      s = query('projects', 'created_at', 't').size
+      FactoryBot.create(:project, created_at: Date.yesterday)
+      expect(query('projects', 'created_at', 't').size).to eq(s)
+      FactoryBot.create(:project, created_at: Time.now)
+      expect(query('projects', 'created_at', 't').size).to eq(s + 1)
     end
 
     it "does <t+ (before the day which is n days in the future)" do
-      n = query('projects', 'created_on', '<t+', 2).size
-      FactoryBot.create(:project, created_on: Date.tomorrow + 1)
-      expect(query('projects', 'created_on', '<t+', 2).size).to eq(n + 1)
-      FactoryBot.create(:project, created_on: Date.tomorrow + 2)
-      expect(query('projects', 'created_on', '<t+', 2).size).to eq(n + 1)
+      n = query('projects', 'created_at', '<t+', 2).size
+      FactoryBot.create(:project, created_at: Date.tomorrow + 1)
+      expect(query('projects', 'created_at', '<t+', 2).size).to eq(n + 1)
+      FactoryBot.create(:project, created_at: Date.tomorrow + 2)
+      expect(query('projects', 'created_at', '<t+', 2).size).to eq(n + 1)
     end
 
     it "does t+ (n days in the future)" do
-      n = query('projects', 'created_on', 't+', 1).size
-      FactoryBot.create(:project, created_on: Date.tomorrow)
-      expect(query('projects', 'created_on', 't+', 1).size).to eq(n + 1)
-      FactoryBot.create(:project, created_on: Date.tomorrow + 2)
-      expect(query('projects', 'created_on', 't+', 1).size).to eq(n + 1)
+      n = query('projects', 'created_at', 't+', 1).size
+      FactoryBot.create(:project, created_at: Date.tomorrow)
+      expect(query('projects', 'created_at', 't+', 1).size).to eq(n + 1)
+      FactoryBot.create(:project, created_at: Date.tomorrow + 2)
+      expect(query('projects', 'created_at', 't+', 1).size).to eq(n + 1)
     end
 
     it "does >t+ (after the day which is n days in the furure)" do
-      n = query('projects', 'created_on', '>t+', 1).size
-      FactoryBot.create(:project, created_on: Time.now)
-      expect(query('projects', 'created_on', '>t+', 1).size).to eq(n)
-      FactoryBot.create(:project, created_on: Date.tomorrow + 1)
-      expect(query('projects', 'created_on', '>t+', 1).size).to eq(n + 1)
+      n = query('projects', 'created_at', '>t+', 1).size
+      FactoryBot.create(:project, created_at: Time.now)
+      expect(query('projects', 'created_at', '>t+', 1).size).to eq(n)
+      FactoryBot.create(:project, created_at: Date.tomorrow + 1)
+      expect(query('projects', 'created_at', '>t+', 1).size).to eq(n + 1)
     end
 
     it "does >t- (after the day which is n days ago)" do
-      n = query('projects', 'created_on', '>t-', 1).size
-      FactoryBot.create(:project, created_on: Date.today)
-      expect(query('projects', 'created_on', '>t-', 1).size).to eq(n + 1)
-      FactoryBot.create(:project, created_on: Date.yesterday - 1)
-      expect(query('projects', 'created_on', '>t-', 1).size).to eq(n + 1)
+      n = query('projects', 'created_at', '>t-', 1).size
+      FactoryBot.create(:project, created_at: Date.today)
+      expect(query('projects', 'created_at', '>t-', 1).size).to eq(n + 1)
+      FactoryBot.create(:project, created_at: Date.yesterday - 1)
+      expect(query('projects', 'created_at', '>t-', 1).size).to eq(n + 1)
     end
 
     it "does t- (n days ago)" do
-      n = query('projects', 'created_on', 't-', 1).size
-      FactoryBot.create(:project, created_on: Date.yesterday)
-      expect(query('projects', 'created_on', 't-', 1).size).to eq(n + 1)
-      FactoryBot.create(:project, created_on: Date.yesterday - 2)
-      expect(query('projects', 'created_on', 't-', 1).size).to eq(n + 1)
+      n = query('projects', 'created_at', 't-', 1).size
+      FactoryBot.create(:project, created_at: Date.yesterday)
+      expect(query('projects', 'created_at', 't-', 1).size).to eq(n + 1)
+      FactoryBot.create(:project, created_at: Date.yesterday - 2)
+      expect(query('projects', 'created_at', 't-', 1).size).to eq(n + 1)
     end
 
     it "does <t- (before the day which is n days ago)" do
-      n = query('projects', 'created_on', '<t-', 1).size
-      FactoryBot.create(:project, created_on: Date.today)
-      expect(query('projects', 'created_on', '<t-', 1).size).to eq(n)
-      FactoryBot.create(:project, created_on: Date.yesterday - 1)
-      expect(query('projects', 'created_on', '<t-', 1).size).to eq(n + 1)
+      n = query('projects', 'created_at', '<t-', 1).size
+      FactoryBot.create(:project, created_at: Date.today)
+      expect(query('projects', 'created_at', '<t-', 1).size).to eq(n)
+      FactoryBot.create(:project, created_at: Date.yesterday - 1)
+      expect(query('projects', 'created_at', '<t-', 1).size).to eq(n + 1)
     end
 
     #Our own operators
@@ -243,20 +249,20 @@ describe CostQuery, type: :model, reporting_query_helper: true do
 
     it "does =d" do
       #assuming that there aren't more than one project created at the same time
-      expect(query('projects', 'created_on', '=d', Project.order(Arel.sql('id ASC')).first.created_on).size).to eq(1)
+      expect(query('projects', 'created_at', '=d', Project.order(Arel.sql('id ASC')).first.created_at).size).to eq(1)
     end
 
     it "does <d" do
-      expect(query('projects', 'created_on', '<d', Time.now).size).to eq(Project.count)
+      expect(query('projects', 'created_at', '<d', Time.now).size).to eq(Project.count)
     end
 
     it "does <>d" do
-      expect(query('projects', 'created_on', '<>d', Time.now, 5.minutes.from_now).size).to eq(0)
+      expect(query('projects', 'created_at', '<>d', Time.now, 5.minutes.from_now).size).to eq(0)
     end
 
     it "does >d" do
       #assuming that all projects were created in the past
-      expect(query('projects', 'created_on', '>d', Time.now).size).to eq(0)
+      expect(query('projects', 'created_at', '>d', Time.now).size).to eq(0)
     end
 
     describe 'arity' do
@@ -265,6 +271,5 @@ describe CostQuery, type: :model, reporting_query_helper: true do
         it("#{o} should take #{a} values") { expect(o.to_operator.arity).to eq(a) }
       end
     end
-
   end
 end

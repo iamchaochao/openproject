@@ -1,5 +1,0 @@
-ca:
-  js:
-    bcf:
-      import: 'Import'
-      export: 'Exportar'

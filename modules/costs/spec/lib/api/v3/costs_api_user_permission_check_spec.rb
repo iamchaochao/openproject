@@ -1,11 +1,18 @@
 #-- copyright
-# OpenProject Costs Plugin
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
-# Copyright (C) 2009 - 2014 the OpenProject Foundation (OPF)
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License version 3.
+#
+# OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+# Copyright (C) 2006-2017 Jean-Philippe Lang
+# Copyright (C) 2010-2013 the ChiliProject Team
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
-# version 3.
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,13 +22,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
+# See docs/COPYRIGHT.rdoc for more details.
 #++
 
 require File.expand_path('../../../../spec_helper', __FILE__)
 
-describe API::V3::CostsAPIUserPermissionCheck do
-  class CostsAPIUserPermissionCheckTestClass
-    include API::V3::CostsAPIUserPermissionCheck
+describe API::V3::CostsApiUserPermissionCheck do
+  class CostsApiUserPermissionCheckTestClass
+    include API::V3::CostsApiUserPermissionCheck
   end
 
   let(:user) { mock_model('User') }
@@ -37,7 +46,7 @@ describe API::V3::CostsAPIUserPermissionCheck do
       .and_return(work_package)
   end
 
-  subject { CostsAPIUserPermissionCheckTestClass.new }
+  subject { CostsApiUserPermissionCheckTestClass.new }
 
   let(:view_time_entries) { false }
   let(:view_own_time_entries) { false }

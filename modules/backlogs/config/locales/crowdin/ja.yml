@@ -1,3 +1,25 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
+#---
 ja:
   activerecord:
     attributes:
@@ -34,12 +56,12 @@ ja:
     burndown_graph: "バーンダウングラフ"
     card_paper_size: "カード印刷用の用紙サイズ"
     chart_options: "チャートオプション"
-    close: "終了する"
+    close: "閉じる"
     column_width: "列の幅:"
     date: "日"
     definition_of_done: "「終了」の定義"
     generating_chart: "グラフを生成中..."
-    hours: "時間"
+    hours: " 時間"
     impediment: "障害事項"
     label_versions_default_fold_state: "バージョンを折り畳んで表示"
     work_package_is_closed: "作業パッケージが終了するには"

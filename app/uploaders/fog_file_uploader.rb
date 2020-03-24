@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -57,18 +57,20 @@ class FogFileUploader < CarrierWave::Uploader::Base
     super
   end
 
+  ##
+  # Generates a download URL for this file.
+  #
+  # @param options [Hash] Options hash.
+  # @option options [String] :content_disposition Pass this content disposition to S3 so that it serves the file with it.
+  # @option options [DateTime] :expires_at Date at which the link should expire (default: now + 5 minutes)
+  # @option options [ActiveSupport::Duration] :expires_in Duration in which the link should expire.
+  #
+  # @return [String] The URL to download the file from.
   def download_url(options = {})
     url_options = {}
 
-    if options[:content_disposition].present?
-      url_options[:query] = {
-        # Passing this option to S3 will make it serve the file with the
-        # respective content disposition. Without it no content disposition
-        # header is sent. This only works for S3 but we don't support
-        # anything else anyway (see carrierwave.rb).
-        "response-content-disposition" => options[:content_disposition]
-      }
-    end
+    set_content_disposition! url_options, options: options
+    set_expires_at! url_options, options: options
 
     remote_file.url url_options
   end
@@ -84,5 +86,31 @@ class FogFileUploader < CarrierWave::Uploader::Base
     remote_file&.exists?
   rescue Excon::Errors::Forbidden
     false
+  end
+
+  private
+
+  def set_content_disposition!(url_options, options:)
+    if options[:content_disposition].present?
+      url_options[:query] = {
+        # Passing this option to S3 will make it serve the file with the
+        # respective content disposition. Without it no content disposition
+        # header is sent. This only works for S3 but we don't support
+        # anything else anyway (see carrierwave.rb).
+        "response-content-disposition" => options[:content_disposition]
+      }
+    end
+  end
+
+  def set_expires_at!(url_options, options:)
+    if options[:expires_in].present?
+      # AWS allows at max < 604800 expires time
+      expires = [options[:expires_in], 604799].min
+      url_options[:expire_at] = ::Fog::Time.now + expires
+    end
+
+    if options[:expires_at].present?
+      url_options[:expire_at] = ::Fog::Time.at options[:expires_at] - ::Fog::Time.offset
+    end
   end
 end

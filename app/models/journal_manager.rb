@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -253,6 +253,7 @@ class JournalManager
     journable.journals.select(&:new_record?)
 
     journal.save!
+
     journal
   end
 
@@ -355,7 +356,7 @@ class JournalManager
     self.send_notification = send_notifications
 
     result = block.call
-
+  ensure
     self.send_notification = old_value
 
     result

@@ -48,15 +48,14 @@ Let's take a look at the file structure of the costs folder `frontend/`:
 module
 ├── main.ts
 └── wp-display
-    ├── wp-display-costs-by-type-field.module.ts
-    └── wp-display-currency-field.module.ts
+    ├── costs-by-type-display-field.module.ts
+    └── currency-display-field.module.ts
 ```
 
 The Angular frontend entry point is `frontend/module/main.ts` and should export a `PluginModule` ngModule that looks like the following:
 
 ```typescript
 export function initializeCostsPlugin() {
-    return () => {
         window.OpenProject.getPluginContext()
             .then((pluginContext:OpenProjectPluginContext) => {
     		// Register a field type to the core EditField functionality
@@ -76,16 +75,17 @@ export function initializeCostsPlugin() {
                 };
             });
         });
-    };
 }
 
 
 @NgModule({
     providers: [
-        { provide: APP_INITIALIZER, useFactory: initializeCostsPlugin, deps: [Injector], multi: true },
     ],
 })
 export class PluginModule { // The name PluginModule is important!
+  constructor() {
+    initializeCostsPlugin();
+  }
 }
 ```
 

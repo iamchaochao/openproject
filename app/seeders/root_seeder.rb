@@ -1,9 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -35,10 +34,12 @@
 class RootSeeder < Seeder
   include Redmine::I18n
 
-  def initialize
+  def initialize(seed_development_data: Rails.env.development?)
     require 'basic_data_seeder'
     require 'demo_data_seeder'
     require 'development_data_seeder'
+
+    @seed_development_data = seed_development_data
 
     rails_engines.each { |engine| load_engine_seeders! engine }
   end
@@ -62,7 +63,7 @@ class RootSeeder < Seeder
       puts '*** Seeding demo data'
       DemoDataSeeder.new.seed!
 
-      if Rails.env.development?
+      if seed_development_data?
         seed_development_data
       end
 
@@ -71,6 +72,10 @@ class RootSeeder < Seeder
         engine.load_seed
       end
     end
+  end
+
+  def seed_development_data?
+    @seed_development_data
   end
 
   def rails_engines

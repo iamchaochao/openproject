@@ -1,6 +1,6 @@
 //-- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -33,7 +33,7 @@
 
       #main
         #content-wrapper
-          padding: 10px 20px
+          padding: 10px 15px
           &.nomenus
             top: 0
             padding: 0
@@ -42,10 +42,6 @@
 
 
       .work-packages--show-view
-        &.edit-all-mode
-          .work-packages-full-view--split-right
-            display: none
-
         ul#toolbar-items li .wp-create-button .dropdown
           left: 0 !important
 
@@ -68,7 +64,7 @@
 
           .work-packages--panel-inner
             padding: 0
-            max-width: calc(100vw - 30px)
+            max-width: calc(100vw - 40px)
 
         .work-packages-full-view--resizer
           display: none
@@ -76,18 +72,12 @@
 @include breakpoint(1248px down)
   .router--work-packages-base
     // --------------- ALL WP VIEWS ---------------
-    .work-packages-tabletimeline--table-side
-      contain: none
-
     .toolbar-container
       padding-right: 0
 
     .attributes-key-value--key,
     .attributes-key-value--value-container
       margin-bottom: 20px
-
-      .inplace-edit--read-value
-        padding: 0
 
       .inplace-editing--container
         border: none
@@ -101,16 +91,8 @@
         border-bottom: none
         padding-top: 4px
 
-    // Reset margin for mobile, since the wiki toolbar is hidden on mobile
-    .inplace-edit.attribute-description
-      .inplace-edit--write
-        margin-top: 0
-
     div[class*='work-packages--details--']
       width: 100%
-
-      .inplace-edit--read-value span
-        white-space: normal
 
     .work-package-details-activities-messages
       font-size: 0.9rem
@@ -147,7 +129,15 @@
     .work-packages-full-view--split-container
       border-top: none
 
-  .router--work-packages-split-view,
-  .router--work-packages-split-view-new
-    .work-packages-split-view--details-side
+  .router--work-packages-partitioned-split-view,
+  .router--work-packages-partitioned-split-view-new
+    .work-packages-partitioned-page--content-right
       overflow-x: auto
+
+  .router--work-packages-partitioned-split-view
+    // Ensure the WP cards can span the complete width on mobile
+    #content-wrapper
+      padding: 15px 0 !important
+
+      .toolbar-container
+        margin-left: 15px

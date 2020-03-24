@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -28,11 +28,10 @@
 # See docs/COPYRIGHT.rdoc for more details.
 #++
 
-require 'model_contract'
-
 module WorkPackages
   class BaseContract < ::ModelContract
     include ::Attachments::ValidateReplacements
+    include AssignableValuesContract
 
     attribute :subject
     attribute :description
@@ -40,7 +39,7 @@ module WorkPackages
               writeable: ->(*) {
                 # If we did not change into the status,
                 # mark unwritable if status and version is closed
-                model.status_id_change || !model.closed_version_and_status?
+                model.status_id_change || !closed_version_and_status?
               }
     attribute :type_id
     attribute :priority_id
@@ -103,7 +102,9 @@ module WorkPackages
                       message: :greater_than_or_equal_to_start_date,
                       allow_blank: true },
               unless: Proc.new { |wp| wp.start_date.blank? }
+
     validate :validate_enabled_type
+    validate :validate_type_exists
 
     validate :validate_milestone_constraint
     validate :validate_parent_not_milestone
@@ -112,15 +113,19 @@ module WorkPackages
     validate :validate_parent_in_same_project
     validate :validate_parent_not_subtask
 
+    validate :validate_status_exists
     validate :validate_status_transition
 
     validate :validate_active_priority
+    validate :validate_priority_exists
 
     validate :validate_category
     validate :validate_estimated_hours
 
-    def initialize(work_package, user)
-      super(work_package, user)
+    validate :validate_assigned_to_exists
+
+    def initialize(work_package, user, options: {})
+      super
 
       @can = WorkPackagePolicy.new(user)
     end
@@ -137,6 +142,45 @@ module WorkPackages
       ret
     end
 
+    def assignable_statuses(include_default = false)
+      # Do not allow skipping statuses without intermediately saving the work package.
+      # We therefore take the original status of the work_package, while preserving all
+      # other changes to it (e.g. type, assignee, etc.)
+      status = if model.persisted? && model.status_id_changed?
+                 Status.find_by(id: model.status_id_was)
+               else
+                 model.status
+               end
+
+      statuses = new_statuses_allowed_from(status)
+
+      statuses = statuses.or(Status.where_default) if include_default
+
+      statuses.order_by_position
+    end
+
+    def assignable_types
+      scope = if model.project.nil?
+                Type
+              else
+                model.project.types.includes(:color)
+              end
+
+      scope.includes(:color)
+    end
+
+    def assignable_categories
+      model.project.categories if model.project.respond_to?(:categories)
+    end
+
+    def assignable_priorities
+      IssuePriority.active
+    end
+
+    def assignable_versions
+      model.try(:assignable_versions) if model.project
+    end
+
     private
 
     attr_reader :can
@@ -149,9 +193,17 @@ module WorkPackages
 
     def validate_enabled_type
       # Checks that the issue can not be added/moved to a disabled type
-      if model.project && (model.type_id_changed? || model.project_id_changed?)
+      if type_context_changed?
         errors.add :type_id, :inclusion unless model.project.types.include?(model.type)
       end
+    end
+
+    def validate_assigned_to_exists
+      errors.add :assigned_to, :does_not_exist if model.assigned_to&.is_a?(User::InexistentUser)
+    end
+
+    def validate_type_exists
+      errors.add :type, :does_not_exist if type_inexistent?
     end
 
     def validate_milestone_constraint
@@ -186,6 +238,10 @@ module WorkPackages
       end
     end
 
+    def validate_status_exists
+      errors.add :status, :does_not_exist if model.status && !status_exists?
+    end
+
     def validate_status_transition
       if status_changed? && status_exists? && !(model.type_id_changed? || status_transition_exists?)
         errors.add :status_id, :status_transition_invalid
@@ -196,6 +252,10 @@ module WorkPackages
       if model.priority && !model.priority.active? && model.priority_id_changed?
         errors.add :priority_id, :only_active_priorities_allowed
       end
+    end
+
+    def validate_priority_exists
+      errors.add :priority, :does_not_exist if model.priority&.is_a?(Priority::InexistentPriority)
     end
 
     def validate_category
@@ -260,13 +320,11 @@ module WorkPackages
     end
 
     def status_exists?
-      model.status_id && model.status
+      model.status_id && model.status && !model.status.is_a?(Status::InexistentStatus)
     end
 
     def status_transition_exists?
-      model.type.valid_transition?(model.status_id_was,
-                                   model.status_id,
-                                   user.roles(model.project))
+      assignable_statuses.exists?(model.status_id)
     end
 
     def invalid_relations_with_new_hierarchy
@@ -279,10 +337,64 @@ module WorkPackages
       old_parent_id = model.parent_id_was
 
       if old_parent_id.present?
-        query.where.not(hierarchy: 1, from_id: old_parent_id, to_id: model.id)
+        query
+          .where.not(hierarchy: 1)
+          .where.not(from_id: old_parent_id)
+          .where.not(to_id: model.id)
       else
         query
       end
+    end
+
+    def type_context_changed?
+      model.project && !type_inexistent? && (model.type_id_changed? || model.project_id_changed?)
+    end
+
+    def type_inexistent?
+      model.type.is_a?(Type::InexistentType)
+    end
+
+    # Returns a scope of status the user is able to apply
+    def new_statuses_allowed_from(status)
+      return Status.where('1=0') if status.nil?
+
+      current_status = Status.where(id: status.id)
+
+      return current_status if closed_version_and_status?(status)
+
+      statuses = new_statuses_by_workflow(status)
+                   .or(current_status)
+
+      statuses = statuses.where(is_closed: false) if model.blocked?
+
+      statuses
+    end
+
+    def closed_version_and_status?(status = model.status)
+      model.fixed_version&.closed? && status.is_closed?
+    end
+
+    def new_statuses_by_workflow(status)
+      workflows = Workflow
+                  .from_status(status.id,
+                               model.type_id,
+                               users_roles_in_project.map(&:id),
+                               user_is_author?,
+                               user_was_or_is_assignee?)
+
+      Status.where(id: workflows.select(:new_status_id))
+    end
+
+    def user_was_or_is_assignee?
+      model.assigned_to_id_changed? ? model.assigned_to_id_was == user.id : model.assigned_to_id == user.id
+    end
+
+    def user_is_author?
+      model.author == user
+    end
+
+    def users_roles_in_project
+      user.roles_for_project(model.project)
     end
   end
 end

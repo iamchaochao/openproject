@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -82,7 +82,8 @@ describe 'Work Package boards spec', type: :feature, js: true do
     item.find('.toggler').click
 
     subitem = page.find('.main-menu--children-sub-item', text: 'My board', wait: 10)
-    expect(subitem[:href]).to end_with "/projects/#{project.identifier}/boards/#{board_view.id}"
+    # Ends with boards due to lazy route
+    expect(subitem[:href]).to end_with "/projects/#{project.identifier}/boards"
 
     subitem.click
 

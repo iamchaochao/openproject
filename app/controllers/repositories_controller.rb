@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -50,7 +50,7 @@ class RepositoriesController < ApplicationController
   before_action :find_repository, except: [:edit, :update, :create, :destroy, :destroy_info]
   accept_key_auth :revisions
 
-  rescue_from OpenProject::Scm::Exceptions::ScmError, with: :show_error_command_failed
+  rescue_from OpenProject::SCM::Exceptions::SCMError, with: :show_error_command_failed
 
   def update
     @repository = @project.repository
@@ -60,7 +60,7 @@ class RepositoriesController < ApplicationController
   end
 
   def create
-    service = Scm::RepositoryFactoryService.new(@project, params)
+    service = SCM::RepositoryFactoryService.new(@project, params)
     if service.build_and_save
       @repository = service.repository
       flash[:notice] = l('repositories.create_successful')
@@ -333,7 +333,7 @@ class RepositoriesController < ApplicationController
     # Prepare checkout instructions
     # available on all pages (even empty!)
     @path = params[:repo_path] || ''
-    @instructions = ::Scm::CheckoutInstructionsService.new(@repository, path: @path)
+    @instructions = ::SCM::CheckoutInstructionsService.new(@repository, path: @path)
 
     # Asserts repository availability, or renders an appropriate error
     @repository.scm.check_availability!
@@ -346,7 +346,7 @@ class RepositoriesController < ApplicationController
         raise InvalidRevisionParam
       end
     end
-  rescue OpenProject::Scm::Exceptions::ScmEmpty
+  rescue OpenProject::SCM::Exceptions::SCMEmpty
     render 'empty'
   rescue ActiveRecord::RecordNotFound
     render_404

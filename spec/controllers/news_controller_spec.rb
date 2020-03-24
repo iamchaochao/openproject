@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -33,15 +33,15 @@ describe NewsController, type: :controller do
 
   include BecomeMember
 
-  let(:user)    {
+  let(:user) do
     user = FactoryBot.create(:admin)
 
     FactoryBot.create(:user_preference, user: user, others: { no_self_notified: false })
 
     user
-  }
+  end
   let(:project) { FactoryBot.create(:project) }
-  let(:news)    { FactoryBot.create(:news)    }
+  let(:news) { FactoryBot.create(:news) }
 
   before do
     allow(User).to receive(:current).and_return user
@@ -124,6 +124,9 @@ describe NewsController, type: :controller do
         expect(news.description).to eq 'This is the description'
         expect(news.author).to eq user
         expect(news.project).to eq project
+
+
+        perform_enqueued_jobs
 
         expect(ActionMailer::Base.deliveries.size).to eq(1)
       end

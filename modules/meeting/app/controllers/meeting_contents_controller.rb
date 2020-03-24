@@ -1,10 +1,18 @@
 #-- copyright
-# OpenProject Meeting Plugin
-#
-# Copyright (C) 2011-2014 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
+#
+# OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+# Copyright (C) 2006-2017 Jean-Philippe Lang
+# Copyright (C) 2010-2013 the ChiliProject Team
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,7 +23,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
-# See doc/COPYRIGHT.md for more details.
+# See docs/COPYRIGHT.rdoc for more details.
 #++
 
 class MeetingContentsController < ApplicationController
@@ -30,6 +38,8 @@ class MeetingContentsController < ApplicationController
   helper :watchers
   helper :meetings
 
+  helper_method :gon
+
   before_action :find_meeting, :find_content
   before_action :authorize
 
@@ -42,7 +52,9 @@ class MeetingContentsController < ApplicationController
                   tab: @content_type.sub(/^meeting_/, '')
       return
     end
+
     # go to an old version if a version id is given
+    @journaled_version = true
     @content = @content.at_version params[:id] unless params[:id].blank?
     render 'meeting_contents/show'
   end
@@ -55,7 +67,6 @@ class MeetingContentsController < ApplicationController
     if @content.save
       flash[:notice] = l(:notice_successful_update)
       redirect_back_or_default controller: '/meetings', action: 'show', id: @meeting
-    else
     end
   rescue ActiveRecord::StaleObjectError
     # Optimistic locking exception

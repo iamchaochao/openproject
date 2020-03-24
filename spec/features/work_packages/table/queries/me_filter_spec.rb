@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -31,7 +31,7 @@ require 'spec_helper'
 describe 'filter me value', js: true do
   let(:status) { FactoryBot.create :default_status}
   let!(:priority) { FactoryBot.create :default_priority }
-  let(:project) { FactoryBot.create :project, is_public: true }
+  let(:project) { FactoryBot.create :project, public: true }
   let(:role) { FactoryBot.create :existing_role, permissions: [:view_work_packages] }
   let(:admin) { FactoryBot.create :admin }
   let(:user) { FactoryBot.create :user }
@@ -106,7 +106,7 @@ describe 'filter me value', js: true do
         filters.expect_filter_by('Assignee', 'is', 'me')
 
         # Expect new work packages receive assignee
-        split_screen = wp_table.create_wp_split_screen wp_user.type
+        split_screen = wp_table.create_wp_by_button wp_user.type
         subject = split_screen.edit_field :subject
         subject.set_value 'foobar'
         subject.submit_by_enter

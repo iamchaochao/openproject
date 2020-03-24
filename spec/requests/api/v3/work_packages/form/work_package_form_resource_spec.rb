@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,15 +29,21 @@
 require 'spec_helper'
 require 'rack/test'
 
-describe 'API v3 Work package form resource', type: :request do
+describe 'API v3 Work package form resource', type: :request, with_mail: false do
   include Rack::Test::Methods
   include Capybara::RSpecMatchers
   include API::V3::Utilities::PathHelper
 
   shared_let(:all_allowed_permissions) { %i[view_work_packages edit_work_packages assign_versions] }
   shared_let(:assign_permissions) { %i[view_work_packages assign_versions] }
-  shared_let(:project) { FactoryBot.create(:project, is_public: false) }
-  shared_let(:work_package) { FactoryBot.create(:work_package, project: project) }
+  shared_let(:project) { FactoryBot.create(:project, public: false) }
+  shared_let(:work_package) do
+    # Prevent executing as potentially unsaved AnyonymousUser which would
+    # lead to the creation failing as the journal cannot be written with user_id = nil.
+    User.execute_as authorized_user do
+      FactoryBot.create(:work_package, project: project)
+    end
+  end
   shared_let(:authorized_user) do
     FactoryBot.create(:user, member_in_project: project, member_with_permissions: all_allowed_permissions)
   end
@@ -59,7 +65,7 @@ describe 'API v3 Work package form resource', type: :request do
 
     shared_context 'post request' do
       before(:each) do
-        allow(User).to receive(:current).and_return current_user
+        login_as(current_user)
         post post_path, (params ? params.to_json : nil), 'CONTENT_TYPE' => 'application/json'
       end
     end
@@ -511,8 +517,8 @@ describe 'API v3 Work package form resource', type: :request do
 
             describe 'version' do
               let(:path) { '_embedded/payload/_links/version/href' }
-              let(:target_version) { FactoryBot.create(:version, project: project) }
-              let(:other_version) { FactoryBot.create(:version, project: project) }
+              let(:target_version) { FactoryBot.create(:version, project: project, start_date: Date.today - 2.days) }
+              let(:other_version) { FactoryBot.create(:version, project: project, start_date: Date.today - 1.day) }
               let(:version_link) { api_v3_paths.version target_version.id }
               let(:version_parameter) { { _links: { version: { href: version_link } } } }
               let(:params) { valid_params.merge(version_parameter) }

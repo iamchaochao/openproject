@@ -1,6 +1,6 @@
 // -- copyright
-// OpenProject is a project management system.
-// Copyright (C) 2012-2015 the OpenProject Foundation (OPF)
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License version 3.
@@ -23,19 +23,20 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 // ++
 
 import {TimezoneService} from 'core-components/datetime/timezone.service';
 import * as moment from 'moment';
 import {Component} from "@angular/core";
 import {EditFieldComponent} from "core-app/modules/fields/edit/edit-field.component";
+import {InjectField} from "core-app/helpers/angular/inject-field.decorator";
 
 @Component({
   template: `
     <input type="number"
            step="0.01"
-           class="wp-inline-edit--field"
+           class="inline-edit--field"
            [attr.aria-required]="required"
            [ngModel]="formatter(value)"
            (ngModelChange)="value = parser($event)"
@@ -46,7 +47,7 @@ import {EditFieldComponent} from "core-app/modules/fields/edit/edit-field.compon
   `
 })
 export class DurationEditFieldComponent extends EditFieldComponent {
-  readonly TimezoneService:TimezoneService = this.injector.get(TimezoneService);
+  @InjectField() TimezoneService:TimezoneService;
 
   public parser(value:any) {
     if (!isNaN(value)) {

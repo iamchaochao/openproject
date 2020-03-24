@@ -1,3 +1,25 @@
+#-- copyright
+#OpenProject is an open source project management software.
+#Copyright (C) 2012-2020 the OpenProject GmbH
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License version 3.
+#OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+#Copyright (C) 2006-2017 Jean-Philippe Lang
+#Copyright (C) 2010-2013 the ChiliProject Team
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#See docs/COPYRIGHT.rdoc for more details.
+#++
+#---
 ru:
   activerecord:
     attributes:
@@ -30,7 +52,7 @@ ru:
   backlogs:
     add_new_story: "Новая история"
     any: "любой"
-    backlog_settings: "Настройки невыполненной работы"
+    backlog_settings: "Настройки Backlogs"
     burndown_graph: "Диаграмма выгорания задач"
     card_paper_size: "Размер бумаги для печати карточек"
     chart_options: "Параметры диаграммы"
@@ -57,7 +79,7 @@ ru:
     story: "История"
     story_points: "Баллы описаний"
     story_points_ideal: "Точки истории (идеал)"
-    task: "Задача"
+    task: "Задание"
     task_color: "Цвет задачи"
     unassigned: "Нераспределенные"
     x_more: "Еще %{count}..."
@@ -115,8 +137,8 @@ ru:
   label_stories: "Истории"
   label_stories_tasks: "Истории/задачи"
   label_task_board: "Панель задач"
-  label_version_setting: "Версии"
-  label_version: 'Версия'
+  label_version_setting: "Этапы"
+  label_version: 'Стадия'
   label_webcal: "Лента Webcal"
   label_wiki: "Wiki"
   permission_view_master_backlog: "Просмотреть главную невыполненную работу"
@@ -140,5 +162,5 @@ ru:
   todo_work_package_summary: "%{type}: %{summary}"
   version_settings_display_label: "Колонка в невыполненной работе"
   version_settings_display_option_left: "влево"
-  version_settings_display_option_none: "нет"
+  version_settings_display_option_none: "Ничего"
   version_settings_display_option_right: "вправо"

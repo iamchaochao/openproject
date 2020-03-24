@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -176,9 +176,7 @@ describe Attachment, type: :model do
     end
 
     it 'adds no cleanup job' do
-      expect(Delayed::Job)
-        .not_to receive(:enqueue)
-        .with an_instance_of(Attachments::CleanupUncontaineredJob)
+      expect(Attachments::CleanupUncontaineredJob).not_to receive(:perform_later)
 
       attachment.save!
     end
@@ -187,13 +185,7 @@ describe Attachment, type: :model do
       let(:container) { nil }
 
       it 'adds a cleanup job' do
-        allow(Delayed::Job)
-          .to receive(:enqueue)
-
-        expect(Delayed::Job)
-          .to receive(:enqueue)
-          .with(an_instance_of(Attachments::CleanupUncontaineredJob), any_args)
-
+        expect(Attachments::CleanupUncontaineredJob).to receive(:perform_later)
         attachment.save!
       end
     end
@@ -268,12 +260,43 @@ describe Attachment, type: :model do
       CarrierWave::Configuration.configure_fog! credentials: {}, directory: "my-bucket", public: false
     end
 
+    shared_examples "it has a temporary download link" do
+      let(:url_options) { {} }
+      let(:query) { attachment.external_url(url_options).to_s.split("?").last }
+
+      it "should have a default expiry time" do
+        expect(query).to include "X-Amz-Expires="
+        expect(query).not_to include "X-Amz-Expires=3600"
+      end
+
+      context "with a custom expiry time" do
+        let(:url_options) { { expires_in: 1.hour } }
+
+        it "should use that time" do
+          expect(query).to include "X-Amz-Expires=3600"
+        end
+      end
+
+      context 'with expiry time exeeding maximum' do
+        let(:url_options) { { expires_in: 1.year } }
+
+        it "uses the allowed max" do
+          expect(query).to include "X-Amz-Expires=604799"
+        end
+      end
+    end
+
     describe "for an image file" do
       before { image_attachment.save! }
 
       it "should make S3 use content_disposition inline" do
         expect(image_attachment.content_disposition).to eq "inline"
         expect(image_attachment.external_url.to_s).to include "response-content-disposition=inline"
+      end
+
+      # this is independent from the type of file uploaded so we just test this for the first one
+      it_behaves_like "it has a temporary download link" do
+        let(:attachment) { image_attachment }
       end
     end
 
@@ -292,6 +315,78 @@ describe Attachment, type: :model do
       it "should make S3 use content_disposition 'attachment; filename=...'" do
         expect(binary_attachment.content_disposition).to eq "attachment"
         expect(binary_attachment.external_url.to_s).to include "response-content-disposition=attachment"
+      end
+    end
+  end
+
+  describe 'full text extraction job on commit' do
+    let(:created_attachment) do
+      FactoryBot.create(:attachment,
+                        author: author,
+                        container: container)
+    end
+
+    shared_examples_for 'runs extraction' do
+      it 'runs extraction' do
+        extraction_with_id = nil
+
+        allow(ExtractFulltextJob)
+          .to receive(:perform_later) do |id|
+          extraction_with_id = id
+        end
+
+        attachment.save
+
+        expect(extraction_with_id).to eql attachment.id
+      end
+    end
+
+    shared_examples_for 'does not run extraction' do
+      it 'does not run extraction' do
+        created_attachment
+
+        expect(ExtractFulltextJob)
+          .not_to receive(:perform_later)
+
+        created_attachment.save
+      end
+    end
+
+    context 'for a work package' do
+      let(:work_package) { FactoryBot.create(:work_package) }
+      let(:container) { work_package }
+
+      context 'on create' do
+        it_behaves_like 'runs extraction'
+      end
+
+      context 'on update' do
+        it_behaves_like 'does not run extraction'
+      end
+    end
+
+    context 'for a wiki page' do
+      let(:wiki_page) { FactoryBot.create(:wiki_page) }
+      let(:container) { wiki_page }
+
+      context 'on create' do
+        it_behaves_like 'does not run extraction'
+      end
+
+      context 'on update' do
+        it_behaves_like 'does not run extraction'
+      end
+    end
+
+    context 'without a container' do
+      let(:container) { nil }
+
+      context 'on create' do
+        it_behaves_like 'runs extraction'
+      end
+
+      context 'on update' do
+        it_behaves_like 'does not run extraction'
       end
     end
   end

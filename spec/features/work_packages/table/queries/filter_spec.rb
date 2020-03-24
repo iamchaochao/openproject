@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -252,6 +252,95 @@ describe 'filter work packages', js: true do
     end
   end
 
+  context 'by string cf inside a project with url-query relevant chars' do
+    let(:type) do
+      type = FactoryBot.create(:type)
+
+      project.types << type
+
+      type
+    end
+
+    let(:work_package_plus) do
+      wp = FactoryBot.create :work_package, project: project, type: type
+      wp.send("#{string_cf.accessor_name}=", 'G+H')
+      wp.save!
+      wp
+    end
+
+    let(:work_package_and) do
+      wp = FactoryBot.create :work_package, project: project, type: type
+      wp.send("#{string_cf.accessor_name}=", 'A&B')
+      wp.save!
+      wp
+    end
+
+    let(:string_cf) do
+      cf = FactoryBot.create :string_wp_custom_field
+
+      project.work_package_custom_fields << cf
+      type.custom_fields << cf
+
+      cf
+    end
+
+    before do
+      string_cf
+      work_package_plus
+      work_package_and
+
+      wp_table.visit!
+    end
+
+    it 'allows filtering, saving and retrieving the saved filter' do
+
+      # Wait for form to load
+      filters.expect_loaded
+
+      filters.open
+      filters.add_filter_by(string_cf.name,
+                            'is',
+                            ['G+H'],
+                            "customField#{string_cf.id}")
+
+      loading_indicator_saveguard
+      wp_table.expect_work_package_listed work_package_plus
+      wp_table.ensure_work_package_not_listed! work_package_and
+
+      wp_table.save_as('Some query name')
+
+      filters.remove_filter "customField#{string_cf.id}"
+
+      loading_indicator_saveguard
+      wp_table.expect_work_package_listed work_package_plus, work_package_and
+
+      last_query = Query.last
+
+      wp_table.visit_query(last_query)
+
+      loading_indicator_saveguard
+      wp_table.expect_work_package_listed work_package_plus
+      wp_table.ensure_work_package_not_listed! work_package_and
+
+      filters.open
+
+      filters.expect_filter_by(string_cf.name,
+                               'is',
+                               ['G+H'],
+                               "customField#{string_cf.id}")
+
+      filters.set_filter(string_cf,
+                         'is',
+                         ['A&B'],
+                         "customField#{string_cf.id}")
+
+      loading_indicator_saveguard
+      wp_table.expect_work_package_listed work_package_and
+      wp_table.ensure_work_package_not_listed! work_package_plus
+
+    end
+  end
+
   context 'by attachment content' do
     let(:attachment_a) { FactoryBot.build(:attachment, filename: 'attachment-first.pdf') }
     let(:attachment_b) { FactoryBot.build(:attachment, filename: 'attachment-second.pdf') }
@@ -270,10 +359,10 @@ describe 'filter work packages', js: true do
 
       allow_any_instance_of(Plaintext::Resolver).to receive(:text).and_return('I am the first text $1.99.')
       wp_with_attachment_a
-      ExtractFulltextJob.new(attachment_a.id).perform
+      ExtractFulltextJob.perform_now(attachment_a.id)
       allow_any_instance_of(Plaintext::Resolver).to receive(:text).and_return('I am the second text.')
       wp_with_attachment_b
-      ExtractFulltextJob.new(attachment_b.id).perform
+      ExtractFulltextJob.perform_now(attachment_b.id)
       wp_without_attachment
     end
 

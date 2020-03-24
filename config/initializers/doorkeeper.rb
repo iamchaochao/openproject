@@ -193,7 +193,7 @@ Doorkeeper.configure do
   #
   after_successful_authorization do |controller|
     # Schedule a cleanup job to clean out over-TTL tokens and grants
-    Delayed::Job.enqueue ::OAuth::CleanupJob.new, priority: ::ApplicationJob.priority_number(:low)
+    ::OAuth::CleanupJob.perform_later
   end
 
   # Under some circumstances you might want to have applications auto-approved,
@@ -211,6 +211,11 @@ end
 
 OpenProject::Application.configure do |application|
   application.config.to_prepare do
-    # ::Doorkeeper::AuthorizationsController.layout "only_logo"
+    # Requiring some classes of Doorkeeper ourselves which for whatever reasons are
+    # no longer loaded for us now that we use zeitwerk
+    require 'doorkeeper/application_metal_controller'
+    require 'doorkeeper/application_controller'
+    require 'doorkeeper/tokens_controller'
+    require 'doorkeeper/authorizations_controller'
   end
 end

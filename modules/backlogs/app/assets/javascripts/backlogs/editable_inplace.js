@@ -1,20 +1,13 @@
 //-- copyright
-// OpenProject Backlogs Plugin
+// OpenProject is an open source project management software.
+// Copyright (C) 2012-2020 the OpenProject GmbH
 //
-// Copyright (C)2013-2014 the OpenProject Foundation (OPF)
-// Copyright (C)2011 Stephan Eckardt, Tim Felgentreff, Marnen Laibow-Koser, Sandro Munda
-// Copyright (C)2010-2011 friflaj
-// Copyright (C)2010 Maxime Guilbot, Andrew Vit, Joakim Kolsjö, ibussieres, Daniel Passos, Jason Vasquez, jpic, Emiliano Heyns
-// Copyright (C)2009-2010 Mark Maglana
-// Copyright (C)2009 Joe Heck, Nate Lowrie
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License version 3.
 //
-// This program is free software; you can redistribute it and/or modify it under
-// the terms of the GNU General Public License version 3.
-//
-// OpenProject Backlogs is a derivative work based on ChiliProject Backlogs.
-// The copyright follows:
-// Copyright (C) 2010-2011 - Emiliano Heyns, Mark Maglana, friflaj
-// Copyright (C) 2011 - Jens Ulferts, Gregor Schmidt - Finn GmbH - Berlin, Germany
+// OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+// Copyright (C) 2006-2017 Jean-Philippe Lang
+// Copyright (C) 2010-2013 the ChiliProject Team
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -30,7 +23,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// See doc/COPYRIGHT.rdoc for more details.
+// See docs/COPYRIGHT.rdoc for more details.
 //++
 
 RB.EditableInplace = (function ($) {
@@ -38,7 +31,7 @@ RB.EditableInplace = (function ($) {
 
     displayEditor: function (editor) {
       this.$.addClass("editing");
-      editor.find(".editor").bind('keyup', this.handleKeyup);
+      editor.find(".editor").bind('keydown', this.handleKeydown);
     },
 
     getEditor: function () {
@@ -51,20 +44,19 @@ RB.EditableInplace = (function ($) {
       return editor;
     },
 
-    handleKeyup: function (e) {
+    // For detecting Enter and ESC
+    handleKeydown: function (e) {
       var j, that;
 
       j = $(this).parents('.model').first();
       that = j.data('this');
 
-      switch (e.which) {
-      case 13: // Enter
+      // 13 is the key code of Enter, 27 of ESC.
+      if (e.which === 13) {
         that.saveEdits();
-        break;
-      case 27: // ESC
+      } else if (e.which === 27) {
         that.cancelEdit();
-        break;
-      default:
+      } else {
         return true;
       }
     }

@@ -28,9 +28,17 @@ sk:
         project_details:
           title: 'Detailne informácie o projekte'
           no_results: 'No custom fields have been defined for projects.'
+        project_status:
+          title: 'Stav projektu'
+          on_track: 'On track'
+          off_track: 'Off track'
+          at_risk: 'At risk'
+          not_set: 'Not set'
         subprojects:
           title: 'Podprojekty'
           no_results: 'No subprojects.'
+        time_entries_current_user:
+          title: 'My spent time'
         time_entries_list:
           title: 'Strávený čas (posledných 7 dní)'
           no_results: 'Žiadne časové záznamy za posledných 7 dní.'

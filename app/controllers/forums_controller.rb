@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -38,16 +38,9 @@ class ForumsController < ApplicationController
   include SortHelper
   include WatchersHelper
   include PaginationHelper
-  include OpenProject::ClientPreferenceExtractor
 
   def index
     @forums = @project.forums
-    render_404 if @forums.empty?
-    # show the forum if there is only one
-    if @forums.size == 1
-      @forum = @forums.first
-      show
-    end
   end
 
   current_menu_item [:index, :show] do
@@ -97,7 +90,7 @@ class ForumsController < ApplicationController
   def create
     if @forum.save
       flash[:notice] = l(:notice_successful_create)
-      redirect_to_settings_in_projects
+      redirect_to action: 'index'
     else
       render :new
     end
@@ -106,35 +99,31 @@ class ForumsController < ApplicationController
   def edit; end
 
   def update
-    if @forum.update_attributes(permitted_params.forum)
+    if @forum.update(permitted_params.forum)
       flash[:notice] = l(:notice_successful_update)
-      redirect_to_settings_in_projects
+      redirect_to action: 'index'
     else
       render :edit
     end
   end
 
   def move
-    if @forum.update_attributes(permitted_params.forum_move)
+    if @forum.update(permitted_params.forum_move)
       flash[:notice] = t(:notice_successful_update)
     else
       flash.now[:error] = t('forum_could_not_be_saved')
       render action: 'edit'
     end
-    redirect_to_settings_in_projects(@forum.project_id)
+    redirect_to action: 'index'
   end
 
   def destroy
     @forum.destroy
     flash[:notice] = l(:notice_successful_delete)
-    redirect_to_settings_in_projects
+    redirect_to action: 'index'
   end
 
   private
-
-  def redirect_to_settings_in_projects(id = @project)
-    redirect_to controller: '/project_settings', action: 'show', id: id, tab: 'forums'
-  end
 
   def find_forum
     @forum = @project.forums.find(params[:id])

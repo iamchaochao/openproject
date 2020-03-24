@@ -53,7 +53,7 @@ shared_examples 'an auth aware field' do
 end
 
 shared_examples 'having a single validation point' do
-  let(:other_field) { WorkPackageField.new page, :type }
+  let(:other_field) { EditField.new page, :type }
   before do
     other_field.activate_edition
     field.activate_edition
@@ -144,7 +144,7 @@ shared_examples 'a principal autocomplete field' do
 
     it 'autocompletes links to user profiles' do
       field.activate!
-      field.input_element.set('', fill_options: { clear: :backspace })
+      field.clear with_backspace: true
       field.input_element.send_keys(" @lau")
       expect(page).to have_selector('.mention-list-item', text: mentioned_user.name)
       expect(page).to have_selector('.mention-list-item', text: mentioned_group.name)
@@ -152,9 +152,11 @@ shared_examples 'a principal autocomplete field' do
 
       # Close the autocompleter
       field.input_element.send_keys :escape
+      field.ckeditor.clear
 
-      field.input_element.set('', fill_options: { clear: :backspace })
-      field.input_element.send_keys(" @Laura Fo")
+      sleep 2
+
+      field.ckeditor.type_slowly '@Laura'
       expect(page).to have_selector('.mention-list-item', text: mentioned_user.name)
       expect(page).not_to have_selector('.mention-list-item', text: mentioned_group.name)
       expect(page).not_to have_selector('.mention-list-item', text: user.name)

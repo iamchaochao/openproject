@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -109,8 +109,8 @@ describe 'Version action board', type: :feature, js: true do
         queries = board.contained_queries
         expect(queries.count).to eq(2)
 
-        open = queries.first
-        second_open = queries.last
+        open = queries.detect { |q| q.name == 'Open version'}
+        second_open = queries.detect { |q| q.name == 'A second version'}
 
         expect(open.name).to eq 'Open version'
         expect(second_open.name).to eq 'A second version'
@@ -197,7 +197,7 @@ describe 'Version action board', type: :feature, js: true do
       board_page.remove_list 'Shared version'
       queries = board_page.board(reload: true).contained_queries
       expect(queries.count).to eq(2)
-      expect(queries.first.name).to eq 'Open version'
+      expect(queries.map(&:name)).to contain_exactly 'Open version', 'A second version'
 
       board_page.expect_card('Open version', 'Foo', present: false)
       board_page.expect_card('A second version', 'Task 1', present: true)
@@ -213,7 +213,7 @@ describe 'Version action board', type: :feature, js: true do
       board_page.add_list_with_new_value 'Completely new version'
       board_page.expect_list 'Completely new version'
 
-      visit settings_project_path(project, tab: 'versions')
+      visit settings_versions_project_path(project)
       expect(page).to have_content 'Completely new version'
       expect(page).to have_content 'Closed version'
 

@@ -1,6 +1,6 @@
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -30,8 +30,8 @@ require 'spec_helper'
 
 describe 'onboarding tour for new users', js: true do
   let(:user) { FactoryBot.create :admin }
-  let(:project) { FactoryBot.create :project, name: 'Demo project', identifier: 'demo-project', is_public: true, enabled_module_names: %w[work_package_tracking wiki] }
-  let(:scrum_project) {FactoryBot.create :project, name: 'Scrum project', identifier: 'your-scrum-project', is_public: true, enabled_module_names: %w[work_package_tracking] }
+  let(:project) { FactoryBot.create :project, name: 'Demo project', identifier: 'demo-project', public: true, enabled_module_names: %w[work_package_tracking wiki] }
+  let(:scrum_project) {FactoryBot.create :project, name: 'Scrum project', identifier: 'your-scrum-project', public: true, enabled_module_names: %w[work_package_tracking] }
   let!(:wp_1) { FactoryBot.create(:work_package, project: project) }
   let(:next_button) { find('.enjoyhint_next_btn') }
 

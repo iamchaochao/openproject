@@ -1,7 +1,7 @@
 #-- encoding: UTF-8
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -92,7 +92,7 @@ class WikiContent < ApplicationRecord
     return unless Setting.notified_events.include?('wiki_content_added')
 
     create_recipients.uniq.each do |user|
-      UserMailer.wiki_content_added(user, self, User.current).deliver_now
+      UserMailer.wiki_content_added(user, self, User.current).deliver_later
     end
   end
 
@@ -100,7 +100,7 @@ class WikiContent < ApplicationRecord
     return unless Setting.notified_events.include?('wiki_content_updated')
 
     update_recipients.uniq.each do |user|
-      UserMailer.wiki_content_updated(user, self, User.current).deliver_now
+      UserMailer.wiki_content_updated(user, self, User.current).deliver_later
     end
   end
 

@@ -1,8 +1,8 @@
 #-- encoding: UTF-8
 
 #-- copyright
-# OpenProject is a project management system.
-# Copyright (C) 2012-2018 the OpenProject Foundation (OPF)
+# OpenProject is an open source project management software.
+# Copyright (C) 2012-2020 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -58,9 +58,10 @@ class Role < ApplicationRecord
 
   acts_as_list
 
-  validates_presence_of :name
-  validates_uniqueness_of :name
-  validates_length_of :name, maximum: 30
+  validates :name,
+            presence: true,
+            length: { maximum: 30 },
+            uniqueness: { case_sensitive: true }
 
   def self.givable
     where(builtin: NON_BUILTIN)
@@ -168,6 +169,13 @@ class Role < ApplicationRecord
 
   def self.paginated_search(search, options = {})
     paginate_scope! givable.like(search), options
+  end
+
+  def self.in_new_project
+    givable
+      .except(:order)
+      .order(Arel.sql("COALESCE(#{Setting.new_project_user_role_id.to_i} = id, false) DESC, position"))
+      .first
   end
 
   private
